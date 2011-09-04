@@ -73,6 +73,7 @@ def termIsVar(t):
     """
     return type(t)!=type([])
 
+
 def termIsCompound(t):
     """
     Check if the term is a compound term. This assumes that t is a
@@ -80,12 +81,14 @@ def termIsCompound(t):
     """
     return not termIsVar(t)
 
+
 def termFunc(t):
     """
     Return the function symbol of the compound term t.
     """
     assert termIsCompound(t)
     return t[0]
+
 
 def termArgs(t):
     """
@@ -163,7 +166,6 @@ def termListEqual(l1, l2):
     return True        
     
     
-
 def termEqual(t1, t2):
     """
     Compare two terms for syntactic equality.
@@ -188,26 +190,66 @@ def termCopy(t):
     return t
 
 
-# Excercise functions:
-# termIsGround(t): Return True if term has no variables, False
-#                  otherwise
-# termWeight(t, fweight, vweight): Return the weight of the term,
-#                  counting fweight for each function symbol
-#                  occurance, vweight for each variable
-#                  occurance. Examples: 
-#                  termWeight(f(a,b), 1, 1) = 3
-#                  termWeight(f(a,b), 2, 1) = 6
-#                  termWeight(f(X,Y), 2, 1) = 4
-#                  termWeight(X, 2, 1)      = 1
-#                  termWeight(g(a), 3, 1)   = 6
-# subterm(t, pos): Return the subterm of t at position pos (or None if
-#                  pos is not a position in term). pos is a list of
-#                  integers denoting branches, e.g.
-#                  subterm(f(a,b), [])        = f(a,b)
-#                  subterm(f(a,g(b)), [0])    = a
-#                  subterm(f(a,g(b)), [1])    = g(b)
-#                  subterm(f(a,g(b)), [1,0])  = b
-#                  subterm(f(a,g(b)), [3,0])  = None
+def termIsGround(t):
+    """
+    termIsGround(t): Return True if term has no variables, False otherwise
+    """
+    if not t:             # list is empty
+        return True
+    if t[0].isupper():
+        return False
+    for term in termArgs(t):
+        if not termIsGround(term):
+            return False
+    return True
+        
+
+def termWeight(t, fweight, vweight):
+    """
+    termWeight(t, fweight, vweight): Return the weight of the term,
+                  counting fweight for each function symbol
+                  occurance, vweight for each variable
+                  occurance. Examples: 
+                  termWeight(f(a,b), 1, 1) = 3
+                  termWeight(f(a,b), 2, 1) = 6
+                  termWeight(f(X,Y), 2, 1) = 4
+                  termWeight(X, 2, 1)      = 1
+                  termWeight(g(a), 3, 1)   = 6
+    """
+    if not t:
+        return 0
+    total = 0
+    if len(t) == 1:
+        if t[0].isupper():
+            total = vweight
+        else:
+            total = fweight
+        return total
+    for term in t:
+        total = total + termWeight(term,fweight,vweight)
+    return total
+
+
+def subterm(t, pos):
+    """
+    subterm(t, pos): Return the subterm of t at position pos (or None if
+                  pos is not a position in term). pos is a list of
+                  integers denoting branches, e.g.
+                  subterm(f(a,b), [])        = f(a,b)
+                  subterm(f(a,g(b)), [0])    = a
+                  subterm(f(a,g(b)), [1])    = g(b)
+                  subterm(f(a,g(b)), [1,0])  = b
+                  subterm(f(a,g(b)), [3,0])  = None
+    """
+    if len(pos) == 0:
+        return t
+    index = pos.pop(0);
+    if index >= len(t):
+        return []
+    if len(pos) == 0:
+        return t[index]
+    else:
+        return subterm(t[index],pos)
 
 
 class TestTerms(unittest.TestCase):
@@ -226,6 +268,7 @@ class TestTerms(unittest.TestCase):
         self.t4 = string2Term(self.example4)
         self.t5 = string2Term(self.example5)
         
+
     def testToString(self):
         """
         Test that stringTerm and term2String are dual. Start with
@@ -237,6 +280,7 @@ class TestTerms(unittest.TestCase):
         self.assertEqual(string2Term(term2String(self.t3)), self.t3)
         self.assertEqual(string2Term(term2String(self.t4)), self.t4)
 
+
     def testIsVar(self):
         """
         Test if the classification function work as expected.
@@ -246,6 +290,7 @@ class TestTerms(unittest.TestCase):
         self.assert_(not termIsVar(self.t3))
         self.assert_(not termIsVar(self.t4))
         
+
     def testIsCompound(self):
         """
         Test if the classification function work as expected.
@@ -254,6 +299,7 @@ class TestTerms(unittest.TestCase):
         self.assert_(termIsCompound(self.t2))
         self.assert_(termIsCompound(self.t3))
         self.assert_(termIsCompound(self.t4))
+
 
     def testEquality(self):
         """
@@ -270,6 +316,7 @@ class TestTerms(unittest.TestCase):
         self.assert_(not termEqual(self.t1, self.t4))
         self.assert_(not termEqual(self.t3, self.t4))
 
+
     def testCopy(self):
         """
         Test if term copying works.
@@ -283,6 +330,38 @@ class TestTerms(unittest.TestCase):
         t4 = termCopy(self.t4)
         self.assert_(termEqual(t4, self.t4))
         
+
+    def testIsGround(self):
+        """
+        Test if isGround() works as expected.
+        """
+        self.assert_(not termIsGround(self.t1))
+        self.assert_(termIsGround(self.t2))
+        self.assert_(termIsGround(self.t3))
+        self.assert_(not termIsGround(self.t4))
+        self.assert_(not termIsGround(self.t5))
+
+
+    def testIsGround(self):
+        """
+        Test if termWeight() works as expected.
+        """
+        self.assert_(termWeight(self.t1,1,2) == 2)
+        self.assert_(termWeight(self.t2,1,2) == 1)
+        self.assert_(termWeight(self.t3,1,2) == 3)
+        self.assert_(termWeight(self.t4,1,2) == 6)
+        self.assert_(termWeight(self.t5,2,1) == 6)
+
+    def testSubterm(self):
+        """
+        Test if subterm() works as expected.
+        self.example5 = "g(X, f(Y))"  
+        """
+        self.assert_(subterm(self.t5,[]) == ['g', 'X', ['f', 'Y']])
+        self.assert_(subterm(self.t5,[0]) == 'g')
+        self.assert_(subterm(self.t5,[1]) == 'X')
+        self.assert_(subterm(self.t5,[2,0]) == 'f')
+        self.assert_(subterm(self.t5,[5,0]) == [])
 
 if __name__ == '__main__':
     unittest.main()
