@@ -194,15 +194,16 @@ def termIsGround(t):
     """
     termIsGround(t): Return True if term has no variables, False otherwise
     """
-    if not t:             # list is empty
-        return True
-    if t[0].isupper():
+    if termIsVar(t):
         return False
-    for term in termArgs(t):
-        if not termIsGround(term):
-            return False
-    return True
+    else:
+        for term in termArgs(t):
+            if not termIsGround(term):
+                return False
+        return True
         
+
+
 
 def termWeight(t, fweight, vweight):
     """
@@ -216,18 +217,14 @@ def termWeight(t, fweight, vweight):
                   termWeight(X, 2, 1)      = 1
                   termWeight(g(a), 3, 1)   = 6
     """
-    if not t:
-        return 0
-    total = 0
-    if len(t) == 1:
-        if t[0].isupper():
-            total = vweight
-        else:
-            total = fweight
-        return total
-    for term in t:
-        total = total + termWeight(term,fweight,vweight)
-    return total
+    if termIsVar(t):
+        return vweight
+    else:
+        res = fweight
+        for t in termArgs(t):
+            res = res + termWeight(t,fweight,vweight)
+        return res
+
 
 
 def subterm(t, pos):
@@ -241,15 +238,12 @@ def subterm(t, pos):
                   subterm(f(a,g(b)), [1,0])  = b
                   subterm(f(a,g(b)), [3,0])  = None
     """
-    if len(pos) == 0:
+    if not pos:
         return t
     index = pos.pop(0);
     if index >= len(t):
-        return []
-    if len(pos) == 0:
-        return t[index]
-    else:
-        return subterm(t[index],pos)
+        return None
+    return subterm(t[index],pos)
 
 
 class TestTerms(unittest.TestCase):
@@ -361,7 +355,7 @@ class TestTerms(unittest.TestCase):
         self.assert_(subterm(self.t5,[0]) == 'g')
         self.assert_(subterm(self.t5,[1]) == 'X')
         self.assert_(subterm(self.t5,[2,0]) == 'f')
-        self.assert_(subterm(self.t5,[5,0]) == [])
+        self.assert_(subterm(self.t5,[5,0]) == None)
 
 if __name__ == '__main__':
     unittest.main()

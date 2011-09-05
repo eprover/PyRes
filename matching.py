@@ -23,6 +23,22 @@ determine a conflict if either the terms are structurally
 incompatible, or if a variable in s would need to be bound to two
 different terms.
 
+Examples:
+
+X  matches f(X)  with sigma = {X <- f(X)}
+   Note that X and f(X) cannot be unified because of the
+   occurs-check. However, in matching, the substitution is only
+   applied to one side.
+
+X matches X     with sigma = {}
+   However, in this case we might want  to record the binding X<-X
+   explicitly, because if we want to extend the match to further
+   terms, we cannot rebind X
+
+f(X,a) does not match f(a,X)
+   The two terms are unifiable, but again, in matching the
+   substitution is only applied to the potentially matching term.
+
 Since substitutions generated in matching are only simple collection
 of individual bindings, we can simply backtrack to an earlier
 state. This will become useful later, when we try to find a common
@@ -60,13 +76,50 @@ from terms import *
 from substitutions import *
 
 
-
-
-def match(t1, t2, subst):
+   
+       
+def match(matcher, target, subst):
     """
     Match t1 onto t2. If this succeeds, return true and modify subst
     accordingly. Otherwise, return false and leave subst unchanged
-    (i.e. backtrack subst to the old state).
+    (i.e. backtrack subst to the old state). Providing a partial
+    substitution allows us to use the term in places where we need to
+    find a common match for several terms. 
+    """
+    assert isinstance(subst, BTSubst)
+    bt_state = subst.get_state()
+    result = True
+
+    if termIsVar(matcher):
+       if subst.is_bound(matcher):
+          if not termEqual(subst.value(match), target):
+             result = False
+             # No else case - variable is already bound correctly
+       else:
+          subst.add_binding((matcher, target))
+    else:
+       if termIsVar(target) or termFunc(matcher) != termFunc(target):
+          result = False
+       else:
+          for (s,t) in zip(termArgs(matcher), termArgs(target)):
+             result = match(s, t, subst)
+             if not result:
+                break
+    if result:
+       return True
+    subst.backtrackToState(bt_state)
+    return False
+             
+ 
+
+def match_norec(t1, t2, subst):
+    """
+    Match t1 onto t2. If this succeeds, return true and modify subst
+    accordingly. Otherwise, return false and leave subst unchanged
+    (i.e. backtrack subst to the old state). Providing a partial
+    substitution allows us to use the term in places where we need to
+    find a common match for several terms. This is an alternative
+    implementation using explicit work lists instead of recursion.
     """
     assert isinstance(subst, BTSubst)
     bt_state = subst.get_state()
@@ -90,15 +143,19 @@ def match(t1, t2, subst):
              result = False
              break
           else:
+             # We now know that matcher is of the form f(s1, ..., sn)
+             # and target is of the form f(t1, ..., tn). So now we
+             # need to find a common substitution for s1 onto t1,
+             # ..., sn onto tn. To do this, we add the argument lists
+             # to the work lists and let them be processed in the same
+             # loop. 
              mlist.extend(termArgs(matcher))
              tlist.extend(termArgs(target))
     if result:
        return True
     subst.backtrackToState(bt_state)
     return False
-             
-       
-
+              
 
 class TestMatching(unittest.TestCase):
     """
@@ -126,7 +183,7 @@ class TestMatching(unittest.TestCase):
         self.s7 = terms.string2Term("g(X)")
         self.t7 = terms.string2Term("g(f(g(X),b))")
 
-    def match_test(self, s,t, success_expected):
+    def match_test(self, match, s,t, success_expected):
        """
        Test if s can be matched onto t. If yes, report the
        result. Compare to the expected result.
@@ -148,21 +205,43 @@ class TestMatching(unittest.TestCase):
         Test Matching.
         """
         print
-        self.match_test(self.s1, self.t1, True)
-        self.match_test(self.s2, self.t2, True)
-        self.match_test(self.s3, self.t3, True)
-        self.match_test(self.s4, self.t4, False)
-        self.match_test(self.s5, self.t5, False)
-        self.match_test(self.s6, self.t6, False)
-        self.match_test(self.s7, self.t7, True)
+        self.match_test(match, self.s1, self.t1, True)
+        self.match_test(match, self.s2, self.t2, True)
+        self.match_test(match, self.s3, self.t3, True)
+        self.match_test(match, self.s4, self.t4, False)
+        self.match_test(match, self.s5, self.t5, False)
+        self.match_test(match, self.s6, self.t6, False)
+        self.match_test(match, self.s7, self.t7, True)
 
-        self.match_test(self.t1, self.s1, False)
-        self.match_test(self.t2, self.s2, False)
-        self.match_test(self.t3, self.s3, False)
-        self.match_test(self.t4, self.s4, False)
-        self.match_test(self.t5, self.s5, True)
-        self.match_test(self.t6, self.s6, False)
-        self.match_test(self.t7, self.s7, False)
+        self.match_test(match, self.t1, self.s1, False)
+        self.match_test(match, self.t2, self.s2, False)
+        self.match_test(match, self.t3, self.s3, False)
+        self.match_test(match, self.t4, self.s4, False)
+        self.match_test(match, self.t5, self.s5, True)
+        self.match_test(match, self.t6, self.s6, False)
+        self.match_test(match, self.t7, self.s7, False)
+
+    def testMatchNoRec(self):
+        """
+        Test Matching.
+        """
+        print
+        self.match_test(match_norec, self.s1, self.t1, True)
+        self.match_test(match_norec, self.s2, self.t2, True)
+        self.match_test(match_norec, self.s3, self.t3, True)
+        self.match_test(match_norec, self.s4, self.t4, False)
+        self.match_test(match_norec, self.s5, self.t5, False)
+        self.match_test(match_norec, self.s6, self.t6, False)
+        self.match_test(match_norec, self.s7, self.t7, True)
+
+        self.match_test(match_norec, self.t1, self.s1, False)
+        self.match_test(match_norec, self.t2, self.s2, False)
+        self.match_test(match_norec, self.t3, self.s3, False)
+        self.match_test(match_norec, self.t4, self.s4, False)
+        self.match_test(match_norec, self.t5, self.s5, True)
+        self.match_test(match_norec, self.t6, self.s6, False)
+        self.match_test(match_norec, self.t7, self.s7, False)
+
 
 
 
