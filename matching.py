@@ -83,8 +83,8 @@ def match(matcher, target, subst):
     Match t1 onto t2. If this succeeds, return true and modify subst
     accordingly. Otherwise, return false and leave subst unchanged
     (i.e. backtrack subst to the old state). Providing a partial
-    substitution allows us to use the term in places where we need to
-    find a common match for several terms. 
+    substitution allows us to use the function in places where we need
+    to find a common match for several terms. 
     """
     assert isinstance(subst, BTSubst)
     bt_state = subst.get_state()
@@ -117,8 +117,8 @@ def match_norec(t1, t2, subst):
     Match t1 onto t2. If this succeeds, return true and modify subst
     accordingly. Otherwise, return false and leave subst unchanged
     (i.e. backtrack subst to the old state). Providing a partial
-    substitution allows us to use the term in places where we need to
-    find a common match for several terms. This is an alternative
+    substitution allows us to use the function in places where we need
+    to find a common match for several terms. This is an alternative
     implementation using explicit work lists instead of recursion.
     """
     assert isinstance(subst, BTSubst)
