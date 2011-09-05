@@ -120,11 +120,12 @@ class Substitution(object):
             res.extend(args)
             return res                      
         
-    def compose_binding(self, var, term):
+    def compose_binding(self, binding):
         """
-        Add a new binding to a substitution. 
+        Compose a new binding to an existing substitution. 
         """
-        tmpsubst = Substitution([(var, term)])
+        tmpsubst = Substitution([binding])
+        var, term = binding
         vars = self.subst.keys()
         for x in vars:
             bound = self.subst[x]
@@ -137,7 +138,10 @@ class Substitution(object):
 class BTSubst(Substitution):
    """
    A substitution that does not allow composition of new bindings, but
-   in exchange offers backtrackability.
+   in exchange offers backtrackability. Bindings are recorded in two
+   data structures:
+   self.subst is a dictionary that maps variables to terms
+   self.bindings is an ordered list of bindings.
    """
    def __init__(self, init = []):
       """
@@ -230,6 +234,8 @@ class TestSubst(unittest.TestCase):
         self.assertEqual(terms.term2String(self.sigma1(self.t1)),"f(a,g(a))")
         self.assert_(terms.termEqual(self.sigma1(self.t1),  self.t4))
         self.assert_(terms.termEqual(self.sigma2(self.t1),  self.t5))
+
+
 
 
 if __name__ == '__main__':
