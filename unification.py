@@ -4,8 +4,11 @@
 # Module unification.py
 
 """
-This code implements unification and matching for first-order terms
-(and, by inheritance, literals).
+This code implements unification for first-order terms (and, by
+inheritance, atoms).
+
+
+=== Unification ===
 
 The goal of a unification algorithm is to find a substitution sigma
 that will make two term s and t equal, i.e. sigma(s)=sigma(t).  The
@@ -163,7 +166,7 @@ def mguTermList(l1, l2, subst):
           new_binding = Substitution([(t1, t2)])          
           l1 = [new_binding(t) for t in l1]
           l2 = [new_binding(t) for t in l2]
-          subst.add_binding(t1, t2)
+          subst.compose_binding(t1, t2)
        elif termIsVar(t2):
           # Symmetric case
           # We know that t1!=t2, so we can drop this check
@@ -172,7 +175,7 @@ def mguTermList(l1, l2, subst):
           new_binding = Substitution([(t2, t1)])          
           l1 = [new_binding(t) for t in l1]
           l2 = [new_binding(t) for t in l2]
-          subst.add_binding(t2, t1)
+          subst.compose_binding(t2, t1)
        else: 
           assert termIsCompound(t1) and termIsCompound(t2)
           # For f(s1, ..., sn) = g(t1, ..., tn), first f and g have to
@@ -248,7 +251,15 @@ class TestUnification(unittest.TestCase):
         self.unif_test(self.s5, self.t5, True)
         self.unif_test(self.s6, self.t6, True)
         self.unif_test(self.s7, self.t7, False)
-        
+
+        # Unification should be symmetrical
+        self.unif_test(self.t1, self.s1, True)
+        self.unif_test(self.t2, self.s2, False)
+        self.unif_test(self.t3, self.s3, True)
+        self.unif_test(self.t4, self.s4, True)
+        self.unif_test(self.t5, self.s5, True)
+        self.unif_test(self.t6, self.s6, True)
+        self.unif_test(self.t7, self.s7, False)
 
 
 if __name__ == '__main__':

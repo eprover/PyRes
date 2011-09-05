@@ -39,7 +39,9 @@ import re
 
 
 class ScannerError(Exception):
-
+    """
+    A class representing all errors that the scanner can produce.
+    """
     def __init__(self):
         self.name = "ScannerError"
         self.value = "<none>"        

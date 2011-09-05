@@ -94,13 +94,20 @@ class Substitution(object):
 
     def value(self, var):
         """
-        Return the value assigned to a variable.
+        Return the value of a variable (i.e. the term it is bound to,
+        or the variable itself if it is not bound).
         """
         if var in self.subst:
             return self.subst[var]
         else:
             return var
 
+    def is_bound(self, var):
+        """
+        Return True if var is bound in self, false otherwise.
+        """
+        return var in self.subst
+    
     def apply(self, term):
         """
         Apply the substitution to a term. Return the result.
@@ -113,7 +120,7 @@ class Substitution(object):
             res.extend(args)
             return res                      
         
-    def add_binding(self, var, term):
+    def compose_binding(self, var, term):
         """
         Add a new binding to a substitution. 
         """
@@ -125,6 +132,71 @@ class Substitution(object):
         if not var in self.subst:
             self.subst[var] = term
 
+
+
+class BTSubst(Substitution):
+   """
+   A substitution that does not allow composition of new bindings, but
+   in exchange offers backtrackability.
+   """
+   def __init__(self, init = []):
+      """
+      Initialize. The optional argument is a list of variable/term
+      pairs representing the initial binding. This is taken as-is,
+      without any checks for consistency.
+      """
+      self.bindings = list(init)
+      Substitution.__init__(self, init)
+
+   def get_state(self):
+      """
+      Return a state to which this substitution can be backtracked
+      later. We encode the state of the binding list, but also the
+      object itself, to allow for some basic sanity checking.
+      """
+      return (self, len(self.bindings))
+
+   def backtrack(self):
+      """
+      Backtrack a single binding (if there is one). Return success or
+      failure. 
+      """
+      if self.bindings:
+         tmp = self.bindings.pop()
+         del self.subst[tmp[0]]
+         return True
+      else:
+         return False
+
+   def backtrackToState(self, bt_state):
+      """
+      Backtrack to the given state. Note that we only perform very
+      basic sanity checking. Return number of binding retracted.
+      """
+      subst, state = bt_state
+      assert subst == self
+      res = 0
+      
+      while len(self.bindings)>state:
+         self.backtrack()
+         res = res+1
+      return res
+
+   def add_binding(self, binding):
+      """
+      Add a single binding to the substitution.
+      """
+      var, term = binding
+      self.subst[var] = term
+      self.bindings.append(binding)
+
+   def compose_binding(self, binding):
+      """
+      Overloaded to catch usage errors!
+      """
+      assert False and \
+             "You cannot compose backtrackable substitutions."
+   
 
 
 class TestSubst(unittest.TestCase):
