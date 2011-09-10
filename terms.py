@@ -15,11 +15,14 @@ follows:
 - For all X in V, X in Term(F,V)
 - For all f|n in F and t1,..,tn in Term(F,V), f(t1, ..., tn) in
   Term(F,V).
-- Nothing else is a term.
+- Term(F,V) is the smallest set with the above two properties.
 
-We represent elements of F by identifers starting with a lower-case
-letter. The arity is implicitly given by the number of argument terms
-in a term.
+
+In the concrete syntax (i.e. the syntax we use to write terms in ASCII
+text form), we represent elements of F by identifers starting with a
+lower-case letter. The arity is implicitly given by the number of
+argument terms in a term. For function symbols with arity 0, we omit
+the parenthesis of the empty argument list.
 
 We represent elements of V by identifiers starting with an upper-case
 letter or underscore.
