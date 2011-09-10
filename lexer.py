@@ -98,6 +98,7 @@ class Token:
     ClosePar       = Ident(")")
     Comma          = Ident(",")
     EqualSign      = Ident("=")
+    NotEqualSign   = Ident("!=")
     Negation       = Ident("~")
     Or             = Ident("|")
     And            = Ident("&")
@@ -139,6 +140,7 @@ class Lexer:
         (re.compile("\)"),                    Token.ClosePar),
         (re.compile(","),                     Token.Comma),
         (re.compile("="),                     Token.EqualSign),
+        (re.compile("!="),                    Token.NotEqualSign),
         (re.compile("~"),                     Token.Negation),
         (re.compile("\|"),                    Token.Or),
         (re.compile("&"),                     Token.And),
