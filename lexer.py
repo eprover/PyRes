@@ -47,15 +47,10 @@ class ScannerError(Exception):
         self.value = "<none>"        
     
     def __repr__(self):
-        return name+"("+repr(self.value)+")"
+        return self.name+"("+repr(self.value)+")"
 
-
-class UnexpectedTokenError(ScannerError):
-    """
-    Class representing an unexpected token error.
-    """
-    def __init__(self, token):
-        self.value = token
+    def __str__(self):
+        return self.__repr__()
 
 
 class IllegalCharacterError(ScannerError):
@@ -63,7 +58,28 @@ class IllegalCharacterError(ScannerError):
     Class representing an unexpexted character error
     """
     def __init__(self, char):
+        self.name  = "Illegal character"
         self.value = char
+    
+
+class UnexpectedTokenError(ScannerError):
+    """
+    Class representing an unexpected token error.
+    """
+    def __init__(self, token):
+        self.name  = "Unexpected token"
+        self.value = token
+
+
+
+class UnexpectedIdentError(ScannerError):
+    """
+    Class representing an unexpected identifier error.
+    """
+    def __init__(self, token):
+        self.name  = "Unexpected identifier"
+        self.value = token
+
     
 
 
@@ -92,6 +108,7 @@ class Token:
     Comment        = Ident("Comment")
     IdentUpper     = Ident("Identifier starting with capital letter")
     IdentLower     = Ident("Identifier starting with lower case letter")
+    DefFunctor     = Ident("Defined symbol (starting with a $)")
     Integer        = Ident("Positive or negative Integer")         
     FullStop       = Ident(". (full stop)")
     OpenPar        = Ident("(")
@@ -149,6 +166,7 @@ class Lexer:
 	(re.compile("\s+"),                   Token.WhiteSpace),
         (re.compile("[a-z][_a-z0-9_A-Z]*"),   Token.IdentLower),
         (re.compile("[_A-Z][_a-z0-9_A-Z]*"),  Token.IdentUpper),
+        (re.compile("\$[_a-z0-9_A-Z]*"),      Token.DefFunctor),
         (re.compile("#[^\n]*"),               Token.Comment)
         ]
     
@@ -178,6 +196,13 @@ class Lexer:
         self.Push(res)
         return res
 
+    def LookLit(self):
+        """
+        Return the literal value of the next token, i.e. the string
+        generating the token.
+        """
+        return self.Look().literal
+        
     def TestTok(self, tokens):
         """
         Take a list of expected token types. Return True if the
@@ -211,6 +236,38 @@ class Lexer:
         """
         self.CheckTok(tokens)
         return self.Next()
+
+
+    def TestLit(self, litvals):
+        """
+        Take a list of expected literal strings. Return True if the
+        next token's string value is among them, False otherwise.
+        """
+        try:
+            return self.LookLit() in litvals
+        except TypeError:
+            return self.LookLit() == litvals
+
+    def CheckLit(self, litvals):
+        """
+        Take a list of expected literal strings. If the next token's
+        literal is not among the expected ones, exit with an
+        error. Otherwise do nothing. 
+        """
+        if not self.TestLit(litvals):
+            raise UnexpectedIdentError(
+                repr(self.Look().literal)+
+                " not "+repr(litvals))
+
+    def AcceptLit(self, litvals):
+        """
+        Take a list of expected literal strings. If the next token's
+        literal is among the expected ones, consume and return the
+        literal. Otherwise, exit with an error.
+        """
+        self.CheckLit(litvals)
+        return self.Next()
+
     
     def Next(self):
         """
@@ -261,9 +318,11 @@ class TestLexer(unittest.TestCase):
     Test the lexer functions.
     """
     def setUp(self):
+        print
         self.example1 = "f(X,g(a,b))"
         self.example2 = "# Comment\nf(X,g(a,b))"
         self.example3 = "cnf(test,axiom,p(a)|p(f(X)))."
+        self.example4 = "^"
         
     def testLex(self):
         """
@@ -304,7 +363,42 @@ class TestLexer(unittest.TestCase):
         tmp = [i.literal for i in toks]
         rebuild = "".join([i.literal for i in toks])
         self.assertEqual(rebuild, self.example3)
+
+    def testAcceptLit(self):
+        """
+        Check the positive case of AcceptLit().
+        """
+        lex = Lexer(self.example3)
+        lex.AcceptLit("cnf")
+        lex.AcceptLit("(")
+        lex.AcceptLit("test")
+        lex.AcceptLit(",")
+        lex.AcceptLit("axiom")
+        lex.AcceptLit(",")
+        lex.AcceptLit("p")
+        lex.AcceptLit("(")
+        lex.AcceptLit("a")
+        lex.AcceptLit(")")
+        lex.AcceptLit("|")
+        lex.AcceptLit("p")
+        lex.AcceptLit("(")
+        lex.AcceptLit("f")
+        lex.AcceptLit("(")
+        # That should be enoug ;-)
         
+    def testErrors(self):
+        """
+        Provoke different errors.
+        """
+        lex = Lexer(self.example4)
+        self.assertRaises(IllegalCharacterError, lex.Look) 
+
+        lex = Lexer(self.example1)
+        self.assertRaises(UnexpectedTokenError, lex.CheckTok, Token.EqualSign) 
+
+        lex = Lexer(self.example1)
+        self.assertRaises(UnexpectedIdentError, lex.CheckLit, "abc") 
+
 
 if __name__ == '__main__':
     unittest.main()
