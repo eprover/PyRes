@@ -4,40 +4,14 @@
 # Module clause.py
 
 """
-A simple implementation of first-order atoms, literals, and clauses.
+A simple implementation of first-order clauses.
 
-We assume a set of function symbols F (with associated arities) and
-variables symbols as defined in terms.py. We now also assume a set P
-of predicate symbols, and extend the arity function to
-ar:F \cup P ->N
+See literals.py for the definition of atoms and literals.
 
-The set of all first-order atoms over P, F, V, Atom(P,F,V) is defined
-as follows:
-- If t1, ... t_n are in Term(F,V) and p|n is in P, then p(t1,..., tn)
-  is in Atom(P,F,V)
-- Atom(P,F,V) is the smallest set with this property.
-
-
-Assume F={f|2, g|1, a|0, b|0}, V={X, Y, ...} and P={p|1, q|2}. Then
-the following are atoms:
-
-p(a)
-q(X, g(g(a)))
-p(f(b, Y))
-
-Because of the special role of equality for theorem proving, we
-usually assume "="|2 and "!="|2 are in P. In the concrete syntax,
-these symbols are written as infix symbols, i.e. we write a=b, not
-"=(a, b)".
-
-A literal is a signed atom. A positive literal is syntactically
-identical to its atom. A negative literal consists of the negation
-sign, ~, followed by an atom.
-
-We establish the convention that t1!=t2 is equivalent to ~t1=t2  and
-~t1!=t2 is equivalent to t1=t2, and only use the respective later
-forms internally. In other words, the symbol != only occurs during
-parsing and printing. 
+A logical clause in our sense is a multi-set of literals, represented
+as a list of literals. The actual clause data structure contains
+additional information that is useful, but not strictly necessary from
+a clogic/alculus point of view.
 
 
 Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
@@ -69,161 +43,124 @@ Email: schulz@eprover.org
 import unittest
 from lexer import Token,Lexer
 from terms import *
+from literals import Literal, parseLiteral, parseLiteralList, literalList2String
 
 
-
-
-def parseAtom(lexer):
+class Clause(object):
     """
-    Parse an atom. An atom is either a conventional atom, in which
-    case it's syntactically identical to a term, or it is an
-    equational literal, of the form 't1=t2' or 't1!=t2', where t1 and
-    t2 are terms.
-
-    In either case, we represent the atom as a first-order
-    term. Equational literals are represented at terms with faux
-    function symbols "=" and "!=". 
+    A class representing a clause. A clause at the moment comprises
+    the following elements:
+    - The literal list.
+    - The type ("plain" if none given)
+    - The name (generated automatically if not given)
     """
-    atom = parseTerm(lexer)
-    if lexer.TestTok([Token.EqualSign, Token.NotEqualSign]):
-        # The literal is equational.
-        # We get the actual operator, '=' or '!=', followed by the
-        # other side of the (in)equation
-        op  = lexer.Next().literal
-        lhs = atom
-        rhs = parseTerm(lexer)
-        atom = list([op, lhs, rhs])        
-
-    return atom
-    
-
-
-
-class Literal(object):
+    clauseIdCounter = 0
     """
-    A class representing a literal. A literal is a signed atom. We
-    already allow for equational atoms with infix "=" or "!="
-    operators, and normalize them on creation.
+    Counter for generating new clause names.
     """
-    def __init__(self, atom, negative=False):
+        
+    def __init__(self, literals, type="plain", name="None"):
         """
-        Initialize a literal. Normalize literals with negative
-        equational atoms in the process.
+        Initialize the clause.
         """
-
-        if termFunc(atom) == "!=":
-            self.negative = not negative
-            self.atom = list(["="])
-            self.atom.extend(termArgs(atom))
+        self.literals = literals
+        self.type     = type
+        if name:
+            self.name = name
         else:
-            self.negative = negative
-            self.atom = atom
+            name = "%d"%(Clause.clauseIdCounter,)
+            Clause.clauseIdCounter = Clause.clauseIdCounter+1
+            
         
     def __repr__(self):
         """
         Return a string representation of the literal.
         """
-        if self.isEquational():
-            op = "="
-            if self.isNegative():
-                op = "!="
-                
-            result = term2String(termArgs(self.atom)[0])+\
-                     op+\
-                     term2String(termArgs(self.atom)[1])
-        else:
-            if self.isNegative():
-                result = "~"+term2String(self.atom)
-            else:
-                result = term2String(self.atom)
-        return result
+        return "cnf(%s,%s,%s)."%(self.name, self.type, literalList2String(self.literals))
 
-    def isEquational(self):
+    def isEmpty(self):
         """
-        Returm true if the literal is equational.
+        Return true if the clause is empty.
         """
-        return termFunc(self.atom)=="="
+        return len(self.literals) == 0
 
-    def isNegative(self):
+    def isUnit(self):
         """
-        Return true if the literal is negative.
+        Return true if the clause is a unit clause.
         """
-        return self.negative
-    
-    def isPositive(self):
-        """
-        Return true if the literal is positive.
-        """
-        return not self.negative
+        return len(self.literals) == 1
 
-    def isEqual(self, other):
+    def isHorn(self):
         """
-        Return true if the literal is structurally identical to
-        other.
+        Return true if the clause is a Horn clause.
         """
-        return self.isNegative()==other.isNegative() and \
-               termEqual(self.atom, other.atom)
+        tmp = [l for l in self.literals if lit.isPositive()]
+        return len(self.literals) <= 1
+        
 
 
-def parseLiteral(lexer):
+def parseClause(lexer):
     """
-    Parse a literal. A literal is an optional negation sign '~',
-    followed by an atom.
+    Parse a clause. A clause in (slightly simplified) TPTP-3 syntax is
+    written as
+       cnf(<name>, <type>, <literal list>).
+    where <name> is a lower-case ident, type is a lower-case ident
+    from a specific list, and <literal list> is a "|" separated list
+    of literals, optionally enclosed in parenthesis.
+
+    For us, all clause types are essentially the same, so we only
+    distinguish "axiom", "negated_conjecture", and map everything else
+    to "plain".
     """
-    negative = False
-    if lexer.TestTok(Token.Negation):
-        negative = True
-        lexer.Next()
-    atom = parseAtom(lexer)
+    lexer.AcceptLit("cnf");
+    lexer.AcceptTok(Token.OpenPar)
+    name = lexer.LookLit()
+    lexer.AcceptTok(Token.IdentLower)
+    lexer.AcceptTok(Token.Comma)
+    type = lexer.LookLit()
+    if not type in ["axiom", "negated conjecture"]:
+        type = "plain"
+    lexer.AcceptTok(Token.IdentLower)
+    lexer.AcceptTok(Token.Comma)
+    if lexer.TestTok(Token.OpenPar):
+        lexer.AcceptTok(Token.OpenPar)
+        lits = parseLiteralList(lexer)
+        lexer.AcceptTok(Token.ClosePar)
+    else:
+        lits = parseLiteralList(lexer)
+    lexer.AcceptTok(Token.ClosePar)
+    lexer.AcceptTok(Token.FullStop)
 
-    return Literal(atom, negative)
+    return Clause(lits, type, name)
+
+
     
-
 
 class TestClauses(unittest.TestCase):
     """
-    Test basic term functions.
+    Unit test class for clauses. Test clause and literal
+    functionality.
     """
     def setUp(self):
+        """
+        Setup function for clause/literal unit tests. Initialize
+        variables needed throughout the tests.
+        """
         print
-        self.input1="p(X)  ~q(f(X,a), b)  ~a=b  a!=b  ~a!=f(X,b)"
-        
-
-    def testLiterals(self):
+        self.str1 = "cnf(test,axiom,p(a)|p(f(X)))."+\
+                   "cnf(test,axiom,(p(a)|p(f(X))))."
+       
+    def testClauses(self):
         """
-        Test that stringTerm and term2String are dual. Start with
-        terms, so that we are sure to get the canonical string
-        representation. 
+        Test that basic literal parsing works correctly.
         """
-        lexer = Lexer(self.input1)
-        a1 = parseLiteral(lexer)
-        a2 = parseLiteral(lexer)
-        a3 = parseLiteral(lexer)
-        a4 = parseLiteral(lexer)
-        a5 = parseLiteral(lexer)
+        lex = Lexer(self.str1)
+        c1 = parseClause(lex)
+        c2 = parseClause(lex)
 
-        print a1
-        self.assert_(a1.isPositive())
-        self.assert_(not a1.isEquational())
-
-        print a2
-        self.assert_(a2.isNegative())
-        self.assert_(not a2.isEquational())
-
-        print a3
-        self.assert_(a3.isNegative())
-        self.assert_(a3.isEquational())
-        self.assert_(a3.isEqual(a4))
-        
-        print a4
-        self.assert_(a4.isNegative())
-        self.assert_(a4.isEquational())
-        self.assert_(a4.isEqual(a3))
-        
-        print a5
-        self.assert_(not a5.isNegative())
-        self.assert_(a5.isEquational())
-        
+        print c1
+        print c2
+        self.assertEqual(repr(c1), repr(c2))
         
 
 if __name__ == '__main__':
