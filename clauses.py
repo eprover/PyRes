@@ -68,7 +68,7 @@ class Clause(object):
         if name:
             self.name = name
         else:
-            name = "%d"%(Clause.clauseIdCounter,)
+            name = "c%d"%(Clause.clauseIdCounter,)
             Clause.clauseIdCounter = Clause.clauseIdCounter+1
             
         
