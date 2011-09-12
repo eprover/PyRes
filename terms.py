@@ -206,44 +206,56 @@ def termIsGround(t):
         return True
         
 
+def termCollectVars(t, res=None):
+    """
+    Insert all variables in t into the set res. For convenience,
+    return res. If res is not given, create and return it.
+    """
+    if res == None:
+        res = set()
+    if termIsVar(t):
+        res.add(t)
+    else:
+        for s in termArgs(t):
+            termCollectVars(s, res)
+    return res
 
 
 def termWeight(t, fweight, vweight):
     """
-    termWeight(t, fweight, vweight): Return the weight of the term,
-                  counting fweight for each function symbol
-                  occurance, vweight for each variable
-                  occurance. Examples: 
-                  termWeight(f(a,b), 1, 1) = 3
-                  termWeight(f(a,b), 2, 1) = 6
-                  termWeight(f(X,Y), 2, 1) = 4
-                  termWeight(X, 2, 1)      = 1
-                  termWeight(g(a), 3, 1)   = 6
+    Return the weight of the term, counting fweight for each function
+    symbol occurance, vweight for each variable occurance.
+    Examples: 
+      termWeight(f(a,b), 1, 1) = 3
+      termWeight(f(a,b), 2, 1) = 6
+      termWeight(f(X,Y), 2, 1) = 4
+      termWeight(X, 2, 1)      = 1
+      termWeight(g(a), 3, 1)   = 6
     """
     if termIsVar(t):
         return vweight
     else:
         res = fweight
-        for t in termArgs(t):
-            res = res + termWeight(t,fweight,vweight)
+        for s in termArgs(t):
+            res = res + termWeight(s, fweight, vweight)
         return res
 
 
 
 def subterm(t, pos):
     """
-    subterm(t, pos): Return the subterm of t at position pos (or None if
-                  pos is not a position in term). pos is a list of
-                  integers denoting branches, e.g.
-                  subterm(f(a,b), [])        = f(a,b)
-                  subterm(f(a,g(b)), [0])    = a
-                  subterm(f(a,g(b)), [1])    = g(b)
-                  subterm(f(a,g(b)), [1,0])  = b
-                  subterm(f(a,g(b)), [3,0])  = None
+    Return the subterm of t at position pos (or None if pos is not a
+    position in term). pos is a list of integers denoting branches,
+    e.g. 
+       subterm(f(a,b), [])        = f(a,b)
+       subterm(f(a,g(b)), [0])    = a
+       subterm(f(a,g(b)), [1])    = g(b)
+       subterm(f(a,g(b)), [1,0])  = b
+       subterm(f(a,g(b)), [3,0])  = None
     """
     if not pos:
         return t
-    index = pos.pop(0);
+    index = pos.pop(0)
     if index >= len(t):
         return None
     return subterm(t[index],pos)
@@ -338,8 +350,25 @@ class TestTerms(unittest.TestCase):
         self.assert_(not termIsGround(self.t4))
         self.assert_(not termIsGround(self.t5))
 
+    def testCollectVars(self):
+        """
+        Test the variable collection.
+        """
+        vars = termCollectVars(self.t1)
+        self.assertEqual(len(vars),1)
+        termCollectVars(self.t2, vars)
+        self.assertEqual(len(vars),1)
+        termCollectVars(self.t3, vars)
+        self.assertEqual(len(vars),1)
+        termCollectVars(self.t4, vars)
+        self.assertEqual(len(vars),2)
+        termCollectVars(self.t5, vars)
+        self.assertEqual(len(vars),2)
 
-    def testIsGround(self):
+        self.assert_("X" in vars)
+        self.assert_("Y" in vars)
+
+    def testWeight(self):
         """
         Test if termWeight() works as expected.
         """
