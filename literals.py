@@ -164,6 +164,15 @@ class Literal(object):
         return self.isNegative()==other.isNegative() and \
                termEqual(self.atom, other.atom)
 
+    def collectVars(self, res=None):
+        """
+        Insert all variables in self into the set res and return
+        it. If res is not given, create it.
+        """
+        termCollectVars(self.atom, res)
+        return res
+        
+
 
 def parseLiteral(lexer):
     """
@@ -234,7 +243,8 @@ class TestLiterals(unittest.TestCase):
 
     def testLiterals(self):
         """
-        Test that basic literal parsing works correctly.
+        Test that basic literal parsing and literal functions work
+        correctly.
         """
         lexer = Lexer(self.input1)
         a1 = parseLiteral(lexer)
@@ -243,27 +253,38 @@ class TestLiterals(unittest.TestCase):
         a4 = parseLiteral(lexer)
         a5 = parseLiteral(lexer)
 
+        vars = set()
         print a1
         self.assert_(a1.isPositive())
         self.assert_(not a1.isEquational())
-
+        a1.collectVars(vars)
+        self.assertEqual(len(vars), 1)
+        
         print a2
         self.assert_(a2.isNegative())
         self.assert_(not a2.isEquational())
+        a2.collectVars(vars)
+        self.assertEqual(len(vars), 1)
 
         print a3
         self.assert_(a3.isNegative())
         self.assert_(a3.isEquational())
         self.assert_(a3.isEqual(a4))
+        a3.collectVars(vars)
+        self.assertEqual(len(vars), 1)
         
         print a4
         self.assert_(a4.isNegative())
         self.assert_(a4.isEquational())
         self.assert_(a4.isEqual(a3))
+        a4.collectVars(vars)
+        self.assertEqual(len(vars), 1)
         
         print a5
         self.assert_(not a5.isNegative())
         self.assert_(a5.isEquational())
+        a5.collectVars(vars)
+        self.assertEqual(len(vars), 1)
         
     def testLitList(self):
         """

@@ -96,7 +96,21 @@ class Clause(object):
         """
         tmp = [l for l in self.literals if lit.isPositive()]
         return len(self.literals) <= 1
-        
+
+    def litNumber(self):
+        """
+        Return the number of literals in the clause.
+        """
+        return len(self.literals)
+
+    def getLiteral(self, position):
+        """
+        Return the indicated literal of the clause. Position is an
+        integer from 0 to litNumber (exclusive).
+        """
+        assert position >= 0
+        assert position < self.litNumber()
+        return self.literals[position]
 
 
 def parseClause(lexer):

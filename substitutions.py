@@ -58,6 +58,12 @@ class Substitution(object):
     are always fully expanded, i.e. each variable is bound directly to
     the term it maps too.
     """
+
+    varCounter = 1
+    """
+    A counter to generate fresh variables.
+    """
+    
     def __init__(self, init = []):
         """
         Initialize. The optional argument is a list of variable/term
@@ -201,6 +207,9 @@ class BTSubst(Substitution):
       assert False and \
              "You cannot compose backtrackable substitutions."
    
+
+
+
 
 
 class TestSubst(unittest.TestCase):
