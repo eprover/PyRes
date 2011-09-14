@@ -208,7 +208,27 @@ class BTSubst(Substitution):
              "You cannot compose backtrackable substitutions."
    
 
+def freshVar():
+    """
+    Return a fresh variable. Note that this is not guaranteed to be
+    different from input variables. However, it is guaranteed that
+    freshVar() will never return the same variable more than once.
+    """
+    Substitution.varCounter =  Substitution.varCounter + 1
+    return "X%d"%(Substitution.varCounter,)
+    
 
+def uniqSubst(vars):
+    """
+    Create a substitution that maps all variables in var to fresh
+    variables. Note that there is no guarantee that the fresh
+    variables have never been used. However, there is a a guarantee
+    that the fresh variables have never been produced by a uniqSubst
+    substitution.
+    """
+    l = [(var, freshVar()) for var in vars]
+    return Substitution(l)
+    
 
 
 
@@ -245,6 +265,16 @@ class TestSubst(unittest.TestCase):
         self.assert_(terms.termEqual(self.sigma2(self.t1),  self.t5))
 
 
+    def testUniqSubst(self):
+        var1 = freshVar()
+        var2 = freshVar()
+        self.assert_(var1!=var2)
+        
+        vars = terms.termCollectVars(self.t1)
+        sigma = uniqSubst(vars)
+        vars2 = terms.termCollectVars(sigma(self.t1))
+        shared = set(vars).intersection(set(vars2))
+        self.assert_(not shared)
 
 
 if __name__ == '__main__':

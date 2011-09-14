@@ -65,11 +65,7 @@ class Clause(object):
         """
         self.literals = literals
         self.type     = type
-        if name:
-            self.name = name
-        else:
-            name = "c%d"%(Clause.clauseIdCounter,)
-            Clause.clauseIdCounter = Clause.clauseIdCounter+1
+        self.setName(name)
             
         
     def __repr__(self):
@@ -77,6 +73,16 @@ class Clause(object):
         Return a string representation of the literal.
         """
         return "cnf(%s,%s,%s)."%(self.name, self.type, literalList2String(self.literals))
+
+    def setName(self, name = None):
+        """
+        Set the name. If no name is given, generate a default name.
+        """
+        if name:
+            self.name = name
+        else:
+            name = "c%d"%(Clause.clauseIdCounter,)
+            Clause.clauseIdCounter = Clause.clauseIdCounter+1        
 
     def isEmpty(self):
         """
@@ -112,6 +118,23 @@ class Clause(object):
         assert position < self.litNumber()
         return self.literals[position]
 
+    def collectVars(self, res):
+        """
+        Insert all variables in self into the set res and return
+        it. If res is not given, create it.
+        """
+        for i in self.literals:
+            res = i.collectVars(res)
+        return res
+
+    def instantiate(self, subst):
+        """
+        Return an instantiated copy of self. Name and type are copied
+        and need to be overwritten if that is not desired.
+        """
+        lits = [l.instantiate(subst) for l in self.literals]
+        return Clause(lits, self.type, self.name)
+   
 
 def parseClause(lexer):
     """

@@ -169,10 +169,15 @@ class Literal(object):
         Insert all variables in self into the set res and return
         it. If res is not given, create it.
         """
-        termCollectVars(self.atom, res)
+        res = termCollectVars(self.atom, res)
         return res
-        
 
+    def instantiate(self, subst):
+        """
+        Return a copy of self, instantiated with the given
+        subtitution.
+        """
+        return Literal(subst(self.atom), self.negative)
 
 def parseLiteral(lexer):
     """
