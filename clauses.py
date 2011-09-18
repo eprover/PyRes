@@ -43,6 +43,7 @@ Email: schulz@eprover.org
 import unittest
 from lexer import Token,Lexer
 from terms import *
+import substitutions
 from literals import Literal, parseLiteral, parseLiteralList, literalList2String
 
 
@@ -118,7 +119,7 @@ class Clause(object):
         assert position < self.litNumber()
         return self.literals[position]
 
-    def collectVars(self, res):
+    def collectVars(self, res=None):
         """
         Insert all variables in self into the set res and return
         it. If res is not given, create it.
@@ -134,6 +135,14 @@ class Clause(object):
         """
         lits = [l.instantiate(subst) for l in self.literals]
         return Clause(lits, self.type, self.name)
+
+    def freshVarCopy(self):
+        """
+        Return a copy of self with fresh variables.
+        """
+        vars  = self.collectVars()
+        subst = substitutions.freshVarSubst(vars)
+        return self.instantiate(subst)
    
 
 def parseClause(lexer):
@@ -198,7 +207,10 @@ class TestClauses(unittest.TestCase):
         print c1
         print c2
         self.assertEqual(repr(c1), repr(c2))
-        
+
+        c3 = c1.freshVarCopy()
+        print c1
+        print c3
 
 if __name__ == '__main__':
     unittest.main()

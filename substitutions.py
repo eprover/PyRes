@@ -218,7 +218,7 @@ def freshVar():
     return "X%d"%(Substitution.varCounter,)
     
 
-def uniqSubst(vars):
+def freshVarSubst(vars):
     """
     Create a substitution that maps all variables in var to fresh
     variables. Note that there is no guarantee that the fresh
@@ -265,13 +265,13 @@ class TestSubst(unittest.TestCase):
         self.assert_(terms.termEqual(self.sigma2(self.t1),  self.t5))
 
 
-    def testUniqSubst(self):
+    def testFreshVarSubst(self):
         var1 = freshVar()
         var2 = freshVar()
         self.assert_(var1!=var2)
         
         vars = terms.termCollectVars(self.t1)
-        sigma = uniqSubst(vars)
+        sigma = freshVarSubst(vars)
         vars2 = terms.termCollectVars(sigma(self.t1))
         shared = set(vars).intersection(set(vars2))
         self.assert_(not shared)
