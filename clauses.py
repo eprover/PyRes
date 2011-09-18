@@ -8,10 +8,16 @@ A simple implementation of first-order clauses.
 
 See literals.py for the definition of atoms and literals.
 
-A logical clause in our sense is a multi-set of literals, represented
-as a list of literals. The actual clause data structure contains
-additional information that is useful, but not strictly necessary from
-a clogic/alculus point of view.
+A logical clause in our sense is a multi-set of literals, implicitly
+representing the universally quantified disjunction of these literals.
+
+
+The set of all clauses for a given signature is denoted as
+Clauses(P,F,V).
+
+We represent a clause as a list of literals. The actual clause data
+structure contains additional information that is useful, but not
+strictly necessary from a clogic/alculus point of view.
 
 
 Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
@@ -128,6 +134,15 @@ class Clause(object):
             res = i.collectVars(res)
         return res
 
+    def weight(self, fweight, vweight):
+        """
+        Return the symbol-count weight of the clause.
+        """
+        res = 0
+        for l in self.literals:
+            res = res + l.weight(fweight, vweight)
+        return res
+
     def instantiate(self, subst):
         """
         Return an instantiated copy of self. Name and type are copied
@@ -217,6 +232,9 @@ class TestClauses(unittest.TestCase):
         c3 = c1.freshVarCopy()
         print c1
         print c3
+
+        self.assertEqual(c3.weight(2,1), c1.weight(2,1))
+        self.assertEqual(c3.weight(1,1), c1.weight(1,1))
 
 if __name__ == '__main__':
     unittest.main()

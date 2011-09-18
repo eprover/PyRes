@@ -34,10 +34,13 @@ A literal is a signed atom. A positive literal is syntactically
 identical to its atom. A negative literal consists of the negation
 sign, ~, followed by an atom.
 
-We establish the convention that t1!=t2 is equivalent to ~t1=t2  and
+Thus, we can describe the set
+Literals(P,F,V) = {~a | a in Atom(P,F,V)} \cup Atom(P,F,V)
+
+We establish the convention that t1!=t2 is equivalent to ~t1=t2 and
 ~t1!=t2 is equivalent to t1=t2, and only use the respective later
 forms internally. In other words, the symbol != only occurs during
-parsing and printing. 
+parsing and printing.
 
 
 Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
@@ -179,6 +182,12 @@ class Literal(object):
         """
         return Literal(subst(self.atom), self.negative)
 
+    def weight(self, fweight, vweight):
+        """
+        Return the symbol count weight of the literal.        
+        """
+        return termWeight(self.atom, fweight, vweight)
+
 def parseLiteral(lexer):
     """
     Parse a literal. A literal is an optional negation sign '~',
@@ -245,51 +254,63 @@ class TestLiterals(unittest.TestCase):
         self.input3="$false"
         self.input4="$false|~q(f(X,a), b)|$false"
         
+        lexer = Lexer(self.input1)
+        self.a1 = parseLiteral(lexer)
+        self.a2 = parseLiteral(lexer)
+        self.a3 = parseLiteral(lexer)
+        self.a4 = parseLiteral(lexer)
+        self.a5 = parseLiteral(lexer)
 
     def testLiterals(self):
         """
-        Test that basic literal parsing and literal functions work
+        Test that basic literal literal functions work
         correctly.
         """
-        lexer = Lexer(self.input1)
-        a1 = parseLiteral(lexer)
-        a2 = parseLiteral(lexer)
-        a3 = parseLiteral(lexer)
-        a4 = parseLiteral(lexer)
-        a5 = parseLiteral(lexer)
 
         vars = set()
-        print a1
-        self.assert_(a1.isPositive())
-        self.assert_(not a1.isEquational())
-        a1.collectVars(vars)
+        print self.a1
+        self.assert_(self.a1.isPositive())
+        self.assert_(not self.a1.isEquational())
+        self.a1.collectVars(vars)
         self.assertEqual(len(vars), 1)
         
-        print a2
-        self.assert_(a2.isNegative())
-        self.assert_(not a2.isEquational())
-        a2.collectVars(vars)
+        print self.a2
+        self.assert_(self.a2.isNegative())
+        self.assert_(not self.a2.isEquational())
+        self.a2.collectVars(vars)
         self.assertEqual(len(vars), 1)
 
-        print a3
-        self.assert_(a3.isNegative())
-        self.assert_(a3.isEquational())
-        self.assert_(a3.isEqual(a4))
-        a3.collectVars(vars)
+        print self.a3
+        self.assert_(self.a3.isNegative())
+        self.assert_(self.a3.isEquational())
+        self.assert_(self.a3.isEqual(self.a4))
+        self.a3.collectVars(vars)
         self.assertEqual(len(vars), 1)
         
-        print a4
-        self.assert_(a4.isNegative())
-        self.assert_(a4.isEquational())
-        self.assert_(a4.isEqual(a3))
-        a4.collectVars(vars)
+        print self.a4
+        self.assert_(self.a4.isNegative())
+        self.assert_(self.a4.isEquational())
+        self.assert_(self.a4.isEqual(self.a3))
+        self.a4.collectVars(vars)
         self.assertEqual(len(vars), 1)
         
-        print a5
-        self.assert_(not a5.isNegative())
-        self.assert_(a5.isEquational())
-        a5.collectVars(vars)
+        print self.a5
+        self.assert_(not self.a5.isNegative())
+        self.assert_(self.a5.isEquational())
+        self.a5.collectVars(vars)
         self.assertEqual(len(vars), 1)
+
+
+    def testLitWeight(self):
+        """
+        Test the weight function.
+        """
+        self.assertEqual(self.a1.weight(2,1),3)
+        self.assertEqual(self.a2.weight(2,1),9)
+        self.assertEqual(self.a3.weight(2,1),6)
+        self.assertEqual(self.a4.weight(2,1),6)
+        self.assertEqual(self.a5.weight(2,1),9)
+
         
     def testLitList(self):
         """
