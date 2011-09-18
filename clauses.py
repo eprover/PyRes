@@ -64,14 +64,14 @@ class Clause(object):
         """
         Initialize the clause.
         """
-        self.literals = literals
-        self.type     = type
+        self.literals   = literals
+        self.type       = type
         self.setName(name)
-            
+        self.evaluation = None
         
     def __repr__(self):
         """
-        Return a string representation of the literal.
+        Return a string representation of the clause.
         """
         return "cnf(%s,%s,%s)."%(self.name, self.type, literalList2String(self.literals))
 
@@ -143,6 +143,12 @@ class Clause(object):
         vars  = self.collectVars()
         subst = substitutions.freshVarSubst(vars)
         return self.instantiate(subst)
+
+    def addEval(self, eval):
+        """
+        Add an evaluation to the clause.
+        """
+        self.evaluation = eval
    
 
 def parseClause(lexer):
