@@ -161,7 +161,9 @@ class Clause(object):
 
     def addEval(self, eval):
         """
-        Add an evaluation to the clause.
+        Add an evaluation to the clause. "eval" is an ordered list of
+        numerical evaluations, one for each of the different
+        evaluation functions used.
         """
         self.evaluation = eval
    
@@ -185,7 +187,7 @@ def parseClause(lexer):
     lexer.AcceptTok(Token.IdentLower)
     lexer.AcceptTok(Token.Comma)
     type = lexer.LookLit()
-    if not type in ["axiom", "negated conjecture"]:
+    if not type in ["axiom", "negated_conjecture"]:
         type = "plain"
     lexer.AcceptTok(Token.IdentLower)
     lexer.AcceptTok(Token.Comma)
