@@ -38,15 +38,17 @@ from lexer import Lexer
 from clauses import Clause, parseClause
 from heuristics import FIFOEvaluation, SymbolCountEvaluation
 
+
 class ClauseSet(object):
     """
-    A class representing a clause set. Clause sets really are lists of
-    clauses. Clause sets support heuristic evaluation of
-    clauses. Clauses are evaluated when inserting them, according to
-    several criteria. The lightest clause (by any of the critera) can
-    be extracted. Since inserting is a lot more frequent, we search
-    the list when extracting. This can be made a lot more efficient
-    with clever data structures (e.g. trees or heaps).
+    A class representing a clause set (or, more precisely,
+    a multi-set of clauses). 
+
+    A clause optionally supports heuristic ordering of its clauses. If
+    a list of heuristic functions is configured at creation time of
+    the clause set, all clauses inserted into the set are evaluated
+    according to all criteria. The clause set support extraction of
+    the "best" clause according to any of the configured heuristics.
     """
     def __init__(self, eval_functions=None):
         """
@@ -54,13 +56,18 @@ class ClauseSet(object):
         """
         self.clauses  = []
         self.eval_functions = eval_functions
-        
-        
+              
     def __repr__(self):
         """
         Return a string representation of the clause set.
         """
         return "\n".join([repr(clause) for clause in self.clauses])
+
+    def __len__(self):
+        """
+        Return number of clauses in set.
+        """
+        return len(self.clauses)
 
     def addClause(self, clause):
         """
@@ -72,12 +79,6 @@ class ClauseSet(object):
         if self.eval_functions:
             evals = [f(clause) for f in self.eval_functions]
             clause.addEval(evals)
-
-    def __len__(self):
-        """
-        Return number of clauses in set.
-        """
-        return len(self.clauses)
 
     def extractBest(self, heuristic_index):
         """
@@ -115,14 +116,89 @@ class TestClauseSets(unittest.TestCase):
         """
         print
         self.spec ="""
-cnf(c1,axiom,(f(X1,X2)=f(X2,X1))).
-cnf(c2,axiom,(f(X1,f(X2,X3))=f(f(X1,X2),X3))).
-cnf(c3,axiom,(g(X1,X2)=g(X2,X1))).
-cnf(c4,axiom,(f(f(X1,X2),f(X3,g(X4,X5)))!=f(f(g(X4,X5),X3),f(X2,X1))|k(X1,X1)!=k(a,b))).
-cnf(c5,axiom,(b=c|X1!=X2|X3!=X4|c!=d)).
-cnf(c6,axiom,(a=b|a=c)).
-cnf(c7,axiom,(i(X1)=i(X2))).
-cnf(c8,axiom,(c=d|h(i(a))!=h(i(e)))).
+%------------------------------------------------------------------------------
+% File     : PUZ001-1 : TPTP v4.1.0. Released v1.0.0.
+% Domain   : Puzzles
+% Problem  : Dreadbury Mansion
+% Version  : Especial.
+%            Theorem formulation : Made unsatisfiable.
+% English  : Someone who lives in Dreadbury Mansion killed Aunt Agatha.
+%            Agatha, the butler, and Charles live in Dreadbury Mansion,
+%            and are the only people who live therein. A killer always
+%            hates his victim, and is never richer than his victim.
+%            Charles hates no one that Aunt Agatha hates. Agatha hates
+%            everyone except the butler. The butler hates everyone not
+%            richer than Aunt Agatha. The butler hates everyone Aunt
+%            Agatha hates. No one hates everyone. Agatha is not the
+%            butler. Therefore : Agatha killed herself.
+
+% Refs     : [Pel86] Pelletier (1986), Seventy-five Problems for Testing Au
+%          : [MB88]  Manthey & Bry (1988), SATCHMO: A Theorem Prover Implem
+% Source   : [TPTP]
+% Names    :
+
+% Status   : Unsatisfiable
+% Rating   : 0.00 v2.0.0
+% Syntax   : Number of clauses     :   12 (   2 non-Horn;   5 unit;  12 RR)
+%            Number of atoms       :   21 (   0 equality)
+%            Maximal clause size   :    3 (   2 average)
+%            Number of predicates  :    4 (   0 propositional; 1-2 arity)
+%            Number of functors    :    3 (   3 constant; 0-0 arity)
+%            Number of variables   :    8 (   0 singleton)
+%            Maximal term depth    :    1 (   1 average)
+% SPC      : CNF_UNS_EPR
+
+% Comments : Modified from the [MB88] version to be unsatisfiable, by Geoff
+%            Sutcliffe.
+%          : Also known as "Who killed Aunt Agatha"
+%------------------------------------------------------------------------------
+cnf(agatha,hypothesis,
+    ( lives(agatha) )).
+
+cnf(butler,hypothesis,
+    ( lives(butler) )).
+
+cnf(charles,hypothesis,
+    ( lives(charles) )).
+
+cnf(poorer_killer,hypothesis,
+    ( ~ killed(X,Y)
+    | ~ richer(X,Y) )).
+
+cnf(different_hates,hypothesis,
+    ( ~ hates(agatha,X)
+    | ~ hates(charles,X) )).
+
+cnf(no_one_hates_everyone,hypothesis,
+    ( ~ hates(X,agatha)
+    | ~ hates(X,butler)
+    | ~ hates(X,charles) )).
+
+cnf(agatha_hates_agatha,hypothesis,
+    ( hates(agatha,agatha) )).
+
+cnf(agatha_hates_charles,hypothesis,
+    ( hates(agatha,charles) )).
+
+cnf(killer_hates_victim,hypothesis,
+    ( ~ killed(X,Y)
+    | hates(X,Y) )).
+
+cnf(same_hates,hypothesis,
+    ( ~ hates(agatha,X)
+    | hates(butler,X) )).
+
+cnf(butler_hates_poor,hypothesis,
+    ( ~ lives(X)
+    | richer(X,agatha)
+    | hates(butler,X) )).
+
+%----Literal dropped from here to make it unsatisfiable
+cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
+    ( killed(butler,agatha)
+    | killed(charles,agatha) )).
+
+%------------------------------------------------------------------------------
 """
        
     def testClauseSetInit(self):
@@ -141,11 +217,16 @@ cnf(c8,axiom,(c=d|h(i(a))!=h(i(e)))).
         clauses.parse(lexer)
         print clauses
 
-        self.assertEqual(len(clauses), 8)
+        # Check if FIFO returns clauses in order.
+        self.assertEqual(len(clauses), 12)
         c1 = clauses.extractBest(1)
-        self.assertEqual(c1.name, "c1")
+        self.assertEqual(c1.name, "agatha")
         c2 = clauses.extractBest(1)
-        self.assertEqual(c2.name, "c2")
+        self.assertEqual(c2.name, "butler")
+        c3 = clauses.extractBest(1)
+        self.assertEqual(c3.name, "charles")
+
+        
 
 if __name__ == '__main__':
     unittest.main()

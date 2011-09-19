@@ -271,11 +271,13 @@ class TestTerms(unittest.TestCase):
         self.example3 = "g(a,b)"
         self.example4 = "g(X, f(Y))"     
         self.example5 = "g(X, f(Y))"     
+        self.example6 = "g(b,b)"     
         self.t1 = string2Term(self.example1)
         self.t2 = string2Term(self.example2)
         self.t3 = string2Term(self.example3)
         self.t4 = string2Term(self.example4)
         self.t5 = string2Term(self.example5)
+        self.t6 = string2Term(self.example6)
         
 
     def testToString(self):
@@ -324,7 +326,12 @@ class TestTerms(unittest.TestCase):
 
         self.assert_(not termEqual(self.t1, self.t4))
         self.assert_(not termEqual(self.t3, self.t4))
-
+        self.assert_(not termEqual(self.t3, self.t6))
+        
+        l1 = []
+        l2 = [self.t1]
+        self.assert_(not termListEqual(l1,l2))
+        
 
     def testCopy(self):
         """
