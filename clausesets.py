@@ -64,6 +64,9 @@ class ClauseSet(object):
 
     def addClause(self, clause):
         """
+        Add a clause to the clause set. If the clause set supports
+        heuristic evaluations, add the relevant evaluations to the
+        clause. 
         """
         self.clauses.append(clause)
         if self.eval_functions:
