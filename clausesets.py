@@ -36,6 +36,7 @@ Email: schulz@eprover.org
 import unittest
 from lexer import Lexer
 from clauses import Clause, parseClause
+from heuristics import FIFOEvaluation, SymbolCountEvaluation
 
 class ClauseSet(object):
     """
@@ -69,6 +70,28 @@ class ClauseSet(object):
             evals = [f(clause) for f in self.eval_functions]
             clause.addEval(evals)
 
+    def __len__(self):
+        """
+        Return number of clauses in set.
+        """
+        return len(self.clauses)
+
+    def extractBest(self, heuristic_index):
+        """
+        Extract and return the clause with the lowest weight according
+        to the selected heuristic. If the set is empty, return None.
+        """
+        if self.clauses:
+            best = 0
+            besteval = self.clauses[0].evaluation[heuristic_index]
+            for i in xrange(1, len(self.clauses)):
+                if self.clauses[i].evaluation[heuristic_index] < besteval:
+                    besteval = clauses[i].evaluation[heuristic_index]
+                    best     = i
+            return self.clauses.pop(best)
+        else:
+            return None
+                    
     def parse(self, lexer):
         """
         Parse a sequence of clauses from lex and add them to the set.
@@ -107,6 +130,19 @@ cnf(c8,axiom,(c=d|h(i(a))!=h(i(e)))).
         clauses = ClauseSet()
         clauses.parse(lexer)
         print clauses
+
+        print "=========================================="
+
+        clauses = ClauseSet([SymbolCountEvaluation(2,1), FIFOEvaluation()])
+        lexer = Lexer(self.spec)
+        clauses.parse(lexer)
+        print clauses
+
+        self.assertEqual(len(clauses), 8)
+        c1 = clauses.extractBest(1)
+        self.assertEqual(c1.name, "c1")
+        c2 = clauses.extractBest(1)
+        self.assertEqual(c2.name, "c2")
 
 if __name__ == '__main__':
     unittest.main()
