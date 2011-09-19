@@ -66,7 +66,7 @@ class Clause(object):
     Counter for generating new clause names.
     """
         
-    def __init__(self, literals, type="plain", name="None"):
+    def __init__(self, literals, type="plain", name=None):
         """
         Initialize the clause.
         """
@@ -107,7 +107,7 @@ class Clause(object):
         """
         Return true if the clause is a Horn clause.
         """
-        tmp = [l for l in self.literals if lit.isPositive()]
+        tmp = [l for l in self.literals if l.isPositive()]
         return len(self.literals) <= 1
 
     def litNumber(self):
@@ -214,8 +214,10 @@ class TestClauses(unittest.TestCase):
         variables needed throughout the tests.
         """
         print
-        self.str1 = "cnf(test,axiom,p(a)|p(f(X)))."+\
-                   "cnf(test,axiom,(p(a)|p(f(X))))."
+        self.str1 = """
+cnf(test,axiom,p(a)|p(f(X))).
+cnf(test,axiom,(p(a)|p(f(X)))).
+cnf(test3,lemma,(p(a)|~p(f(X))))."""
        
     def testClauses(self):
         """
@@ -224,17 +226,34 @@ class TestClauses(unittest.TestCase):
         lex = Lexer(self.str1)
         c1 = parseClause(lex)
         c2 = parseClause(lex)
+        c3 = parseClause(lex)
 
         print c1
         print c2
         self.assertEqual(repr(c1), repr(c2))
 
-        c3 = c1.freshVarCopy()
+        c4 = c1.freshVarCopy()
         print c1
-        print c3
+        print c4
 
-        self.assertEqual(c3.weight(2,1), c1.weight(2,1))
-        self.assertEqual(c3.weight(1,1), c1.weight(1,1))
+        self.assertEqual(c4.weight(2,1), c1.weight(2,1))
+        self.assertEqual(c4.weight(1,1), c1.weight(1,1))
 
+        c5 = Clause(c4.literals)
+        self.assert_(c5.getLiteral(0).isEqual(c4.getLiteral(0)))
+
+        empty = Clause([])
+        self.assert_(empty.isEmpty())
+        self.assert_(not empty.isUnit())
+        self.assert_(empty.isHorn())
+
+        unit = Clause([c5.getLiteral(0)])
+        self.assert_(not unit.isEmpty())
+        self.assert_(unit.isUnit())
+        self.assert_(unit.isHorn())
+
+        self.assert_(not c1.isHorn())
+        self.assert_(not c3.isHorn())
+        
 if __name__ == '__main__':
     unittest.main()

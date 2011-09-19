@@ -21,7 +21,7 @@ clean:
 testcov: *.py
 	-rm -r .coverage COVERAGE
 	for f in *.py ;do coverage run -a $$f; done
-	coverage report > testcov.cov
+	coverage report > testcov
 	mkdir COVERAGE
 	coverage annotate -d COVERAGE
-
+	cat testcov
