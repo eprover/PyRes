@@ -87,7 +87,7 @@ def match(matcher, target, subst):
     to find a common match for several terms. 
     """
     assert isinstance(subst, BTSubst)
-    bt_state = subst.get_state()
+    bt_state = subst.getState()
     result = True
 
     if termIsVar(matcher):
@@ -122,7 +122,7 @@ def match_norec(t1, t2, subst):
     implementation using explicit work lists instead of recursion.
     """
     assert isinstance(subst, BTSubst)
-    bt_state = subst.get_state()
+    bt_state = subst.getState()
     result = True
     mlist = [t1]
     tlist = [t2]

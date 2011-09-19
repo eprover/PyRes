@@ -158,7 +158,7 @@ class BTSubst(Substitution):
       self.bindings = list(init)
       Substitution.__init__(self, init)
 
-   def get_state(self):
+   def getState(self):
       """
       Return a state to which this substitution can be backtracked
       later. We encode the state of the binding list, but also the
@@ -200,7 +200,7 @@ class BTSubst(Substitution):
       self.subst[var] = term
       self.bindings.append(binding)
 
-   def compose_binding(self, binding):
+   def compose_binding(self, binding): # pragma: no cover
       """
       Overloaded to catch usage errors!
       """
