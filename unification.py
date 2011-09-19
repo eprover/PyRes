@@ -181,7 +181,7 @@ def mguTermList(l1, l2, subst):
           # For f(s1, ..., sn) = g(t1, ..., tn), first f and g have to
           # be equal...
           if termFunc(t1) != termFunc(t2):
-             return False
+             return None
           # ...and then we need to ensure that for all i si=ti get
           # added to the list of equations to be solved.
           l1.extend(termArgs(t1))

@@ -104,6 +104,10 @@ cnf(c3,axiom,p(Z,X)|~p(f(Z),X0)).
         self.assert_(res3)
         print res3
 
+        res4 = resolution(self.c1, 0, self.c3,1)
+        self.assert_(not res4)
+        print res4
+
         
 if __name__ == '__main__':
     unittest.main()
