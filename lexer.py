@@ -167,7 +167,8 @@ class Lexer:
         (re.compile("[a-z][_a-z0-9_A-Z]*"),   Token.IdentLower),
         (re.compile("[_A-Z][_a-z0-9_A-Z]*"),  Token.IdentUpper),
         (re.compile("\$[_a-z0-9_A-Z]*"),      Token.DefFunctor),
-        (re.compile("#[^\n]*"),               Token.Comment)
+        (re.compile("#[^\n]*"),               Token.Comment),
+        (re.compile("%[^\n]*"),               Token.Comment)
         ]
     
     def __init__(self, source, name="user string"):
