@@ -53,25 +53,25 @@ class ClauseEvaluationFunction(object):
     from previous calls.
     """
         
-    def __init__(self):
+    def __init__(self): # pragma: nocover
         """
         Initialize the evaluaton function.
         """
         self.name = "Virtual Base"
         
-    def __repr__(self):
+    def __repr__(self): # pragma: nocover
         """
         Return a string representation of the clause.
         """
         return "ClauseEvalFun(%s)"%(self.name,)
 
-    def __call__(self, clause):
+    def __call__(self, clause): 
         """
         Provide this as a callable function.
         """
         return self.hEval(clause)
    
-    def hEval(self, clause):
+    def hEval(self, clause): # pragma: nocover
         """
         This needs to be overloaded...
         """
