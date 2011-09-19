@@ -167,6 +167,14 @@ class Literal(object):
         return self.isNegative()==other.isNegative() and \
                termEqual(self.atom, other.atom)
 
+    def isOpposite(self, other):
+        """
+        Return true if the atoms of self and other are structurally
+        identical to each other, but the sign is the opposite.
+        """
+        return self.isNegative()!=other.isNegative() and \
+               termEqual(self.atom, other.atom)
+
     def collectVars(self, res=None):
         """
         Insert all variables in self into the set res and return
@@ -237,6 +245,27 @@ def literalList2String(list):
     return "|".join(map(repr, list))
     
 
+def litInLitList(lit, litlist):
+    """
+    Return true if (a literal equal to) lit is in litlist, false
+    otherwise.
+    """
+    for l in litlist:
+        if l.isEqual(lit):
+            return True
+    return False
+
+
+def oppositeInLitList(lit, litlist):
+    """
+    Return true if (a literal equal to) lit is in litlist, false
+    otherwise.
+    """
+    for l in litlist:
+        if l.isOpposite(lit):
+            return True
+    return False
+
 
 class TestLiterals(unittest.TestCase):
     """
@@ -249,7 +278,7 @@ class TestLiterals(unittest.TestCase):
         variables needed throughout the tests.
         """
         print
-        self.input1="p(X)  ~q(f(X,a), b)  ~a=b  a!=b  ~a!=f(X,b)"
+        self.input1="p(X)  ~q(f(X,a), b)  ~a=b  a!=b  ~a!=f(X,b) p(X) ~p(X)"
         self.input2="p(X)|~q(f(X,a), b)|~a=b|a!=b|~a!=f(X,b)"
         self.input3="$false"
         self.input4="$false|~q(f(X,a), b)|$false"
@@ -260,6 +289,8 @@ class TestLiterals(unittest.TestCase):
         self.a3 = parseLiteral(lexer)
         self.a4 = parseLiteral(lexer)
         self.a5 = parseLiteral(lexer)
+        self.a6 = parseLiteral(lexer)
+        self.a7 = parseLiteral(lexer)
 
     def testLiterals(self):
         """
@@ -300,6 +331,13 @@ class TestLiterals(unittest.TestCase):
         self.a5.collectVars(vars)
         self.assertEqual(len(vars), 1)
 
+        print self.a6, self.a7
+        self.assert_(self.a6.isOpposite(self.a7))
+        self.assert_(self.a7.isOpposite(self.a6))
+        self.assert_(not self.a6.isOpposite(self.a6))
+        self.assert_(not self.a6.isOpposite(self.a1))
+
+        
 
     def testLitWeight(self):
         """
@@ -329,9 +367,14 @@ class TestLiterals(unittest.TestCase):
         lexer = Lexer(self.input4)
         l4 = parseLiteralList(lexer)
         print literalList2String(l4)
-        self.assertEqual(len(l4),1) 
-
+        self.assertEqual(len(l4),1)
         
+        self.assert_(litInLitList(l4[0], l4))
+        self.assert_(not litInLitList(self.a6, l4))
+        
+        self.assert_(oppositeInLitList(self.a7, l2))
+        self.assert_(not oppositeInLitList(self.a7, l4))
+
 
 if __name__ == '__main__':
     unittest.main()

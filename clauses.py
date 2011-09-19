@@ -50,7 +50,8 @@ import unittest
 from lexer import Token,Lexer
 from terms import *
 import substitutions
-from literals import Literal, parseLiteral, parseLiteralList, literalList2String
+from literals import Literal, parseLiteral, parseLiteralList,\
+     literalList2String, litInLitList, oppositeInLitList
 
 
 class Clause(object):
@@ -81,6 +82,12 @@ class Clause(object):
         """
         return "cnf(%s,%s,%s)."%(self.name, self.type, literalList2String(self.literals))
 
+    def __len__(self):
+        """
+        Return the number of literals in the clause.
+        """
+        return len(self.literals)
+
     def setName(self, name = None):
         """
         Set the name. If no name is given, generate a default name.
@@ -88,7 +95,7 @@ class Clause(object):
         if name:
             self.name = name
         else:
-            name = "c%d"%(Clause.clauseIdCounter,)
+            self.name = "c%d"%(Clause.clauseIdCounter,)
             Clause.clauseIdCounter = Clause.clauseIdCounter+1        
 
     def isEmpty(self):
@@ -110,19 +117,13 @@ class Clause(object):
         tmp = [l for l in self.literals if l.isPositive()]
         return len(self.literals) <= 1
 
-    def litNumber(self):
-        """
-        Return the number of literals in the clause.
-        """
-        return len(self.literals)
-
     def getLiteral(self, position):
         """
         Return the indicated literal of the clause. Position is an
         integer from 0 to litNumber (exclusive).
         """
         assert position >= 0
-        assert position < self.litNumber()
+        assert position < len(self)
         return self.literals[position]
 
     def collectVars(self, res=None):
@@ -166,6 +167,28 @@ class Clause(object):
         evaluation functions used.
         """
         self.evaluation = eval
+
+    def removeDupLits(self):
+        """
+        Remove duplicated literals from clause.
+        """
+        res = []
+        for l in self.literals:
+            if not litInLitList(l,res):
+                res.append(l)
+        self.literals = res
+
+    def isTautology(self):
+        """
+        Check if a clause is a simple tautology, i.e. if it contains
+        two literals with the same atom, but different signs.
+        """
+        for i in xrange(len(self.literals)):
+            if oppositeInLitList(self.literals[i],
+                                 self.literals[i+1:]):
+                return True
+        return False                
+        
    
 
 def parseClause(lexer):
@@ -219,7 +242,10 @@ class TestClauses(unittest.TestCase):
         self.str1 = """
 cnf(test,axiom,p(a)|p(f(X))).
 cnf(test,axiom,(p(a)|p(f(X)))).
-cnf(test3,lemma,(p(a)|~p(f(X))))."""
+cnf(test3,lemma,(p(a)|~p(f(X)))).
+cnf(taut,axiom,p(a)|q(a)|~p(a)).
+cnf(dup,axiom,p(a)|q(a)|p(a)).
+"""
        
     def testClauses(self):
         """
@@ -229,20 +255,22 @@ cnf(test3,lemma,(p(a)|~p(f(X))))."""
         c1 = parseClause(lex)
         c2 = parseClause(lex)
         c3 = parseClause(lex)
+        c4 = parseClause(lex)
+        c5 = parseClause(lex)        
 
         print c1
         print c2
         self.assertEqual(repr(c1), repr(c2))
 
-        c4 = c1.freshVarCopy()
+        cf = c1.freshVarCopy()
         print c1
-        print c4
+        print cf
 
-        self.assertEqual(c4.weight(2,1), c1.weight(2,1))
-        self.assertEqual(c4.weight(1,1), c1.weight(1,1))
+        self.assertEqual(cf.weight(2,1), c1.weight(2,1))
+        self.assertEqual(cf.weight(1,1), c1.weight(1,1))
 
-        c5 = Clause(c4.literals)
-        self.assert_(c5.getLiteral(0).isEqual(c4.getLiteral(0)))
+        cnew = Clause(c4.literals)
+        self.assert_(cnew.getLiteral(0).isEqual(c4.getLiteral(0)))
 
         empty = Clause([])
         self.assert_(empty.isEmpty())
@@ -256,6 +284,14 @@ cnf(test3,lemma,(p(a)|~p(f(X))))."""
 
         self.assert_(not c1.isHorn())
         self.assert_(not c3.isHorn())
+
+        self.assert_(c4.isTautology())
+        self.assert_(not c5.isTautology())
+
+        oldlen = len(c5)
+        c5.removeDupLits()
+        self.assert_(len(c5)<oldlen)
+        
         
 if __name__ == '__main__':
     unittest.main()
