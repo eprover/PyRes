@@ -95,6 +95,17 @@ class ClauseSet(object):
             return self.clauses.pop(best)
         else:
             return None
+
+    def getResolutionLiterals(self, lit):
+        """
+        Return a list of tuples (clause, literal-index) such that the
+        set includes at least all literals that can potentially be
+        resolved against lit. In the naive and obviously correct first
+        implementation, this simply returns a list of all
+        literal-indices for all clauses.
+        """
+        res = [(c, i) for c in self.clauses for i in xrange(len(c))]
+        return res
                     
     def parse(self, lexer):
         """
@@ -226,6 +237,16 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         c3 = clauses.extractBest(1)
         self.assertEqual(c3.name, "charles")
 
+    def testResPositions(self):
+        """
+        Test the the reolution position function works.
+        """
+        lexer = Lexer(self.spec)
+        clauses = ClauseSet()
+        clauses.parse(lexer)
+
+        pos = clauses.getResolutionLiterals(["p"])
+        print pos
         
 
 if __name__ == '__main__':

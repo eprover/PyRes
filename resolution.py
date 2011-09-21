@@ -66,7 +66,7 @@ def resolution(clause1, lit1, clause2, lit2):
     lits1.extend(lits2)
     res = clauses.Clause(lits1)
     return res
-    
+
 
 class TestResolution(unittest.TestCase):
     """
@@ -107,6 +107,7 @@ cnf(c3,axiom,p(Z,X)|~p(f(Z),X0)).
         res4 = resolution(self.c1, 0, self.c3,1)
         self.assert_(not res4)
         print res4
+
 
         
 if __name__ == '__main__':
