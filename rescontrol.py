@@ -71,7 +71,7 @@ def computeAllResolvents(clause, clauseset):
 
 def computeAllFactors(clause):
     """
-    Compute all factors of clause.
+    Compute all (direkt) factors of clause.
     """
     res = []
     for i in xrange(len(clause)):
@@ -79,7 +79,6 @@ def computeAllFactors(clause):
             fact = factor(clause, i, j)
             if fact:
                 res.append(fact)
-
     return res
     
 
@@ -103,6 +102,10 @@ cnf(c3, axiom, c).
         self.conj = parseClause(lex)
         self.cset = ClauseSet()
         self.cset.parse(lex)
+
+        cstr = "cnf(ftest, axiom, p(X)|~q|p(a)|~q|p(Y))."
+        lex = Lexer(cstr)
+        self.fclause = parseClause(lex)
        
     def testSetResolution(self):
         """
@@ -111,6 +114,15 @@ cnf(c3, axiom, c).
         """
         res = computeAllResolvents(self.conj, self.cset)
         print res
+
         
+    def testFactoring(self):
+        """
+        Test full factoring of a clause.
+        """
+        res = computeAllFactors(self.fclause)
+        print res
+
+
 if __name__ == '__main__':
     unittest.main()

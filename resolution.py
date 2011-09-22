@@ -80,6 +80,7 @@ def resolution(clause1, lit1, clause2, lit2):
     lits2 = [l.instantiate(sigma) for l in clause2.literals if l!=l2]
     lits1.extend(lits2)
     res = clauses.Clause(lits1)
+    res.removeDupLits()
     return res
 
 
@@ -98,6 +99,7 @@ def factor(clause, lit1, lit2):
         return None
     lits = [l.instantiate(sigma) for l in clause.literals if l!=l2]
     res = clauses.Clause(lits)
+    res.removeDupLits()
     return res
 
 
