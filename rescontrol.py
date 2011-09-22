@@ -48,7 +48,7 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Token,Lexer
-from resolution import resolution
+from resolution import resolution, factor
 from clauses import parseClause
 from clausesets import ClauseSet
 
@@ -67,7 +67,20 @@ def computeAllResolvents(clause, clauseset):
             if resolvent!=None:
                 res.append(resolvent)
     return res
-    
+
+
+def computeAllFactors(clause):
+    """
+    Compute all factors of clause.
+    """
+    res = []
+    for i in xrange(len(clause)):
+        for j in xrange(i+1, len(clause)):
+            fact = factor(clause, i, j)
+            if fact:
+                res.append(fact)
+
+    return res
     
 
 class TestInferences(unittest.TestCase):
