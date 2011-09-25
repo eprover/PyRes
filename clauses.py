@@ -80,8 +80,11 @@ class Clause(object):
         """
         Return a string representation of the clause.
         """
-        return "cnf(%s,%s,%s)."%(self.name, self.type, literalList2String(self.literals))
-
+        res = "cnf(%s,%s,%s)."%(self.name, self.type, literalList2String(self.literals))
+        if self.evaluation:
+            res = res+"/* %s */"%(repr(self.evaluation),)
+        return res
+    
     def __len__(self):
         """
         Return the number of literals in the clause.
@@ -131,6 +134,8 @@ class Clause(object):
         Insert all variables in self into the set res and return
         it. If res is not given, create it.
         """
+        if not res:
+            res = set([])
         for i in self.literals:
             res = i.collectVars(res)
         return res
