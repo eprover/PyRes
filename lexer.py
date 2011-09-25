@@ -36,7 +36,7 @@ Email: schulz@eprover.org
 import unittest
 import string
 import re
-
+from idents import Ident
 
 class ScannerError(Exception):
     """
@@ -85,20 +85,9 @@ class UnexpectedIdentError(ScannerError):
 
 nl_re  = re.compile("\n")
 
+   
 
-class Ident:
-    """
-    Dummy class for generating distinct named objects.
-    """
-
-    def __init__(self, name = ""):
-        self.name = name
-
-    def __repr__(self):
-        return self.name
-    
-
-class Token:
+class Token(object):
     """
     Represent a single token with name, position, and print
     representation.
@@ -140,7 +129,7 @@ class Token:
         return len(nl_re.findall(self.source[:self.pos]))+1
     
 
-class Lexer:
+class Lexer(object):
     """
     Lexical analysier. This will convert a string into a sequence of
     tokens that can be inspected and processed in-order. It is a bit
