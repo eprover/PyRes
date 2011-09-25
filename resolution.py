@@ -19,6 +19,12 @@ empty, and that a1 and a2 are atoms (so a1 and ~a2 are literals).
 Also, since | is AC (or, alternatively, the clauses are unordered
 multisets), the order of literals is irrelevant.
 
+Clauses are interpreted as implicitly universally quantified
+disjunctions of literals. This implies that the scope of the variables
+is a single clause. In other words, from a theoretical point of view,
+variables in different clauses are different. In practice, we have to
+enforce this explicitly by making sure that all clauses used as
+premises in an inference are indeed variable disjoint.
 
 
 Factoring:
@@ -94,7 +100,6 @@ def factor(clause, lit1, lit2):
     if l1.isNegative() != l2.isNegative():
         return None
     sigma = mgu(l1.atom, l2.atom)
-    print sigma
     if sigma == None:
         return None
     lits = [l.instantiate(sigma) for l in clause.literals if l!=l2]
