@@ -116,7 +116,44 @@ class SymbolCountEvaluation(ClauseEvaluationFunction):
         """
         return clause.weight(self.fweight, self.vweight)
 
-        
+
+class EvalStructure(object):
+    """
+    Represent a heuristic clause processing schema. The scheme
+    contains several different evaluation functions, and a way to
+    alternate between them. Concretely, each evaluation function is
+    paired with a counter, and clauses are picked from each function
+    in a weighted round-robin scheme.
+    """
+    def __init__(self, eval_descriptor):
+        """
+        Initialize ths structure. The argument is a list of pairs,
+        where each pair consists of a function and its relative weight
+        count.         
+        """
+        assert len(eval_descriptor)
+        self.eval_funs = [pair[0] for pair in eval_descriptor]
+        self.eval_vec  = [pair[1] for pair in eval_descriptor]
+        self.current = 0
+        self.current_count = self.eval_vec[0]
+
+    def evaluate(self, clause):
+        """
+        Return a composite evaluation of the clause.
+        """
+        evals = [f(clause) for f in self.eval_funs]
+        return evals
+
+    def nextEval(self):
+        """
+        Return the index of the next evaluation function of the scheme.
+        """
+        while not self.current_count:
+            self.current = (self.current+1) % len(self.eval_vec)
+            self.current_count = self.eval_vec[self.current]
+        self.current_count = self.current_count - 1
+        return self.current
+            
 
 class TestHeuristics(unittest.TestCase):
     """
@@ -127,6 +164,7 @@ class TestHeuristics(unittest.TestCase):
         Setup function for tests. Create some clauses to test
         evaluations on.
         """
+
         print
         self.spec ="""
 cnf(c1,axiom,(f(X1,X2)=f(X2,X1))).
@@ -151,7 +189,7 @@ cnf(c8,axiom,(c=d|h(i(a))!=h(i(e)))).
 
     def testFIFO(self):
         """
-        Test that basic literal parsing works correctly.
+        Test that FIFO evaluation works as expected.
         """
         eval = FIFOEvaluation()
         e1 = eval(self.c1)
@@ -172,7 +210,7 @@ cnf(c8,axiom,(c=d|h(i(a))!=h(i(e)))).
 
     def testSymbolCount(self):
         """
-        Test that basic literal parsing works correctly.
+        Test that symbol counting works as expected.
         """
         eval = SymbolCountEvaluation(2,1)
         e1 = eval(self.c1)
@@ -191,7 +229,22 @@ cnf(c8,axiom,(c=d|h(i(a))!=h(i(e)))).
         self.assertEqual(e6, self.c6.weight(2,1))
         self.assertEqual(e7, self.c7.weight(2,1))
         self.assertEqual(e8, self.c8.weight(2,1))
-      
+
+    def testEvalStructure(self):
+        """
+        Test composite evaluations.
+        """
+        eval_funs = EvalStructure([(SymbolCountEvaluation(2,1),2),
+                                   (FIFOEvaluation(),1)])
+        
+        evals = eval_funs.evaluate(self.c1)
+        self.assertEqual(len(evals), 2)
+        self.assertEqual(eval_funs.nextEval(),0)
+        self.assertEqual(eval_funs.nextEval(),0)
+        self.assertEqual(eval_funs.nextEval(),1)
+        self.assertEqual(eval_funs.nextEval(),0)
+        self.assertEqual(eval_funs.nextEval(),0)
+        self.assertEqual(eval_funs.nextEval(),1)
 
 if __name__ == '__main__':
     unittest.main()
