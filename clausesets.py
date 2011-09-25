@@ -36,7 +36,7 @@ Email: schulz@eprover.org
 import unittest
 from lexer import Lexer
 from clauses import Clause, parseClause
-from heuristics import FIFOEvaluation, SymbolCountEvaluation
+from heuristics import FIFOEvaluation, SymbolCountEvaluation, EvalStructure
 
 
 class ClauseSet(object):
@@ -77,10 +77,10 @@ class ClauseSet(object):
         """
         self.clauses.append(clause)
         if self.eval_functions:
-            evals = [f(clause) for f in self.eval_functions]
+            evals = self.eval_functions.evaluate(clause)
             clause.addEval(evals)
 
-    def extractBest(self, heuristic_index):
+    def extractBestByEval(self, heuristic_index):
         """
         Extract and return the clause with the lowest weight according
         to the selected heuristic. If the set is empty, return None.
@@ -90,11 +90,19 @@ class ClauseSet(object):
             besteval = self.clauses[0].evaluation[heuristic_index]
             for i in xrange(1, len(self.clauses)):
                 if self.clauses[i].evaluation[heuristic_index] < besteval:
-                    besteval = clauses[i].evaluation[heuristic_index]
+                    besteval = self.clauses[i].evaluation[heuristic_index]
                     best     = i
             return self.clauses.pop(best)
         else:
             return None
+
+    def extractBest(self):
+        """
+        Extract and return the next "best" clause according to the
+        evaluation scheme.
+        """
+        return self.extractBestByEval(self.eval_functions.nextEval())
+        
 
     def getResolutionLiterals(self, lit):
         """
@@ -109,12 +117,15 @@ class ClauseSet(object):
                     
     def parse(self, lexer):
         """
-        Parse a sequence of clauses from lex and add them to the set.
+        Parse a sequence of clauses from lex and add them to the
+        set. Return number of clauses parsed.
         """
+        count = 0
         while lexer.LookLit() == "cnf":
             clause = parseClause(lexer)
             self.addClause(clause)
-    
+            count = count+1
+        return count
 
 class TestClauseSets(unittest.TestCase):
     """
@@ -188,9 +199,6 @@ cnf(no_one_hates_everyone,hypothesis,
 cnf(agatha_hates_agatha,hypothesis,
     ( hates(agatha,agatha) )).
 
-cnf(agatha_hates_charles,hypothesis,
-    ( hates(agatha,charles) )).
-
 cnf(killer_hates_victim,hypothesis,
     ( ~ killed(X,Y)
     | hates(X,Y) )).
@@ -198,6 +206,9 @@ cnf(killer_hates_victim,hypothesis,
 cnf(same_hates,hypothesis,
     ( ~ hates(agatha,X)
     | hates(butler,X) )).
+
+cnf(agatha_hates_charles,hypothesis,
+    ( hates(agatha,charles) )).
 
 cnf(butler_hates_poor,hypothesis,
     ( ~ lives(X)
@@ -212,7 +223,7 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
 %------------------------------------------------------------------------------
 """
        
-    def testClauseSetInit(self):
+    def testClauseSetChanges(self):
         """
         Test that clause set initialization and parsing work.
         """
@@ -221,21 +232,41 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         clauses.parse(lexer)
         print clauses
 
-        print "=========================================="
 
-        clauses = ClauseSet([SymbolCountEvaluation(2,1), FIFOEvaluation()])
+
+    def testClauseSetHeuristics(self):
+        """
+        Test the evaluation and heuristic methods.
+        """
+        print "=========================================="
+        clauses = ClauseSet(EvalStructure([(SymbolCountEvaluation(2,1),2),
+                                           (FIFOEvaluation(),1)]))
         lexer = Lexer(self.spec)
-        clauses.parse(lexer)
+        parsed = clauses.parse(lexer)
+        self.assertEqual(parsed, 12)
         print clauses
 
         # Check if FIFO returns clauses in order.
         self.assertEqual(len(clauses), 12)
-        c1 = clauses.extractBest(1)
+        c1 = clauses.extractBestByEval(1)
         self.assertEqual(c1.name, "agatha")
-        c2 = clauses.extractBest(1)
+        c2 = clauses.extractBestByEval(1)
         self.assertEqual(c2.name, "butler")
-        c3 = clauses.extractBest(1)
+        c3 = clauses.extractBestByEval(1)
         self.assertEqual(c3.name, "charles")
+        c = clauses.extractBestByEval(0)
+        while c != None:
+            c = clauses.extractBestByEval(0)
+
+        print "=========================================="
+        clauses = ClauseSet(EvalStructure([(SymbolCountEvaluation(2,1),2),
+                                           (FIFOEvaluation(),1)]))
+        lexer = Lexer(self.spec)
+        parsed = clauses.parse(lexer)
+        c = clauses.extractBest()
+        while c != None:
+            print c
+            c = clauses.extractBest()
 
     def testResPositions(self):
         """
