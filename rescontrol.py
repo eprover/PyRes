@@ -1,23 +1,10 @@
 #!/usr/bin/env python2.7
 # ----------------------------------
 #
-# Module clause.py
+# Module rescontrol.py
 
 """
-A simple implementation of first-order clauses.
-
-See literals.py for the definition of atoms and literals.
-
-A logical clause in our sense is a multi-set of literals, implicitly
-representing the universally quantified disjunction of these literals.
-
-
-The set of all clauses for a given signature is denoted as
-Clauses(P,F,V).
-
-We represent a clause as a list of literals. The actual clause data
-structure contains additional information that is useful, but not
-strictly necessary from a clogic/alculus point of view.
+Functions wrapping basic inference rules for convenience.
 
 
 Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
@@ -82,7 +69,7 @@ def computeAllFactors(clause):
     return res
     
 
-class TestInferences(unittest.TestCase):
+class TestSetInferences(unittest.TestCase):
     """
     Unit test class for simple resolution inference control.
     """
