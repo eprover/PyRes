@@ -25,3 +25,9 @@ testcov: *.py
 	mkdir COVERAGE
 	coverage annotate -d COVERAGE
 	cat testcov
+
+
+tags: TAGS
+
+TAGS: *.py
+	etags *.py
