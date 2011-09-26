@@ -91,12 +91,12 @@ def match(matcher, target, subst):
     result = True
 
     if termIsVar(matcher):
-       if subst.is_bound(matcher):
+       if subst.isBound(matcher):
           if not termEqual(subst.value(match), target):
              result = False
              # No else case - variable is already bound correctly
        else:
-          subst.add_binding((matcher, target))
+          subst.addBinding((matcher, target))
     else:
        if termIsVar(target) or termFunc(matcher) != termFunc(target):
           result = False
@@ -131,13 +131,13 @@ def match_norec(t1, t2, subst):
        target   = tlist.pop()
 
        if termIsVar(matcher):
-          if subst.is_bound(matcher):
+          if subst.isBound(matcher):
              if not termEqual(subst.value(match), target):
                 result = False
                 break
              # No else case - variable is already bound correctly
           else:
-             subst.add_binding((matcher, target))
+             subst.addBinding((matcher, target))
        else:
           if termIsVar(target) or termFunc(matcher) != termFunc(target):
              result = False

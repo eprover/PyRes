@@ -36,26 +36,19 @@ Email: schulz@eprover.org
 import unittest
 from lexer import Lexer
 from clauses import Clause, parseClause
-from heuristics import FIFOEvaluation, SymbolCountEvaluation, EvalStructure
+from heuristics import PickGiven2
 
 
 class ClauseSet(object):
     """
     A class representing a clause set (or, more precisely,
     a multi-set of clauses). 
-
-    A clause optionally supports heuristic ordering of its clauses. If
-    a list of heuristic functions is configured at creation time of
-    the clause set, all clauses inserted into the set are evaluated
-    according to all criteria. The clause set support extraction of
-    the "best" clause according to any of the configured heuristics.
     """
-    def __init__(self, eval_functions=None):
+    def __init__(self):
         """
         Initialize the clause.
         """
-        self.clauses  = []
-        self.eval_functions = eval_functions
+        self.clauses = []
               
     def __repr__(self):
         """
@@ -71,14 +64,66 @@ class ClauseSet(object):
 
     def addClause(self, clause):
         """
+        Add a clause to the clause set.
+        """
+        self.clauses.append(clause)
+
+    def extractClause(self, clause):
+        """
+        Remove a clause to the clause set and return it.
+        """
+        self.clauses.remove(clause)
+        return clause
+
+    def getResolutionLiterals(self, lit):
+        """
+        Return a list of tuples (clause, literal-index) such that the
+        set includes at least all literals that can potentially be
+        resolved against lit. In the naive and obviously correct first
+        implementation, this simply returns a list of all
+        literal-indices for all clauses.
+        """
+        res = [(c, i) for c in self.clauses for i in xrange(len(c))]
+        return res
+                    
+    def parse(self, lexer):
+        """
+        Parse a sequence of clauses from lex and add them to the
+        set. Return number of clauses parsed.
+        """
+        count = 0
+        while lexer.LookLit() == "cnf":
+            clause = parseClause(lexer)
+            self.addClause(clause)
+            count = count+1
+        return count
+
+class HeuristicClauseSet(ClauseSet):
+    """
+    A class representing a clause set (or, more precisely, a multi-set
+    of clauses) with heuristic evaluations.  
+
+    All clauses inserted into the set are evaluated
+    according to all criteria. The clause set support extraction of
+    the "best" clause according to any of the configured heuristics.
+    """
+    def __init__(self, eval_functions):
+        """
+        Initialize the clause.
+        """
+        self.clauses  = []
+        self.eval_functions = eval_functions
+              
+
+    def addClause(self, clause):
+        """
         Add a clause to the clause set. If the clause set supports
         heuristic evaluations, add the relevant evaluations to the
         clause. 
         """
-        self.clauses.append(clause)
-        if self.eval_functions:
-            evals = self.eval_functions.evaluate(clause)
-            clause.addEval(evals)
+        evals = self.eval_functions.evaluate(clause)
+        clause.addEval(evals)
+        ClauseSet.addClause(self, clause)
 
     def extractBestByEval(self, heuristic_index):
         """
@@ -103,29 +148,6 @@ class ClauseSet(object):
         """
         return self.extractBestByEval(self.eval_functions.nextEval())
         
-
-    def getResolutionLiterals(self, lit):
-        """
-        Return a list of tuples (clause, literal-index) such that the
-        set includes at least all literals that can potentially be
-        resolved against lit. In the naive and obviously correct first
-        implementation, this simply returns a list of all
-        literal-indices for all clauses.
-        """
-        res = [(c, i) for c in self.clauses for i in xrange(len(c))]
-        return res
-                    
-    def parse(self, lexer):
-        """
-        Parse a sequence of clauses from lex and add them to the
-        set. Return number of clauses parsed.
-        """
-        count = 0
-        while lexer.LookLit() == "cnf":
-            clause = parseClause(lexer)
-            self.addClause(clause)
-            count = count+1
-        return count
 
 class TestClauseSets(unittest.TestCase):
     """
@@ -231,16 +253,18 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         clauses = ClauseSet()
         clauses.parse(lexer)
         print clauses
-
-
+        oldlen = len(clauses)
+        c = clauses.clauses[0]
+        clauses.extractClause(c)
+        self.assertEqual(len(clauses), oldlen-1)
+        
 
     def testClauseSetHeuristics(self):
         """
         Test the evaluation and heuristic methods.
         """
         print "=========================================="
-        clauses = ClauseSet(EvalStructure([(SymbolCountEvaluation(2,1),2),
-                                           (FIFOEvaluation(),1)]))
+        clauses = HeuristicClauseSet(PickGiven2)
         lexer = Lexer(self.spec)
         parsed = clauses.parse(lexer)
         self.assertEqual(parsed, 12)
@@ -259,8 +283,7 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
             c = clauses.extractBestByEval(0)
 
         print "=========================================="
-        clauses = ClauseSet(EvalStructure([(SymbolCountEvaluation(2,1),2),
-                                           (FIFOEvaluation(),1)]))
+        clauses = HeuristicClauseSet(PickGiven2)
         lexer = Lexer(self.spec)
         parsed = clauses.parse(lexer)
         c = clauses.extractBest()

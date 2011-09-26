@@ -36,18 +36,10 @@ Email: schulz@eprover.org
 import unittest
 from idents import Ident
 from lexer import Token,Lexer
-from clausesets import ClauseSet
+from clausesets import ClauseSet, HeuristicClauseSet
 import heuristics
 from rescontrol import computeAllResolvents, computeAllFactors
 
-
-class SearchValues(object):
-    """
-    Container for possible parameter values.
-    """
-    Never        = Ident("Never")
-    OnProcessing = Ident("On processing")
-    OnCreation   = Ident("On creation")
 
 
 class SearchParams(object):
@@ -56,18 +48,21 @@ class SearchParams(object):
     search.    
     """
     def __init__(self,
-                 heuristics = [heuristics.SymbolCountEvaluation(2,1),
-                               heuristics.FIFOEvaluation()],
-                 delete_tautologies = SearchValues.Never,
-                 delete_subsumed    = SearchValues.Never):
+                 heuristics = heuristics.PickGiven5,
+                 delete_tautologies   = False,
+                 forward_subsumption  = False,
+                 backward_subsumption = False):
+                 
+                 
         """
         Initialize heuristic parameters.
         """
-        self.heuristics = heuristics
-        self.delete_tautologies = delete_tautologies
-        self.delete_subsumed    = delete_subsumed
+        self.heuristics           = heuristics
+        self.delete_tautologies   = delete_tautologies
+        self.forward_subsumption  = forward_subsumption
+        self.backward_subsumption = backward_subsumption
                  
-                 
+        
 
 
 class ProofState(object):
@@ -75,13 +70,12 @@ class ProofState(object):
     Top-level data structure for the prover: Processed and uprocessed
     clause sets, and statistical data.
     """
-    def __init__(self, clauses):
+    def __init__(self, params, clauses):
         """
         Initialize the proof state with a set of clauses.
         """
-        self.unprocessed = ClauseSet(
-            heuristics.EvalStructure([(heuristics.SymbolCountEvaluation(2,1),5),
-                                      (heuristics.FIFOEvaluation(),1)]))
+        self.params = params
+        self.unprocessed = HeuristicClauseSet(params.heuristics)
                                      
         self.processed   = ClauseSet()
         for c in clauses.clauses:
@@ -90,17 +84,24 @@ class ProofState(object):
         self.proc_clause_count    = 0
         self.factor_count         = 0
         self.resolvent_count      = 0
+        self.tautologies_deleted  = 0
         
     def processClause(self):
         """
-        Pick a clause from unprocessed and process it.
+        Pick a clause from unprocessed and process it. If the empty
+        clause is found, return it. Otherwise return None.
         """
         given_clause = self.unprocessed.extractBest()
         given_clause = given_clause.freshVarCopy()
-        print "# ", given_clause
+        print "#", given_clause
         if given_clause.isEmpty():
             # We have found an explicit contradiction
             return given_clause
+        if self.params.delete_tautologies and \
+           given_clause.isTautology():
+            self.tautologies_deleted = self.tautologies_deleted+1
+            return None
+            
         new = []
         factors    = computeAllFactors(given_clause)
         new.extend(factors)
@@ -117,15 +118,34 @@ class ProofState(object):
 
     def saturate(self):
         """
-        Main proof procedure.
+        Main proof procedure. If the clause set is found
+        unsatisfiable, return the empty clause as a witness. Otherwise
+        return None.
         """
         while self.unprocessed:
             res = self.processClause()
             if res != None:
-                print "# Proof found!"
-                break
+                return res
         else:
-            print "# No proof found"
+            return None
+
+    def statisticsStr(self):
+        """
+        Return the proof state statistics in string form ready for
+        output.
+        """
+        return """
+# Initial clauses    : %d
+# Processed clauses  : %d
+# Factors computed   : %d
+# Resolvents computed: %d
+# Tautologies deleted: %d""" \
+    %(self.initial_clause_count,
+      self.proc_clause_count,
+      self.factor_count,
+      self.resolvent_count,
+      self.tautologies_deleted)
+        
 
 class TestProver(unittest.TestCase):
     """
@@ -137,9 +157,11 @@ class TestProver(unittest.TestCase):
         variables needed throughout the tests.
         """
         print
+        self.params = SearchParams()
+        self.params.delete_tautologies = True
         self.spec1 = """
-    cnf(axiom, a_is_true, a).
-    cnf(negated_conjecture, is_a_true, ~a)."""
+ cnf(axiom, a_is_true, a).
+ cnf(negated_conjecture, is_a_true, ~a)."""
 
         self.spec2 = """
 %------------------------------------------------------------------------------
@@ -226,27 +248,59 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
 
 %------------------------------------------------------------------------------
 """
-       
-    def testProver(self):
+
+        self.spec3 = """
+cnf(p_or_q, axiom, p(X)|q(a)).
+cnf(taut, axiom, p(X)|~p(X)).
+cnf(not_p, axiom, ~p(a)).
+"""
+
+    def evalSatResult(self, spec, provable):
         """
-        Test that forming resolvents between a clause and a clause set
-        works. 
+        Evaluate the result of a saturation compared to the expected
+        result.
         """
-        lex = Lexer(self.spec1)
+
+        lex = Lexer(spec)
         problem = ClauseSet()
         problem.parse(lex)
 
-        prover = ProofState(problem)
-        prover.saturate()
+        prover = ProofState(self.params, problem)
+        res = prover.saturate()
 
-        lex = Lexer(self.spec2)
-        problem = ClauseSet()
-        problem.parse(lex)
+        if provable:
+            self.assertNotEqual(res, None)
+            if res == None: # pragma: nocover
+                print "# Bug: Should have found a proof!"
+            else:
+                print "# Proof found"
+        else:
+            self.assertEqual(res, None)
+            if res != None: # pragma: nocover
+                print "# Bug: Should not have  found a proof!"
+            else:
+                print "# No proof found"
+                
+        print prover.statisticsStr()
+        
+    def testSaturation(self):
+        """
+        Test that saturation works.
+        """
+        self.evalSatResult(self.spec1, True)
+        self.evalSatResult(self.spec2, True)
+        self.evalSatResult(self.spec3, False)
 
-        prover = ProofState(problem)
-        prover.saturate()
 
-
+    def testParamSet(self):
+        """
+        Test that parameter setting code works.        
+        """
+        pm = SearchParams()
+        self.assertEqual(pm.heuristics, heuristics.PickGiven5)
+        self.assertEqual(pm.delete_tautologies,   False)
+        self.assertEqual(pm.forward_subsumption,  False)
+        self.assertEqual(pm.backward_subsumption, False)
 
 if __name__ == '__main__':
     unittest.main()

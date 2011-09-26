@@ -166,7 +166,7 @@ def mguTermList(l1, l2, subst):
           new_binding = Substitution([(t1, t2)])          
           l1 = [new_binding(t) for t in l1]
           l2 = [new_binding(t) for t in l2]
-          subst.compose_binding((t1, t2))
+          subst.composeBinding((t1, t2))
        elif termIsVar(t2):
           # Symmetric case
           # We know that t1!=t2, so we can drop this check
@@ -175,7 +175,7 @@ def mguTermList(l1, l2, subst):
           new_binding = Substitution([(t2, t1)])          
           l1 = [new_binding(t) for t in l1]
           l2 = [new_binding(t) for t in l2]
-          subst.compose_binding((t2, t1))
+          subst.composeBinding((t2, t1))
        else: 
           assert termIsCompound(t1) and termIsCompound(t2)
           # For f(s1, ..., sn) = g(t1, ..., tn), first f and g have to

@@ -155,6 +155,40 @@ class EvalStructure(object):
         return self.current
             
 
+FIFOEval        = EvalStructure([(FIFOEvaluation(),1)])
+"""
+Strict first-in/first out evaluation. This is obviously fair
+(i.e. every clause will be picked eventuall), but not a good search
+strategy. 
+"""
+
+SymbolCountEval = EvalStructure([(SymbolCountEvaluation(2,1),1)])
+"""
+Strict symbol counting (a smaller clause is always better than a
+larger clause). This is only fair if subsumption or a similar
+mechanism is employed, otherwise there can e.g. be an infinite set of 
+clauses p(X1), p(X2), p(X3),.... that are all smaller than q(f(X)), so
+that the latter is never selected.
+"""
+
+PickGiven5      = EvalStructure([(SymbolCountEvaluation(2,1),5),
+                                 (FIFOEvaluation(),1)])
+"""
+Experiences have shown that picking always the smallest clause (by
+symbol count) isn't optimal, but that i pays of to interleave smallest
+and oldes clause. The ratio betwee the two schemes is sometimes
+called the "pick-given ratio", and, according to folklore, Larry Wos
+has stated that "the optimal pick-given ratio is five." Since he is a
+very smart person we use this value here.
+"""
+
+PickGiven2      = EvalStructure([(SymbolCountEvaluation(2,1),2),
+                                 (FIFOEvaluation(),1)])
+"""
+See above, but now with a pick-given ration of 2 for easier testing.
+"""
+
+
 class TestHeuristics(unittest.TestCase):
     """
     Test heuristic evaluation functions.

@@ -72,7 +72,8 @@ Email: schulz@eprover.org
 import unittest
 from lexer import Token,Lexer
 from terms import *
-
+from substitutions import BTSubst
+from matching import match
 
 
 
@@ -196,6 +197,17 @@ class Literal(object):
         """
         return termWeight(self.atom, fweight, vweight)
 
+    def match(self, other, subst):
+        """
+        Try to extend subst a match from self to other. Return True on
+        success, False otherwise. In the False case, subst is
+        unchanged. 
+        """
+        if self.isNegative()!=other.isNegative():
+            return False
+        else:
+            return match(self.atom, other.atom, subst)
+
 def parseLiteral(lexer):
     """
     Parse a literal. A literal is an optional negation sign '~',
@@ -278,7 +290,7 @@ class TestLiterals(unittest.TestCase):
         variables needed throughout the tests.
         """
         print
-        self.input1="p(X)  ~q(f(X,a), b)  ~a=b  a!=b  ~a!=f(X,b) p(X) ~p(X)"
+        self.input1="p(X)  ~q(f(X,a), b)  ~a=b  a!=b  ~a!=f(X,b) p(X) ~p(X) p(a)"
         self.input2="p(X)|~q(f(X,a), b)|~a=b|a!=b|~a!=f(X,b)"
         self.input3="$false"
         self.input4="$false|~q(f(X,a), b)|$false"
@@ -291,6 +303,7 @@ class TestLiterals(unittest.TestCase):
         self.a5 = parseLiteral(lexer)
         self.a6 = parseLiteral(lexer)
         self.a7 = parseLiteral(lexer)
+        self.a8 = parseLiteral(lexer)
 
     def testLiterals(self):
         """
@@ -349,6 +362,18 @@ class TestLiterals(unittest.TestCase):
         self.assertEqual(self.a4.weight(2,1),6)
         self.assertEqual(self.a5.weight(2,1),9)
 
+    def testMatch(self):
+        """
+        Test literal matching.
+        """
+        self.assert_(self.a1.match(self.a1, BTSubst()))
+        self.assert_(not self.a1.match(self.a2, BTSubst()))
+
+        self.assert_(self.a1.match(self.a8, BTSubst()))
+        self.assert_(not self.a8.match(self.a1, BTSubst()))
+
+        self.assert_(not self.a1.match(self.a2, BTSubst()))
+        self.assert_(not self.a2.match(self.a1, BTSubst()))
         
     def testLitList(self):
         """

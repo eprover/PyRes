@@ -108,7 +108,7 @@ class Substitution(object):
         else:
             return var
 
-    def is_bound(self, var):
+    def isBound(self, var):
         """
         Return True if var is bound in self, false otherwise.
         """
@@ -126,7 +126,7 @@ class Substitution(object):
             res.extend(args)
             return res                      
         
-    def compose_binding(self, binding):
+    def composeBinding(self, binding):
         """
         Compose a new binding to an existing substitution. 
         """
@@ -192,7 +192,7 @@ class BTSubst(Substitution):
          res = res+1
       return res
 
-   def add_binding(self, binding):
+   def addBinding(self, binding):
       """
       Add a single binding to the substitution.
       """
@@ -200,7 +200,7 @@ class BTSubst(Substitution):
       self.subst[var] = term
       self.bindings.append(binding)
 
-   def compose_binding(self, binding): # pragma: no cover
+   def composeBinding(self, binding): # pragma: no cover
       """
       Overloaded to catch usage errors!
       """
@@ -266,6 +266,9 @@ class TestSubst(unittest.TestCase):
 
 
     def testFreshVarSubst(self):
+        """
+        Test that 
+        """
         var1 = freshVar()
         var2 = freshVar()
         self.assert_(var1!=var2)
@@ -276,6 +279,19 @@ class TestSubst(unittest.TestCase):
         shared = set(vars).intersection(set(vars2))
         self.assert_(not shared)
 
+    def testBacktrack(self):
+        """
+        Test backtrackable substitutions.
+        """
+        sigma = BTSubst()
+        state = sigma.getState()
+        sigma.addBinding(('X', terms.string2Term("f(Y)")))
+        res = sigma.backtrackToState(state)
+        self.assertEqual(res, 1)
+        res = sigma.backtrack()
+        self.assert_(not res)
+        
+        
 
 if __name__ == '__main__':
     unittest.main()
