@@ -97,6 +97,7 @@ class ClauseSet(object):
             self.addClause(clause)
             count = count+1
         return count
+    
 
 class HeuristicClauseSet(ClauseSet):
     """

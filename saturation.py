@@ -51,24 +51,48 @@ class SearchParams(object):
                  heuristics = heuristics.PickGiven5,
                  delete_tautologies   = False,
                  forward_subsumption  = False,
-                 backward_subsumption = False):
-                 
-                 
+                 backward_subsumption = False):                        
         """
         Initialize heuristic parameters.
-        """
+        """        
         self.heuristics           = heuristics
+        """
+        This defines the clause selection heuristic, i.e. the order in
+        which uprocessed clauses are selected for processing.
+        """
         self.delete_tautologies   = delete_tautologies
+        """
+        This determines if tautologies will be deleted. Tautologies in
+        plain first-order logic (without equality) are clauses which
+        contain two literals with the same atom, but opposite signs.
+        """
         self.forward_subsumption  = forward_subsumption
+        """
+        Forward-subsumption checks the given clause against already
+        processed clauses, and discards it if it is subsumed.
+        """
         self.backward_subsumption = backward_subsumption
-                 
+        """
+        Backwars subsumption checks the processed clauses against the
+        given clause, and discards all processed clauses that are
+        subsumed. 
+        """
         
 
 
 class ProofState(object):
     """
-    Top-level data structure for the prover: Processed and uprocessed
-    clause sets, and statistical data.
+    Top-level data structure for the prover. The complete knowledge
+    base is split into two sets, processed clauses and unprocessed
+    clauses. These are represented here as individual clause sets. The
+    main algorithm "processes" clauses and moves them from the
+    unprocessed into the processed set. Processing typically generates
+    several new clauses, which are direct consequences of the given
+    clause and the processed claues. These new clauses are added to
+    the set of unprocessed clauses.
+
+    In addition to the clause sets, this data structure also maintains
+    a number of counters for statistics on the proof search.
     """
     def __init__(self, params, clauses):
         """
@@ -121,6 +145,7 @@ class ProofState(object):
         self.proc_clause_count = self.proc_clause_count+1
         self.factor_count = self.factor_count+len(factors)
         self.resolvent_count = self.resolvent_count+len(resolvents)
+
         self.processed.addClause(given_clause)
 
         for c in new:

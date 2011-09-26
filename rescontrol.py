@@ -43,7 +43,10 @@ from clausesets import ClauseSet
 def computeAllResolvents(clause, clauseset):
     """
     Compute all binary resolvents between a given clause and all
-    clauses in clauseset.
+    clauses in clauseset. This is used when integrating a new clause 
+    into the processed part of the proof state, where all posible
+    resolvents between the new clause and the already processed
+    clauses are computed. [Note: Explain  better]
     """
     res = []
     for lit in xrange(len(clause)):
@@ -58,7 +61,10 @@ def computeAllResolvents(clause, clauseset):
 
 def computeAllFactors(clause):
     """
-    Compute all (direkt) factors of clause.
+    Compute all (direct) factors of clause. This operation is O(n^2)
+    if n is the number of literals. However, factoring is nearly never
+    a critical operation. Single-clause operations are nearly always
+    much cheaper than clause/clause-set operations.
     """
     res = []
     for i in xrange(len(clause)):
