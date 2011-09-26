@@ -97,7 +97,7 @@ def backwardSubsumption(clause, set):
     Remove all clauses that are subsumed by clause from set. 
     """
     subsumed_set = []
-    for c i set.clauses:
+    for c in set.clauses:
         if subsumes(clause, c):
             subsumed_set.append(c)
     res = len(subsumed_set)
