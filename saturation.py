@@ -39,7 +39,7 @@ from lexer import Token,Lexer
 from clausesets import ClauseSet, HeuristicClauseSet
 import heuristics
 from rescontrol import computeAllResolvents, computeAllFactors
-
+from subsumption import forwardSubsumption, backwardSubsumption
 
 
 class SearchParams(object):
@@ -85,6 +85,8 @@ class ProofState(object):
         self.factor_count         = 0
         self.resolvent_count      = 0
         self.tautologies_deleted  = 0
+        self.forward_subsumed     = 0
+        self.backward_subsumed    = 0
         
     def processClause(self):
         """
@@ -101,6 +103,15 @@ class ProofState(object):
            given_clause.isTautology():
             self.tautologies_deleted = self.tautologies_deleted+1
             return None
+        if self.params.forward_subsumption and \
+           forwardSubsumption(self.processed, given_clause):
+            self.forward_subsumed = self.forward_subsumed+1
+            return None
+
+        if self.params.backward_subsumption:
+            tmp = backwardSubsumption(given_clause, self.processed)
+            self.backward_subsumed = self.backward_subsumed+tmp
+
             
         new = []
         factors    = computeAllFactors(given_clause)
@@ -139,12 +150,16 @@ class ProofState(object):
 # Processed clauses  : %d
 # Factors computed   : %d
 # Resolvents computed: %d
-# Tautologies deleted: %d""" \
+# Tautologies deleted: %d
+# Forward subsumed   : %d
+# Backward subsumed  : %d""" \
     %(self.initial_clause_count,
       self.proc_clause_count,
       self.factor_count,
       self.resolvent_count,
-      self.tautologies_deleted)
+      self.tautologies_deleted,
+      self.forward_subsumed,
+      self.backward_subsumed)
         
 
 class TestProver(unittest.TestCase):
