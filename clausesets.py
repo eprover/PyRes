@@ -75,6 +75,17 @@ class ClauseSet(object):
         self.clauses.remove(clause)
         return clause
 
+    def extractFirst(self):
+        """
+        Extract and return the first clause.
+        """
+        if self.clauses:
+            clause = self.clauses.pop(0)
+            return clause
+        else:
+            return None
+
+
     def getResolutionLiterals(self, lit):
         """
         Return a list of tuples (clause, literal-index) such that the
@@ -277,9 +288,9 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         self.assertEqual(c1.name, "agatha")
         c2 = clauses.extractBestByEval(1)
         self.assertEqual(c2.name, "butler")
-        c3 = clauses.extractBestByEval(1)
+        c3 = clauses.extractFirst()
         self.assertEqual(c3.name, "charles")
-        c = clauses.extractBestByEval(0)
+        c = clauses.extractBestByEval(0)        
         while c != None:
             c = clauses.extractBestByEval(0)
 
@@ -291,6 +302,8 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         while c != None:
             print c
             c = clauses.extractBest()
+        c = clauses.extractFirst()
+        self.assertEqual(c, None)
 
     def testResPositions(self):
         """
