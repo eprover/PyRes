@@ -1,15 +1,15 @@
 #!/usr/bin/env python2.7
 # ----------------------------------
 #
-# Module prover.py
+# Module prover01.py
 
 """
-prover.py 0.1
+prover01.py 0.1
 
-Usage: prover.py [options] <problem_file>
+Usage: prover01.py <problem_file>
 
 This is a straightforward implementation of a simple resolution-based
-prover for first-order clausal logic. Problem file should be in
+prover for first-order clausal logic. Problem files should be in
 (restricted) TPTP-3 CNF syntax. Unsupported features include single-
 and double quoted strings and includes. Equality is parsed, but not
 interpreted so far.
@@ -19,18 +19,6 @@ Options:
  -h
 --help
   Print this help.
-
- -t
---delete-tautologies
-  Discard the given clause if it is a tautology.
-
- -f
---forward-subsumption
-  Discard the given clause if it is subsumed by a processed clause.
-
- -b
---backward-subsumption
-  Discard processed clauses if they are subsumed by the given clause.
 
 Copyright 2011 Stephan Schulz, schulz@eprover.org
 
@@ -62,35 +50,23 @@ import sys
 import getopt
 from lexer import Token,Lexer
 from clausesets import ClauseSet
-from saturation import SearchParams,ProofState
+from simplesat import SimpleProofState
 
 
 def processOptions(opts):
     """
     Process the options given
     """
-    params = SearchParams()
     for opt, optarg in opts:
         if opt == "-h" or opt == "--help":
             print __doc__
             sys.exit()
-        elif opt=="-t" or opt == "--delete-tautologies":
-            params.delete_tautologies = True
-        elif opt=="-f" or opt == "--forward-subsumption":
-            params.forward_subsumption = True
-        elif opt=="-b" or opt == "--backward_subsumption":
-            params.backward_subsuption = True
-
-    return params
-
+            
 if __name__ == '__main__':
     opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                   "htfb",
-                                   ["help",
-                                    "delete-tautologies",
-                                    "forward-subsumption",
-                                    "backward-subsumption"])
-    params = processOptions(opts)
+                                   "h",
+                                   ["help"])
+    processOptions(opts)
     
     problem = ClauseSet()
     for file in args:
@@ -100,10 +76,9 @@ if __name__ == '__main__':
         lex = Lexer(input)
         problem.parse(lex)
 
-    state = ProofState(params, problem)
+    state = SimpleProofState(problem)
     res = state.saturate()
 
-    print state.statisticsStr()
     if res != None:
         print "# SZS status Unsatisfiable"
     else:
