@@ -4,8 +4,11 @@
 # Module heuristics.py
 
 """
-This module implements heuristical evaluation functions for clauses. A
-heuristical evaluation function is a function h:Clauses(F,P,X)->R
+This module implements heuristic evaluation functions for clauses. 
+The purpose of heuristic evaluation is selection of clauses during the
+resolution process.
+
+A heuristical evaluation function is a function h:Clauses(F,P,X)->R
 (where R denotes the set of real numbers, or, in the actual
 implementation, the set of floating point numbers).
 
@@ -175,8 +178,8 @@ PickGiven5      = EvalStructure([(SymbolCountEvaluation(2,1),5),
                                  (FIFOEvaluation(),1)])
 """
 Experiences have shown that picking always the smallest clause (by
-symbol count) isn't optimal, but that i pays of to interleave smallest
-and oldes clause. The ratio betwee the two schemes is sometimes
+symbol count) isn't optimal, but that it pays off to interleave smallest
+and oldest clause. The ratio between the two schemes is sometimes
 called the "pick-given ratio", and, according to folklore, Larry Wos
 has stated that "the optimal pick-given ratio is five." Since he is a
 very smart person we use this value here.
