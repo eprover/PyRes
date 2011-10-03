@@ -122,8 +122,8 @@ class EvalStructure(object):
     Represent a heuristic clause processing schema. The scheme
     contains several different evaluation functions, and a way to
     alternate between them. Concretely, each evaluation function is
-    paired with a counter, and clauses are picked from each function
-    in a weighted round-robin scheme.
+    paired with a counter, and clauses are picked according to each
+    function in a weighted round-robin scheme.
     """
     def __init__(self, eval_descriptor):
         """
