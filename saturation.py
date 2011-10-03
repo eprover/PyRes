@@ -138,6 +138,15 @@ class ProofState(object):
             return None
 
         if self.params.backward_subsumption:
+            # If the given clause subsumes any of the already
+            # processed clauses, it will "cover" for these less
+            # general clauses in the future, so we can remove them
+            # from the proof state. Again, we keep count of the number
+            # of clauses dropped. This typically happens less often
+            # than forward subsumption, because most heuristics prefer
+            # smaller clauses, which tend to be more general (thus the
+            # processed clauses are typically if not universally more
+            # general than the new given clause).
             tmp = backwardSubsumption(given_clause, self.processed)
             self.backward_subsumed = self.backward_subsumed+tmp
 
