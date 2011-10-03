@@ -126,9 +126,14 @@ class ProofState(object):
         if self.params.delete_tautologies and \
            given_clause.isTautology():
             self.tautologies_deleted = self.tautologies_deleted+1
-            return None
+            return None        
         if self.params.forward_subsumption and \
            forwardSubsumption(self.processed, given_clause):
+            # If the given clause is subsumed by an already processed
+            # clause, all releveant inferences will already have been
+            # done with that more general clause. So we can discard
+            # the given clause. We do keep count of how many clauses
+            # we have dropped this way.
             self.forward_subsumed = self.forward_subsumed+1
             return None
 
