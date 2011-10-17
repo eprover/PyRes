@@ -294,6 +294,7 @@ class TestLiterals(unittest.TestCase):
         self.input2="p(X)|~q(f(X,a), b)|~a=b|a!=b|~a!=f(X,b)"
         self.input3="$false"
         self.input4="$false|~q(f(X,a), b)|$false"
+        self.input5="p(a)|p(f(X))"
         
         lexer = Lexer(self.input1)
         self.a1 = parseLiteral(lexer)
@@ -394,6 +395,11 @@ class TestLiterals(unittest.TestCase):
         print literalList2String(l4)
         self.assertEqual(len(l4),1)
         
+        lexer = Lexer(self.input5)
+        l5 = parseLiteralList(lexer)
+        print literalList2String(l5)
+        self.assertEqual(len(l5),2)
+
         self.assert_(litInLitList(l4[0], l4))
         self.assert_(not litInLitList(self.a6, l4))
         
