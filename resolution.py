@@ -131,17 +131,24 @@ cnf(c1,axiom,p(a, X)|p(X,a)).
 cnf(c2,axiom,~p(a,b)|p(f(Y),a)).
 cnf(c3,axiom,p(Z,X)|~p(f(Z),X0)).
 cnf(c4,axiom,p(X,X)|p(a,f(Y))).
+cnf(c5,axiom,p(X)|~q|p(a)|~q|p(Y)).
+cnf(not_p,axiom,~p(a)).
+cnf(taut,axiom,p(X4)|~p(X4)).
 """
         lex = Lexer(self.spec)
         self.c1 = clauses.parseClause(lex)
         self.c2 = clauses.parseClause(lex)
         self.c3 = clauses.parseClause(lex)
         self.c4 = clauses.parseClause(lex)
+        self.c5 = clauses.parseClause(lex)
+        self.c6 = clauses.parseClause(lex)
+        self.c7 = clauses.parseClause(lex)
        
     def testResolution(self):
         """
         Test resolution
         """
+        print "Resolution:"
         res1 = resolution(self.c1, 0, self.c2,0)
         self.assert_(res1)
         print res1
@@ -157,6 +164,10 @@ cnf(c4,axiom,p(X,X)|p(a,f(Y))).
         res4 = resolution(self.c1, 0, self.c3,1)
         self.assert_(res4==None)
         print res4
+
+        res5 = resolution(self.c6, 0, self.c7,0)
+        self.assert_(res5)
+        print res5
 
     def testFactoring(self):
         """
@@ -175,5 +186,9 @@ cnf(c4,axiom,p(X,X)|p(a,f(Y))).
         self.assert_(f4==None)
         print f4
         
+        f5 = factor(self.c5,1,3)
+        self.assert_(f5)
+        print f5
+
 if __name__ == '__main__':
     unittest.main()

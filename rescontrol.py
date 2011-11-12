@@ -105,6 +105,7 @@ cnf(c3, axiom, c).
         Test that forming resolvents between a clause and a clause set
         works. 
         """
+        print "test set resolution"
         res = computeAllResolvents(self.conj, self.cset)
         print res
 
@@ -113,6 +114,7 @@ cnf(c3, axiom, c).
         """
         Test full factoring of a clause.
         """
+        print "test factoring"
         res = computeAllFactors(self.fclause)
         print res
 
