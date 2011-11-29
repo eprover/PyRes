@@ -100,7 +100,13 @@ def parseAtom(lexer):
 
     return atom
     
-
+def atom2String(atom):
+    if termFunc(atom) in ["=", "!="]:
+        arg1 = termArgs(atom)[0]
+        arg2 = termArgs(atom)[1]
+        return term2String(arg1)+termFunc(atom)+term2String(arg2)
+    else:
+        return term2String(atom)
 
 
 class Literal(object):
@@ -351,7 +357,17 @@ class TestLiterals(unittest.TestCase):
         self.assert_(not self.a6.isOpposite(self.a6))
         self.assert_(not self.a6.isOpposite(self.a1))
 
-        
+    def testAtoms(self):
+        """
+        Test atom parsing and printing.
+        """
+        lex = Lexer("p(a) a=b a!=b")
+        a = parseAtom(lex)
+        print atom2String(a)
+        a = parseAtom(lex)
+        print atom2String(a)
+        a = parseAtom(lex)
+        print atom2String(a)
 
     def testLitWeight(self):
         """
