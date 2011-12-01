@@ -102,14 +102,23 @@ class Token(object):
     FullStop       = Ident(". (full stop)")
     OpenPar        = Ident("(")
     ClosePar       = Ident(")")
+    OpenSquare     = Ident("[")
+    CloseSquare    = Ident("]")
     Comma          = Ident(",")
+    Colon          = Ident(":")
     EqualSign      = Ident("=")
     NotEqualSign   = Ident("!=")
-    Negation       = Ident("~")
+    Nand           = Ident("~&")
+    Nor            = Ident("~|")
     Or             = Ident("|")
     And            = Ident("&")
-    Implies        = Ident("->")
+    Implies        = Ident("->")    
+    BImplies       = Ident("<-")    
     Equiv          = Ident("<=>")
+    Xor            = Ident("<~>")
+    Exclamation    = Ident("!")
+    Question       = Ident("?")
+    Negation       = Ident("~")
     EOFToken       = Ident("*EOF*")
    
     def __init__(self, type, literal, source, pos):
@@ -144,14 +153,23 @@ class Lexer(object):
         (re.compile("\."),                    Token.FullStop),
         (re.compile("\("),                    Token.OpenPar),
         (re.compile("\)"),                    Token.ClosePar),
+        (re.compile("\["),                    Token.OpenSquare),
+        (re.compile("\]"),                    Token.CloseSquare),
         (re.compile(","),                     Token.Comma),
+        (re.compile(":"),                     Token.Colon),
         (re.compile("="),                     Token.EqualSign),
         (re.compile("!="),                    Token.NotEqualSign),
-        (re.compile("~"),                     Token.Negation),
+        (re.compile("~\|"),                   Token.Nor),
+        (re.compile("~&"),                    Token.Nand),
         (re.compile("\|"),                    Token.Or),
         (re.compile("&"),                     Token.And),
         (re.compile("->"),                    Token.Implies),
+        (re.compile("<-"),                    Token.BImplies),
         (re.compile("<=>"),                   Token.Equiv),
+        (re.compile("<~>"),                   Token.Xor),
+        (re.compile("~"),                     Token.Negation),
+        (re.compile("!"),                     Token.Exclamation),
+        (re.compile("\?"),                    Token.Question),
 	(re.compile("\s+"),                   Token.WhiteSpace),
         (re.compile("[a-z][_a-z0-9_A-Z]*"),   Token.IdentLower),
         (re.compile("[_A-Z][_a-z0-9_A-Z]*"),  Token.IdentUpper),
@@ -313,6 +331,7 @@ class TestLexer(unittest.TestCase):
         self.example2 = "# Comment\nf(X,g(a,b))"
         self.example3 = "cnf(test,axiom,p(a)|p(f(X)))."
         self.example4 = "^"
+        self.example5 = "fof(test,axio, ![X,Y]:?[Z]:~p(X,Y,Z))."
         
     def testLex(self):
         """
@@ -347,6 +366,19 @@ class TestLexer(unittest.TestCase):
         compare that the strings are the same.
         """
         lex = Lexer(self.example3)
+        toks = lex.Lex()
+        print toks
+        self.assertEqual(len(toks), 20)
+        tmp = [i.literal for i in toks]
+        rebuild = "".join([i.literal for i in toks])
+        self.assertEqual(rebuild, self.example3)
+
+    def testFormula(self):
+        """
+        Perform lexical analysis of a formula, then rebuild it and
+        compare that the strings are the same.
+        """
+        lex = Lexer(self.example5)
         toks = lex.Lex()
         print toks
         self.assertEqual(len(toks), 20)
