@@ -234,7 +234,7 @@ class WFormula(object):
         if name:
             self.name = name
         else:
-            self.name = "c%d"%(WFormula.formulaIdCounter,)
+            self.name = "f%d"%(WFormula.formulaIdCounter,)
             WFormula.formulaIdCounter = WFormula.formulaIdCounter+1        
 
             
