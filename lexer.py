@@ -116,8 +116,8 @@ class Token(object):
     BImplies       = Ident("<-")    
     Equiv          = Ident("<=>")
     Xor            = Ident("<~>")
-    Exclamation    = Ident("!")
-    Question       = Ident("?")
+    Universal      = Ident("!")
+    Existential    = Ident("?")
     Negation       = Ident("~")
     EOFToken       = Ident("*EOF*")
    
@@ -168,8 +168,8 @@ class Lexer(object):
         (re.compile("<=>"),                   Token.Equiv),
         (re.compile("<~>"),                   Token.Xor),
         (re.compile("~"),                     Token.Negation),
-        (re.compile("!"),                     Token.Exclamation),
-        (re.compile("\?"),                    Token.Question),
+        (re.compile("!"),                     Token.Universal),
+        (re.compile("\?"),                    Token.Existential),
 	(re.compile("\s+"),                   Token.WhiteSpace),
         (re.compile("[a-z][_a-z0-9_A-Z]*"),   Token.IdentLower),
         (re.compile("[_A-Z][_a-z0-9_A-Z]*"),  Token.IdentUpper),

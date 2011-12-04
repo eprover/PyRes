@@ -155,7 +155,7 @@ def parseUnitaryFormula(lexer):
     terminology). This can be the first unitary formula of a binary
     formula, of course.
     """
-    if lexer.TestTok([Token.Exclamation, Token.Question]):
+    if lexer.TestTok([Token.Universal, Token.Existential]):
         quantor = lexer.LookLit()
         lexer.Next()
         lexer.AcceptTok(Token.OpenSquare)
