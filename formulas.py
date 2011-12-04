@@ -112,6 +112,23 @@ class Formula(object):
                   "]:"+repr(self.child2)+")"
         return res   
 
+    def isEqual(self, other):
+        """
+        Return True if self is structurally equal to other.
+        """
+        if self.op!=other.op:
+            return False
+        elif not self.op:
+            return self.child1.isEqual(other.child1)
+        elif self.op in ["!", "?"]:
+            return termEqual(self.child1, other.child1) and \
+                   self.child2.isEqual(other.child2)
+        elif self.op == "~":
+            return self.child1.isEqual(other.child1)
+        else:
+            return self.child1.isEqual(other.child1) and \
+                   self.child2.isEqual(other.child2)            
+        
 
 
 def parseQuantified(lexer, quantor):
@@ -166,7 +183,6 @@ def parseAssocFormula(lexer, head):
     while lexer.TestLit(op):
         lexer.AcceptLit(op)
         next = parseUnitaryFormula(lexer)
-        print next
         head = Formula(op, head, next)
     return head
 
@@ -181,11 +197,79 @@ def parseFormula(lexer):
     elif lexer.TestTok([Token.Nor, Token.Nand, Token.Equiv,
                         Token.Xor, Token.Implies, Token.BImplies]):
         op = lexer.LookLit()
+        lexer.Next()
         rest = parseUnitaryFormula(lexer)
         res = Formula(op, res, rest)
     return res
 
+
+class WFormula(object):
+    """
+    Datatype for the complete first-order formula, including
+    meta-information like type and name.
+    """
+    formulaIdCounter = 0
+    """
+    Counter for generating new clause names.
+    """
+    def __init__(self, formula, type="plain", name=None):
+        """
+        Constructor, takes formula, type, and optional name.
+        """
+        self.formula    = formula
+        self.type       = type
+        self.setName(name)
+
+    def __repr__(self):
+        """
+        Return a string representation of the formula.
+        """
+        res = "fof(%s,%s,%s)."%(self.name, self.type, repr(self.formula))
+        return res
     
+    def setName(self, name = None):
+        """
+        Set the name. If no name is given, generate a default name.
+        """
+        if name:
+            self.name = name
+        else:
+            self.name = "c%d"%(WFormula.formulaIdCounter,)
+            WFormula.formulaIdCounter = WFormula.formulaIdCounter+1        
+
+            
+def parseWFormula(lexer):
+    """
+    Parse a formula in (slightly simplified) TPTP-3 syntax. It is
+    written 
+       fof(<name>, <type>, <lformula>).
+    where <name> is a lower-case ident, type is a lower-case ident
+    from a specific list, and <lformula> is a Formula.
+
+    For us, all clause types are essentially the same, so we only
+    distinguish "axiom", "conjecture", and "negated_conjecture", and
+    map everything else to "plain".
+    """
+    lexer.AcceptLit("fof");
+    lexer.AcceptTok(Token.OpenPar)
+    name = lexer.LookLit()
+    lexer.AcceptTok(Token.IdentLower)
+    lexer.AcceptTok(Token.Comma)
+    type = lexer.LookLit()
+    if not type in ["axiom", "conjecture", "negated_conjecture"]:
+        type = "plain"
+    lexer.AcceptTok(Token.IdentLower)
+    lexer.AcceptTok(Token.Comma)
+
+    form = parseFormula(lexer)
+
+    lexer.AcceptTok(Token.ClosePar)
+    lexer.AcceptTok(Token.FullStop)
+
+    return WFormula(form, type, name)
+
+
+ 
 
 class TestFormulas(unittest.TestCase):
     """
@@ -198,19 +282,43 @@ class TestFormulas(unittest.TestCase):
         variables needed throughout the tests.
         """
         print
-        self.nformulas = """![X]:(a(x) | ~a=b)
+        self.nformulas = """
+        ![X]:(a(x) | ~a=b)
+        (![X]:a(X)|b(X)|?[X,Y]:(p(X,f(Y))))<=>q(g(a),X)
+        ((((![X]:a(X))|b(X))|(?[X]:(?[Y]:p(X,f(Y)))))<=>q(g(a),X))
 """
         self.wformulas = """
+        fof(small, axiom, ![X]:(a(x) | ~a=b)).
+        fof(complex, conjecture, (![X]:a(X)|b(X)|?[X,Y]:(p(X,f(Y))))<=>q(g(a),X)).
+        fof(clean, conjecture, ((((![X]:a(X))|b(X))|(?[X]:(?[Y]:p(X,f(Y)))))<=>q(g(a),X))).
+
 """
        
     def testNakedFormula(self):
         """
-        Test that basic parsing works.
+        Test that basic parsing and functionality works.
         """
         lex = Lexer(self.nformulas)
         f1 = parseFormula(lex)
         print f1
+        f2 = parseFormula(lex)
+        print f2
+        f3 = parseFormula(lex)
+        self.assert_(f2.isEqual(f3))
+        self.assert_(f3.isEqual(f2))
+        self.assert_(not f1.isEqual(f2))
+        self.assert_(not f2.isEqual(f1))
+
         
-        
+
+    def testWrappedFormula(self):
+        lex = Lexer(self.wformulas)
+        f1 = parseWFormula(lex)
+        print f1
+        f2 = parseWFormula(lex)
+        print f2
+        f3 = parseWFormula(lex)
+        print f3
+
 if __name__ == '__main__':
     unittest.main()
