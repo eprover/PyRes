@@ -48,25 +48,21 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Token,Lexer
+from derivations import Derivable,Derivation
 from terms import *
 import substitutions
 from literals import Literal, parseLiteral, parseLiteralList,\
      literalList2String, litInLitList, oppositeInLitList
 
 
-class Clause(object):
+class Clause(Derivable):
     """
     A class representing a clause. A clause at the moment comprises
     the following elements:
     - The literal list.
     - The type ("plain" if none given)
     - The name (generated automatically if not given)
-    """
-    clauseIdCounter = 0
-    """
-    Counter for generating new clause names.
-    """
-        
+    """       
     def __init__(self, literals, type="plain", name=None):
         """
         Initialize the clause.
@@ -90,16 +86,6 @@ class Clause(object):
         Return the number of literals in the clause.
         """
         return len(self.literals)
-
-    def setName(self, name = None):
-        """
-        Set the name. If no name is given, generate a default name.
-        """
-        if name:
-            self.name = name
-        else:
-            self.name = "c%d"%(Clause.clauseIdCounter,)
-            Clause.clauseIdCounter = Clause.clauseIdCounter+1        
 
     def isEmpty(self):
         """

@@ -71,6 +71,7 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Token,Lexer
+from derivations import Derivable,Derivation
 from terms import *
 import substitutions
 from literals import Literal, parseLiteral, parseLiteralList,\
@@ -203,14 +204,10 @@ def parseFormula(lexer):
     return res
 
 
-class WFormula(object):
+class WFormula(Derivable):
     """
     Datatype for the complete first-order formula, including
     meta-information like type and name.
-    """
-    formulaIdCounter = 0
-    """
-    Counter for generating new clause names.
     """
     def __init__(self, formula, type="plain", name=None):
         """
@@ -227,16 +224,6 @@ class WFormula(object):
         res = "fof(%s,%s,%s)."%(self.name, self.type, repr(self.formula))
         return res
     
-    def setName(self, name = None):
-        """
-        Set the name. If no name is given, generate a default name.
-        """
-        if name:
-            self.name = name
-        else:
-            self.name = "f%d"%(WFormula.formulaIdCounter,)
-            WFormula.formulaIdCounter = WFormula.formulaIdCounter+1        
-
             
 def parseWFormula(lexer):
     """
