@@ -331,7 +331,7 @@ class TestLexer(unittest.TestCase):
         self.example2 = "# Comment\nf(X,g(a,b))"
         self.example3 = "cnf(test,axiom,p(a)|p(f(X)))."
         self.example4 = "^"
-        self.example5 = "fof(test,axio, ![X,Y]:?[Z]:~p(X,Y,Z))."
+        self.example5 = "fof(test,axiom,![X,Y]:?[Z]:~p(X,Y,Z))."
         
     def testLex(self):
         """
@@ -381,10 +381,10 @@ class TestLexer(unittest.TestCase):
         lex = Lexer(self.example5)
         toks = lex.Lex()
         print toks
-        self.assertEqual(len(toks), 20)
+        self.assertEqual(len(toks), 29)
         tmp = [i.literal for i in toks]
         rebuild = "".join([i.literal for i in toks])
-        self.assertEqual(rebuild, self.example3)
+        self.assertEqual(rebuild, self.example5)
 
     def testAcceptLit(self):
         """

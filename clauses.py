@@ -69,14 +69,17 @@ class Clause(Derivable):
         """
         self.literals   = literals
         self.type       = type
-        self.setName(name)
         self.evaluation = None
+        Derivable.__init__(self, name)
+
         
     def __repr__(self):
         """
         Return a string representation of the clause.
         """
-        res = "cnf(%s,%s,%s)."%(self.name, self.type, literalList2String(self.literals))
+        res = "cnf(%s,%s,%s%s)."%(self.name, self.type,\
+                                  literalList2String(self.literals),\
+                                  self.strDerivation())
         if self.evaluation:
             res = res+"/* %s */"%(repr(self.evaluation),)
         return res
@@ -141,7 +144,9 @@ class Clause(Derivable):
         and need to be overwritten if that is not desired.
         """
         lits = [l.instantiate(subst) for l in self.literals]
-        return Clause(lits, self.type, self.name)
+        res = Clause(lits, self.type, self.name)
+        res.setDerivation(self.derivation)
+        return res
 
     def freshVarCopy(self):
         """
@@ -214,8 +219,9 @@ def parseClause(lexer):
     lexer.AcceptTok(Token.ClosePar)
     lexer.AcceptTok(Token.FullStop)
 
-    return Clause(lits, type, name)
-
+    res = Clause(lits, type, name)
+    res.setDerivation(Derivation("input"))
+    return res
 
     
 

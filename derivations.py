@@ -52,13 +52,18 @@ class Derivable(object):
     """
     Counter for generating new clause names.
     """
+    printDerivation = False
+    """
+    Indicate if derivations shouldbe printed as part of Derivable
+    objects. It's up to the concrete classes to support this.
+    """
     def __init__(self, name=None, derivation = None):
         """
         Initialize the object..
         """
         self.setName(name)
         self.derivation = derivation
-        self.childrenCount = 0
+        self.refCount = 0
 
     def __repr__(self):
         return self.name
@@ -77,17 +82,79 @@ class Derivable(object):
         self.derivation = derivation
 
     def getParents(self):
+        """
+        Return a list of all ancestors of this node in the derivation
+        graph.
+        """
         if self.derivation:
             return self.derivation.getParents()
         else:
             return []
 
-    def incChildCount(self):
-        self.childrenCount = self.childrenCount+1
+    def incRefCount(self):
+        """
+        Increase reference counter (counts virtual edges in the
+        derivation graph coming from the children).
+        """
+        self.refCount = self.refCount+1
         
-    def decChildCount(self):
-        self.childrenCount = self.childrenCount-1
+    def decRefCount(self):
+        """
+        See above.
+        """
+        self.refCount = self.refCount-1
 
+    def strDerivation(self):
+        """
+        If printing of derivations is enabled, return a string
+        representartion suitable as part of TPTP-3 output. Otherwise
+        return the empty string.
+        """
+        if not self.derivation:
+            return ""
+        if Derivable.printDerivation:
+            return ","+repr(self.derivation)
+        return ""
+
+    def annotateDerivationGraph(self):
+        """
+        Compute and set the number of virtual edges in all descendents
+        of self. The root node has one "virtual" edge.
+        """
+        if self.refCount == 0:
+            parents = self.getParents()
+            for p in parents:
+                p.annotateDerivationGraph()
+        self.incRefCount()
+
+    def linearizeDerivation(self, res = None):
+        """
+        Return linearized derivation.
+        """
+        if res == None:
+            res = list()
+        self.decRefCount()
+        if self.refCount==0:
+            res.append(self)
+            parents = self.getParents()
+            for p in parents:
+                p.linearizeDerivation(res)
+        return res
+
+    def orderedDerivation(self):
+        self.annotateDerivationGraph()
+        res = self.linearizeDerivation()
+        res.reverse()
+        return res
+
+def enableDerivationOutput():
+    Derivable.printDerivation = True
+
+def disableDerivationOutput():
+    Derivable.printDerivation = False
+
+def toggleDerivationOutput():
+     Derivable.printDerivation = not Derivable.printDerivation
 
 class Derivation(object):
     """
@@ -97,11 +164,17 @@ class Derivation(object):
     """
     def __init__(self, operator, parents=None):
         """
+        Initialize  a derivation object with the operator and a list
+        of parents (which can be Derivations or, in the case of
+        "reference", Derivables).
         """
         self.operator = operator
         self.parents  = parents
  
     def __repr__(self):
+        """
+        Return a string for the derivation in TPTP-3 format.
+        """
         if self.operator == "input":
             return "input"
         elif self.operator == "binres":
@@ -130,10 +203,12 @@ class Derivation(object):
                 res.extend(p.getParents())
             return res
                 
+
         
 def flatDerivation(operator, parents):
     """
-    Create a derivation which directly references all parents. 
+    Simple convenience function: Create a derivation which directly
+    references all parents. 
     """
     parentlist = [Derivation("reference", [p]) for p in parents]
     return Derivation(operator, parentlist)

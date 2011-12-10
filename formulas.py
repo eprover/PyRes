@@ -71,7 +71,7 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Token,Lexer
-from derivations import Derivable,Derivation
+from derivations import Derivable,Derivation,toggleDerivationOutput
 from terms import *
 import substitutions
 from literals import Literal, parseLiteral, parseLiteralList,\
@@ -215,13 +215,14 @@ class WFormula(Derivable):
         """
         self.formula    = formula
         self.type       = type
-        self.setName(name)
+        Derivable.__init__(self, name)
 
     def __repr__(self):
         """
         Return a string representation of the formula.
         """
-        res = "fof(%s,%s,%s)."%(self.name, self.type, repr(self.formula))
+        res = "fof(%s,%s,%s%s)."%(self.name, self.type,
+                                   repr(self.formula),self.strDerivation())
         return res
     
             
@@ -253,7 +254,10 @@ def parseWFormula(lexer):
     lexer.AcceptTok(Token.ClosePar)
     lexer.AcceptTok(Token.FullStop)
 
-    return WFormula(form, type, name)
+    res = WFormula(form, type, name)
+    res.setDerivation(Derivation("input"))
+
+    return res
 
 
  
@@ -295,7 +299,6 @@ class TestFormulas(unittest.TestCase):
         self.assert_(f3.isEqual(f2))
         self.assert_(not f1.isEqual(f2))
         self.assert_(not f2.isEqual(f1))
-
         
 
     def testWrappedFormula(self):
@@ -306,6 +309,13 @@ class TestFormulas(unittest.TestCase):
         print f2
         f3 = parseWFormula(lex)
         print f3
+        toggleDerivationOutput()
+        print f1
+        print f2
+        print f3
+
+        toggleDerivationOutput()
+        
 
 if __name__ == '__main__':
     unittest.main()

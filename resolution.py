@@ -68,6 +68,7 @@ from lexer import Lexer
 import substitutions
 from unification import mgu
 from literals import Literal
+from derivations import flatDerivation
 import clauses
 
 
@@ -92,6 +93,7 @@ def resolution(clause1, lit1, clause2, lit2):
     lits1.extend(lits2)
     res = clauses.Clause(lits1)
     res.removeDupLits()
+    res.setDerivation(flatDerivation("binres", [clause1, clause2]))
     return res
 
 
@@ -110,6 +112,7 @@ def factor(clause, lit1, lit2):
     lits = [l.instantiate(sigma) for l in clause.literals if l!=l2]
     res = clauses.Clause(lits)
     res.removeDupLits()
+    res.setDerivation(flatDerivation("factor", [clause]))
     return res
 
 

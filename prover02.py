@@ -61,6 +61,7 @@ Email: schulz@eprover.org
 import sys
 import getopt
 from lexer import Token,Lexer
+from derivations import enableDerivationOutput,disableDerivationOutput
 from clausesets import ClauseSet
 from saturation import SearchParams,ProofState
 
@@ -103,6 +104,13 @@ if __name__ == '__main__':
     state = ProofState(params, problem)
     res = state.saturate()
 
+    proof = res.orderedDerivation()
+    enableDerivationOutput()
+    for s in proof:
+        print s
+    disableDerivationOutput()
+
+    
     print state.statisticsStr()
     if res != None:
         print "# SZS status Unsatisfiable"
