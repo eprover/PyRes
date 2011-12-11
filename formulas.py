@@ -128,7 +128,53 @@ class Formula(object):
             return self.child1.isEqual(other.child1)
         else:
             return self.child1.isEqual(other.child1) and \
-                   self.child2.isEqual(other.child2)            
+                   self.child2.isEqual(other.child2)
+
+    def collectVars(self, res=None):
+        """
+        Return the set of all variables in self.
+        """
+        if not self.op:
+            # Literal case
+            res=self.child1.collectVars()
+        elif self.op=="~":
+            # Unary operator
+            res=self.child1.collectVars()
+        elif self.op in ["&", "|", "->", "<-", "<=>", "<~>", "~|", "~&"]:
+            # Binary operator
+            res=self.child1.collectVars()
+            res|=self.child2.collectVars()
+        else:
+            # Quantor case. Here we collect _all_ variables.
+            assert self.op in ["!", "?"]
+            res = termCollectVars(self.child1)
+            res |= self.child2.collectVars()
+        return res   
+
+
+    def collectFreeVars(self):
+        """
+        Return the set of all free variables in self.
+        """
+        if not self.op:
+            # Literal case
+            res=self.child1.collectVars()
+        elif self.op=="~":
+            # Unary operator
+            res=self.child1.collectFreeVars()
+        elif self.op in ["&", "|", "->", "<-", "<=>", "<~>", "~|", "~&"]:
+            # Binary operator
+            res=self.child1.collectFreeVars()
+            res|=self.child2.collectFreeVars()
+        else:
+            # Quantor case. We first collect all free variables in
+            # the quantified formula, then remove the one bound by the
+            # quantifier. 
+            assert self.op in ["!", "?"]
+            res = self.child2.collectFreeVars()
+            res.discard(self.child1)
+        return res   
+        
         
 
 
@@ -291,15 +337,24 @@ class TestFormulas(unittest.TestCase):
         """
         lex = Lexer(self.nformulas)
         f1 = parseFormula(lex)
-        print f1
+        print "f1:", f1
         f2 = parseFormula(lex)
-        print f2
+        print "f2:", f2
         f3 = parseFormula(lex)
+        print "f3:", f3
         self.assert_(f2.isEqual(f3))
         self.assert_(f3.isEqual(f2))
         self.assert_(not f1.isEqual(f2))
         self.assert_(not f2.isEqual(f1))
+
+        self.assertEqual(f1.collectFreeVars(), set())
+        self.assertEqual(f2.collectFreeVars(), set(["X"]))
+        self.assertEqual(f3.collectFreeVars(), set(["X"]))
         
+        self.assertEqual(f1.collectVars(), set(["X"]))
+        self.assertEqual(f2.collectVars(), set(["X","Y"]))
+        self.assertEqual(f3.collectVars(), set(["X","Y"]))
+
 
     def testWrappedFormula(self):
         lex = Lexer(self.wformulas)
