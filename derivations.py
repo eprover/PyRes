@@ -218,6 +218,9 @@ def flatDerivation(operator, parents):
 class TestDerivations(unittest.TestCase):
     """
     """
+    def setUp(self):
+        print
+        
     def testDerivable(self):
         """
         Test basic properties of derivations.
@@ -235,6 +238,54 @@ class TestDerivations(unittest.TestCase):
         print o3.derivation
         self.assertEqual(len(o3.getParents()), 1)
 
+    def testProofExtraction(self):
+        """
+        Test basic proof extraction.
+        """
+        o1 = Derivable()
+        o2 = Derivable()
+        o3 = Derivable()
+        o4 = Derivable()
+        o5 = Derivable()
+        o6 = Derivable()
+        o7 = Derivable()
+        o1.setDerivation(Derivation("input"))
+        o2.setDerivation(Derivation("input"))
+        o3.setDerivation(flatDerivation("factor", [o1]))
+        o4.setDerivation(flatDerivation("factor", [o3]))
+        o5.setDerivation(flatDerivation("binres", [o1,o2]))
+        o6.setDerivation(Derivation("reference", [o5]))
+        o7.setDerivation(flatDerivation("binres", [o5,o1]))
+        proof = o7.orderedDerivation()
+        print proof
+        self.assertEqual(len(proof),4)
+        self.assert_(o1 in proof)
+        self.assert_(o2 in proof)
+        self.assert_(o5 in proof)
+        self.assert_(o7 in proof)
+
+    def testOutput(self):
+        """
+        Test derivation output functions.
+        """
+        o1 = Derivable()
+        o2 = Derivable()
+        o3 = Derivable()
+        o4 = Derivable()
+        o1.setDerivation(Derivation("input"))
+        o2.setDerivation(Derivation("input"))
+        o3.setDerivation(flatDerivation("binres", [o1, o2]))
+        enableDerivationOutput()
+        self.assert_(o3.strDerivation()!="")
+        self.assert_(o4.strDerivation()=="")
+        disableDerivationOutput()
+        self.assert_(o3.strDerivation()=="")
+        self.assert_(o4.strDerivation()=="")
+        toggleDerivationOutput()
+        self.assert_(o3.strDerivation()!="")
+        self.assert_(o4.strDerivation()=="")
+        
+        
 
 if __name__ == '__main__':
     unittest.main()

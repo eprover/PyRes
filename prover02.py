@@ -104,15 +104,15 @@ if __name__ == '__main__':
     state = ProofState(params, problem)
     res = state.saturate()
 
-    proof = res.orderedDerivation()
-    enableDerivationOutput()
-    for s in proof:
-        print s
-    disableDerivationOutput()
 
     
     print state.statisticsStr()
     if res != None:
         print "# SZS status Unsatisfiable"
+        proof = res.orderedDerivation()
+        enableDerivationOutput()
+        for s in proof:
+            print s
+        disableDerivationOutput()
     else:
         print "# SZS status Satisfiable"
