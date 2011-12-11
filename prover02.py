@@ -63,6 +63,7 @@ import getopt
 from lexer import Token,Lexer
 from derivations import enableDerivationOutput,disableDerivationOutput
 from clausesets import ClauseSet
+from heuristics import GivenClauseHeuristics
 from saturation import SearchParams,ProofState
 
 
@@ -81,16 +82,24 @@ def processOptions(opts):
             params.forward_subsumption = True
         elif opt=="-b" or opt == "--backward_subsumption":
             params.backward_subsuption = True
+        elif opt=="-H" or opr == "--given-clause-heuristic":
+            try:
+                params.heuristics = GivenClauseHeuristics[optarg]
+            except KeyError:
+                print "Unknown clause evaluation function", optarg
+                sys.exit(1)
+                
 
     return params
 
 if __name__ == '__main__':
     opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                   "htfb",
+                                   "htfbH:",
                                    ["help",
                                     "delete-tautologies",
                                     "forward-subsumption",
-                                    "backward-subsumption"])
+                                    "backward-subsumption"
+                                    "given-clause-heuristic="])
     params = processOptions(opts)
     
     problem = ClauseSet()

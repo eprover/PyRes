@@ -192,6 +192,16 @@ See above, but now with a pick-given ration of 2 for easier testing.
 """
 
 
+GivenClauseHeuristics = {
+    "FIFO"       : FIFOEval,
+    "SymbolCount": SymbolCountEval,
+    "PickGiven5" : PickGiven5,
+    "PickGiven2" : PickGiven2}
+"""
+Table associating name and evaluation function, so that we can select
+the function by name.
+"""
+
 class TestHeuristics(unittest.TestCase):
     """
     Test heuristic evaluation functions.
