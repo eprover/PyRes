@@ -113,18 +113,59 @@ class Formula(object):
                   "]:"+repr(self.child2)+")"
         return res   
 
+    def isLiteral(self):
+        """
+        Return True if self is a literal.
+        """
+        return not self.op
+
+    def isQuantified(self):
+        """
+        Return True if self is quantified at the top level.
+        """
+        return self.op in ["!", "?"]
+
+    def isBinary(self):
+        """
+        Return True if self has a binary operator at the top level.
+        """
+        return self.op in ["&", "|", "->", "<-", "<=>", "<~>", "~|", "~&"]
+
+    def isUnary(self):
+        """
+        Return True if self has a unary operator at the top level.
+        """
+        return self.op == "~"
+
+    def hasSubform1(self):
+        """
+        Return True if self has a proper subformula as the first
+        argument. This is false for quantified formulas and literals. 
+        """
+        return self.isUnary() or self.isBinary()
+
+
+    def hasSubform2(self):
+        """
+        Return True if self has a proper subformula as the first
+        argument. This is the case for quantified formulas and binary
+        formulas. 
+        """
+        return self.isQuantified() or self.isBinary()
+
+
     def isEqual(self, other):
         """
         Return True if self is structurally equal to other.
         """
         if self.op!=other.op:
             return False
-        elif not self.op:
+        elif self.isLiteral():
             return self.child1.isEqual(other.child1)
-        elif self.op in ["!", "?"]:
+        elif self.isQuantified():
             return termEqual(self.child1, other.child1) and \
                    self.child2.isEqual(other.child2)
-        elif self.op == "~":
+        elif self.isUnary():
             return self.child1.isEqual(other.child1)
         else:
             return self.child1.isEqual(other.child1) and \
@@ -134,19 +175,15 @@ class Formula(object):
         """
         Return the set of all variables in self.
         """
-        if not self.op:
-            # Literal case
+        if self.isLiteral():
             res=self.child1.collectVars()
-        elif self.op=="~":
-            # Unary operator
+        elif self.isUnary():
             res=self.child1.collectVars()
-        elif self.op in ["&", "|", "->", "<-", "<=>", "<~>", "~|", "~&"]:
-            # Binary operator
+        elif self.isBinary():
             res=self.child1.collectVars()
             res|=self.child2.collectVars()
         else:
-            # Quantor case. Here we collect _all_ variables.
-            assert self.op in ["!", "?"]
+            assert self.isQuantified()
             res = termCollectVars(self.child1)
             res |= self.child2.collectVars()
         return res   
@@ -156,21 +193,18 @@ class Formula(object):
         """
         Return the set of all free variables in self.
         """
-        if not self.op:
-            # Literal case
+        if self.isLiteral():
             res=self.child1.collectVars()
-        elif self.op=="~":
-            # Unary operator
+        elif self.isUnary():
             res=self.child1.collectFreeVars()
-        elif self.op in ["&", "|", "->", "<-", "<=>", "<~>", "~|", "~&"]:
-            # Binary operator
+        elif self.isBinary():
             res=self.child1.collectFreeVars()
             res|=self.child2.collectFreeVars()
         else:
             # Quantor case. We first collect all free variables in
             # the quantified formula, then remove the one bound by the
             # quantifier. 
-            assert self.op in ["!", "?"]
+            assert self.isQuantified()
             res = self.child2.collectFreeVars()
             res.discard(self.child1)
         return res   
@@ -320,14 +354,18 @@ class TestFormulas(unittest.TestCase):
         """
         print
         self.nformulas = """
-        ![X]:(a(x) | ~a=b)
+        ![X]:(p(X) | ~a=b)
         (![X]:a(X)|b(X)|?[X,Y]:(p(X,f(Y))))<=>q(g(a),X)
         ((((![X]:a(X))|b(X))|(?[X]:(?[Y]:p(X,f(Y)))))<=>q(g(a),X))
+        ![X]:(p(X) | ~q(X))
+
 """
         self.wformulas = """
-        fof(small, axiom, ![X]:(a(x) | ~a=b)).
+        fof(small, axiom, ![X]:(p(X) | ~a=b)).
         fof(complex, conjecture, (![X]:a(X)|b(X)|?[X,Y]:(p(X,f(Y))))<=>q(g(a),X)).
-        fof(clean, conjecture, ((((![X]:a(X))|b(X))|(?[X]:(?[Y]:p(X,f(Y)))))<=>q(g(a),X))).
+        fof(clean, conjecture,
+                   ((((![X]:a(X))|b(X))|(?[X]:(?[Y]:p(X,f(Y)))))<=>q(g(a),X))).
+        fof(weird, weird, ![X]:(p(X) | ~q(X))).
 
 """
        
@@ -342,10 +380,13 @@ class TestFormulas(unittest.TestCase):
         print "f2:", f2
         f3 = parseFormula(lex)
         print "f3:", f3
+        f4 = parseFormula(lex)
+        print "f4:", f4
         self.assert_(f2.isEqual(f3))
         self.assert_(f3.isEqual(f2))
         self.assert_(not f1.isEqual(f2))
         self.assert_(not f2.isEqual(f1))
+        self.assert_(not f1.isEqual(f4))
 
         self.assertEqual(f1.collectFreeVars(), set())
         self.assertEqual(f2.collectFreeVars(), set(["X"]))
@@ -354,6 +395,17 @@ class TestFormulas(unittest.TestCase):
         self.assertEqual(f1.collectVars(), set(["X"]))
         self.assertEqual(f2.collectVars(), set(["X","Y"]))
         self.assertEqual(f3.collectVars(), set(["X","Y"]))
+
+        self.assert_(f1.isQuantified())
+        self.assert_(not f2.isQuantified())
+        self.assert_(not f3.isQuantified())
+        self.assert_(not f1.hasSubform1())
+        self.assert_(f2.hasSubform1())
+        self.assert_(f3.hasSubform1())
+        self.assert_(f1.hasSubform2())
+        self.assert_(f2.hasSubform2())
+        self.assert_(f3.hasSubform2())
+        
 
 
     def testWrappedFormula(self):
@@ -364,10 +416,13 @@ class TestFormulas(unittest.TestCase):
         print f2
         f3 = parseWFormula(lex)
         print f3
+        f4 = parseWFormula(lex)
+        print f4
         toggleDerivationOutput()
         print f1
         print f2
         print f3
+        print f4
 
         toggleDerivationOutput()
         
