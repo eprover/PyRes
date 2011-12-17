@@ -105,7 +105,7 @@ class Formula(object):
             res=str(self.child1)
         elif self.op=="~":
             res="(~"+repr(self.child1)+")"
-        elif self.op in ["&", "|", "->", "<-", "<=>", "<~>", "~|", "~&"]:
+        elif self.op in ["&", "|", "=>", "<=", "<=>", "<~>", "~|", "~&"]:
             res = "("+repr(self.child1)+self.op+repr(self.child2)+")"
         else:
             assert self.op in ["!", "?"]
@@ -129,7 +129,7 @@ class Formula(object):
         """
         Return True if self has a binary operator at the top level.
         """
-        return self.op in ["&", "|", "->", "<-", "<=>", "<~>", "~|", "~&"]
+        return self.op in ["&", "|", "=>", "<=", "<=>", "<~>", "~|", "~&"]
 
     def isUnary(self):
         """
