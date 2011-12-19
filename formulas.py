@@ -119,6 +119,20 @@ class Formula(object):
         """
         return not self.op
 
+
+    def isPropConst(self, polarity):
+        """
+        Return True if self is a propositional constant of the given
+        polarity.
+        """
+        if self.isLiteral():
+            if polarity:
+                return self.child1.isPropTrue()
+            else:
+                return self.child1.isPropFalse()
+            
+        
+
     def isQuantified(self):
         """
         Return True if self is quantified at the top level.

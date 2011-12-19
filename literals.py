@@ -109,6 +109,20 @@ def atom2String(atom):
         return term2String(atom)
 
 
+def atomIsConstTrue(atom):
+    """
+    Return True if the atom is $true.
+    """
+    return termEqual(atom, ["$true"])
+
+
+def atomIsConstFalse(atom):
+    """
+    Return True if the atom is $false.
+    """
+    return termEqual(atom, ["$false"])
+
+
 class Literal(object):
     """
     A class representing a literal. A literal is a signed atom. We
@@ -166,6 +180,27 @@ class Literal(object):
         """
         return not self.negative
 
+    def isPropTrue(self):
+        """
+        Return True if the literal is of the form $true or ~$false.
+        """
+        return ((self.isNegative() and
+                 atomIsConstFalse(self.atom))
+                or 
+                (self.isPositive() and
+                 atomIsConstTrue(self.atom)))
+        
+    def isPropFalse(self):
+        """
+        Return True if the literal is of the form $false or ~$true.
+        """
+        return ((self.isNegative() and
+                 atomIsConstTrue(self.atom))
+                or 
+                (self.isPositive() and
+                 atomIsConstFalse(self.atom)))
+
+                
     def isEqual(self, other):
         """
         Return true if the literal is structurally identical to
@@ -196,6 +231,12 @@ class Literal(object):
         subtitution.
         """
         return Literal(subst(self.atom), self.negative)
+
+    def negate(self):
+        """
+        Return a copy of self with oposite polarity.
+        """
+        return Literal(termCopy(self.atom), not self.negative)
 
     def weight(self, fweight, vweight):
         """
@@ -356,6 +397,43 @@ class TestLiterals(unittest.TestCase):
         self.assert_(self.a7.isOpposite(self.a6))
         self.assert_(not self.a6.isOpposite(self.a6))
         self.assert_(not self.a6.isOpposite(self.a1))
+
+    def testPropProps(self):
+        """
+        Test if literals are correctly handled as propositional
+        constants. 
+        """
+        lex = Lexer("$true $false ~$false ~$true p(a)")
+        l1 = parseLiteral(lex)
+        l2 = parseLiteral(lex)
+        l3 = parseLiteral(lex)
+        l4 = parseLiteral(lex)
+        l5 = parseLiteral(lex)
+        
+        self.assert_(l1.isPropTrue())
+        self.assert_(not l1.isPropFalse())
+
+        self.assert_(not l2.isPropTrue())
+        self.assert_(l2.isPropFalse())
+
+        self.assert_(l3.isPropTrue())
+        self.assert_(not l3.isPropFalse())
+
+        self.assert_(not l4.isPropTrue())
+        self.assert_(l4.isPropFalse())
+
+        self.assert_(not l5.isPropTrue())
+        self.assert_(not l5.isPropFalse())
+
+        l6 = l1.negate()
+        self.assert_(not l6.isPropTrue())
+        self.assert_(l6.isPropFalse())
+
+        l7 = l2.negate()
+        self.assert_(l7.isPropTrue())
+        self.assert_(not l7.isPropFalse())
+
+        
 
     def testAtoms(self):
         """

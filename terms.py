@@ -136,7 +136,7 @@ def parseTerm(lexer):
         res = lexer.Next().literal
     else:
         res = []
-        lexer.CheckTok(Token.IdentLower)
+        lexer.CheckTok([Token.IdentLower,Token.DefFunctor])
         res.append(lexer.Next().literal)
         if lexer.TestTok(Token.OpenPar):
             # It's a term with proper subterms, so parse them
