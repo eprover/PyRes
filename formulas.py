@@ -119,7 +119,6 @@ class Formula(object):
         """
         return not self.op
 
-
     def isPropConst(self, polarity):
         """
         Return True if self is a propositional constant of the given
@@ -129,9 +128,7 @@ class Formula(object):
             if polarity:
                 return self.child1.isPropTrue()
             else:
-                return self.child1.isPropFalse()
-            
-        
+                return self.child1.isPropFalse()                    
 
     def isQuantified(self):
         """
@@ -420,6 +417,21 @@ class TestFormulas(unittest.TestCase):
         self.assert_(f2.hasSubform2())
         self.assert_(f3.hasSubform2())
         
+    def testPropositional(self):
+        """
+        Check propositional literal recognition and manipulation.
+        """
+        lex = Lexer("$true $false $true|$false ")
+        t = parseFormula(lex)
+        f = parseFormula(lex)
+        c = parseFormula(lex)
+        self.assert_(t.isPropConst(True))
+        self.assert_(not t.isPropConst(False))
+        self.assert_(f.isPropConst(False))
+        self.assert_(not f.isPropConst(True))
+
+        self.assert_(not c.isPropConst(True))
+        self.assert_(not c.isPropConst(False))
 
 
     def testWrappedFormula(self):

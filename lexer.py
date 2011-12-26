@@ -251,9 +251,9 @@ class Lexer(object):
         Take a list of expected literal strings. Return True if the
         next token's string value is among them, False otherwise.
         """
-        try:
-            return self.LookLit() in litvals
-        except TypeError:
+        if type(litvals) == type([]):
+            self.LookLit() in litvals
+        else:
             return self.LookLit() == litvals
 
     def CheckLit(self, litvals):
@@ -283,8 +283,8 @@ class Lexer(object):
         """
         res = self.NextUnfiltered();
         while res.type in [Token.WhiteSpace, Token.Comment]:
-            res = self.NextUnfiltered();
-        return res;
+            res = self.NextUnfiltered()
+        return res
 
     def NextUnfiltered(self):
         """
