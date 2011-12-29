@@ -225,6 +225,14 @@ class Literal(object):
         res = termCollectVars(self.atom, res)
         return res
 
+    def collectFuns(self, res=None):
+        """
+        Insert all variables in self into the set res and return
+        it. If res is not given, create it.
+        """
+        res = termCollectFuns(self.atom, res)
+        return res
+
     def instantiate(self, subst):
         """
         Return a copy of self, instantiated with the given
@@ -365,12 +373,14 @@ class TestLiterals(unittest.TestCase):
         self.assert_(not self.a1.isEquational())
         self.a1.collectVars(vars)
         self.assertEqual(len(vars), 1)
+        self.assertEqual(self.a1.collectFuns(), set(["p"]))
         
         print self.a2
         self.assert_(self.a2.isNegative())
         self.assert_(not self.a2.isEquational())
         self.a2.collectVars(vars)
         self.assertEqual(len(vars), 1)
+        self.assertEqual(self.a2.collectFuns(), set(["q", "f", "a", "b"]))
 
         print self.a3
         self.assert_(self.a3.isNegative())
@@ -469,7 +479,7 @@ class TestLiterals(unittest.TestCase):
 
         self.assert_(not self.a1.match(self.a2, BTSubst()))
         self.assert_(not self.a2.match(self.a1, BTSubst()))
-        
+        1
     def testLitList(self):
         """
         Test literal list parsing and printing.
