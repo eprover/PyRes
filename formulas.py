@@ -184,8 +184,9 @@ class Formula(object):
 
     def collectOps(self):
         """
-        Return the set of all operators used in the formula. This is
-        mostly for unit-testing transformations later on.
+        Return the set of all (first-order) operators and quantors
+        used in the formula. This is mostly for unit-testing
+        transformations later on. 
         """
         res = set([self.op])
         if self.isLiteral():
@@ -199,6 +200,25 @@ class Formula(object):
             assert self.isQuantified()
             res |= self.child2.collectOps()
         return res   
+
+    def collectFuns(self):
+        """
+        Return the set of all function and predicate symbols used in
+        the formula. 
+        """
+        res = set()
+        if self.isLiteral():
+            self.child1.collectFuns(res)
+        elif self.isUnary():
+            res|=self.child1.collectFuns()
+        elif self.isBinary():
+            res|=self.child1.collectFuns()
+            res|=self.child2.collectFuns()
+        else:
+            assert self.isQuantified()
+            res |= self.child2.collectFuns()
+        return res   
+
 
     def collectVars(self):
         """
@@ -451,21 +471,26 @@ class TestFormulas(unittest.TestCase):
         self.assert_(not c.isPropConst(True))
         self.assert_(not c.isPropConst(False))
 
-    def testOps(self):
+    def testCollectOps(self):
         """
-        Test if operator collection works.
+        Test if operator and funtion symbol collection works.
         """
         lex = Lexer("a&(b|~c)    "\
                     "(a=>b)<=(c<=>?[X]:p(X))"\
                     "(a~&(b<~>(c=>d)))~|![Y]:e(Y)")
         f = parseFormula(lex)
         self.assertEqual(f.collectOps(), set(["", "&", "|", "~"]))
+        self.assertEqual(f.collectFuns(), set(["a", "b", "c"]))
+        
         f = parseFormula(lex)
         self.assertEqual(f.collectOps(), set(["", "=>", "<=", "?", "<=>"]))
+        self.assertEqual(f.collectFuns(), set(["a", "b", "c", "p"]))
+
         f = parseFormula(lex)
         self.assertEqual(f.collectOps(),
                          set(["", "~&", "~|", "!", "<~>", "=>"]))
-
+        self.assertEqual(f.collectFuns(), set(["a", "b", "c", "d", "e"]))
+        
 
 
 
