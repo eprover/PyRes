@@ -221,6 +221,21 @@ def termCollectVars(t, res=None):
     return res
 
 
+def termCollectFuns(t, res=None):
+    """
+    Insert all function symbols in t into the set res. For
+    convenience, return res. If res is not given, create and return
+    it. 
+    """
+    if res == None:
+        res = set()
+    if termIsCompound(t):
+        res.add(termFunc(t))
+        for s in termArgs(t):
+            termCollectFuns(s, res)
+    return res
+
+
 def termWeight(t, fweight, vweight):
     """
     Return the weight of the term, counting fweight for each function
@@ -374,6 +389,29 @@ class TestTerms(unittest.TestCase):
 
         self.assert_("X" in vars)
         self.assert_("Y" in vars)
+
+
+    def testCollectFuns(self):
+        """
+        Test function symbol collection.
+        """
+        funs = termCollectFuns(self.t1)
+        self.assertEqual(funs, set())
+
+        funs = termCollectFuns(self.t2)
+        self.assertEqual(funs, set(["a"]))
+
+        funs = termCollectFuns(self.t3)
+        self.assertEqual(funs, set(["g", "a", "b"]))
+
+        funs = termCollectFuns(self.t4)
+        self.assertEqual(funs, set(["g", "f"]))
+
+        funs = termCollectFuns(self.t5)
+        self.assertEqual(funs, set(["g", "f"]))
+
+        funs = termCollectFuns(self.t6)
+        self.assertEqual(funs, set(["g", "b"]))
 
     def testWeight(self):
         """
