@@ -182,7 +182,25 @@ class Formula(object):
             return self.child1.isEqual(other.child1) and \
                    self.child2.isEqual(other.child2)
 
-    def collectVars(self, res=None):
+    def collectOps(self):
+        """
+        Return the set of all operators used in the formula. This is
+        mostly for unit-testing transformations later on.
+        """
+        res = set([self.op])
+        if self.isLiteral():
+            pass
+        elif self.isUnary():
+            res|=self.child1.collectOps()
+        elif self.isBinary():
+            res|=self.child1.collectOps()
+            res|=self.child2.collectOps()
+        else:
+            assert self.isQuantified()
+            res |= self.child2.collectOps()
+        return res   
+
+    def collectVars(self):
         """
         Return the set of all variables in self.
         """
@@ -432,6 +450,23 @@ class TestFormulas(unittest.TestCase):
 
         self.assert_(not c.isPropConst(True))
         self.assert_(not c.isPropConst(False))
+
+    def testOps(self):
+        """
+        Test if operator collection works.
+        """
+        lex = Lexer("a&(b|~c)    "\
+                    "(a=>b)<=(c<=>?[X]:p(X))"\
+                    "(a~&(b<~>(c=>d)))~|![Y]:e(Y)")
+        f = parseFormula(lex)
+        self.assertEqual(f.collectOps(), set(["", "&", "|", "~"]))
+        f = parseFormula(lex)
+        self.assertEqual(f.collectOps(), set(["", "=>", "<=", "?", "<=>"]))
+        f = parseFormula(lex)
+        self.assertEqual(f.collectOps(),
+                         set(["", "~&", "~|", "!", "<~>", "=>"]))
+
+
 
 
     def testWrappedFormula(self):
