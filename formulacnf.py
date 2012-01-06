@@ -26,8 +26,8 @@ several steps:
 
 8) Extract clauses
 
-This basically follows [NW:SmallCNF-2001]. The first version does not
-use formula renaming.
+This basically follows [NW:SmallCNF-2001], albeit with some minor
+changes. The first version does not use formula renaming.
 
 @InCollection{NW:SmallCNF-2001,
   author =       {A. Nonnengart and C. Weidenbach},
@@ -129,8 +129,6 @@ def formulaOpSimplify(f):
 
     
 
-
-
 def formulaTopSimplify(f):
     """
     Try to apply the following simplification rules to f at the top
@@ -144,56 +142,85 @@ def formulaTopSimplify(f):
             return Formula("", f.child1.child1.negate()), True
     elif f.op == "|":
         if f.child1.isPropConst(True):
+            # T | P -> T. Note that child1 is $true or
+            # equivalent. This applies to several other cases where we
+            # can reuse a $true or $false child instead of creating a
+            # new formula.
             return f.child1, True
         elif f.child2.isPropConst(True):
+            # P | T -> T
             return f.child2, True
         elif f.child1.isPropConst(False):
+            # F | P -> P
             return f.child2, True
         elif f.child2.isPropConst(False):
+            # P | F -> P
             return f.child1, True
         elif f.child1.isEqual(f.child2):
+            # P | P -> P
             return f.child2, True
     elif f.op == "&":
         if f.child1.isPropConst(True):
+            # T & P -> P
             return f.child2, True
         elif f.child2.isPropConst(True):
+            # P & T -> P
             return f.child1, True
         elif f.child1.isPropConst(False):
+            # F & P -> F
             return f.child1, True
         elif f.child2.isPropConst(False):
+            # P & F -> F
             return f.child2, True
         elif f.child1.isEqual(f.child2):
+            # P & P -> P
             return f.child2, True
     elif f.op == "<=>":
         if f.child1.isPropConst(True):
+            # T <=> P -> P
             return f.child2, True
         elif f.child2.isPropConst(True):
+            # P <=> T -> P
             return f.child1, True
         elif f.child1.isPropConst(False):
+            # P <=> F -> ~P
             newform = Formula("~", f.child2)            
             newform, m = formulaSimplify(newform)
             return newform, True
         elif f.child2.isPropConst(False):
+            # F <=> P -> ~P
             newform = Formula("~", f.child1)            
             newform, m = formulaSimplify(newform)
             return newform, True
         elif f.child1.isEqual(f.child2):
-            return Formula("", Literal(["$true"]))
+            # P <=> P -> T
+            return Formula("", Literal(["$true"])), True
     elif f.op == "=>":
         if f.child1.isPropConst(True):
+            # T => P -> P
             return f.child2, True
         elif f.child1.isPropConst(False):
+            # F => P -> T
             return Formula("", Literal(["$true"])), True
         elif f.child2.isPropConst(True):
+            # P => T -> T
             return Formula("", Literal(["$true"])), True
         elif f.child2.isPropConst(False):
+            # P => F -> ~P
             newform = Formula("~", f.child1)            
             newform, m = formulaSimplify(newform)
             return newform, True
         elif f.child1.isEqual(f.child2):
+            # P => P -> T
             return Formula("", Literal(["$true"])), True
+    elif f.op in ["!", "?"]:
+        # ![X] F -> F if X is not free in F
+        # ?[X] F -> F if X is not free in F
+        vars = f.child2.collectFreeVars()        
+        if not f.child1 in vars:
+            return f.child2, True
     else:
-        assert "Unexpected operator "+f.op and False
+        assert f.op == "" or "Unexpected op"
     return f, False
     
             
@@ -226,10 +253,11 @@ def formulaSimplify(f):
     if modified:
         f  = Formula(f.op, child1, child2)
 
-    modified = True
+    topmod = True
 
-    while modified:
-        f, modified = formulaTopSimplify(f)        
+    while topmod:
+        f, topmod = formulaTopSimplify(f)
+        modified |= topmod
 
     return f, modified
 
@@ -246,35 +274,116 @@ class TestCNF(unittest.TestCase):
         """
         print
         self.formulas = """
-        ![X]:(a(x) ~| ~a=b)
+        ![X]:(a(X) ~| ~a=b)
         ![X]:(a(X)|b(X)|?[X,Y]:(p(X,f(Y))<~>q(g(a),X)))
         ![X]:(a(X) <= ~a=b)
-        (((![X]:a(X))|b(X))|(?[X]:(?[Y]:p(X,f(Y)))))~&q(g(a),X)
-
+        ((((![X]:a(X))|b(X))|(?[X]:(?[Y]:p(X,f(Y)))))~&q(g(a),X))
+        ![X]:(a(X)|$true)        
         """
         lex = Lexer(self.formulas)
         self.f1 = parseFormula(lex)
         self.f2 = parseFormula(lex)
         self.f3 = parseFormula(lex)
         self.f4 = parseFormula(lex)
-
+        self.f5 = parseFormula(lex)
         self.simple_ops = set(["", "!", "?", "~", "&","|", "=>", "<=>"])
+
+        self.covformulas ="""
+        (a|$true)
+        ($true|a)
+        (a|$false)
+        ($false|a)
+        (a|a)
+        (a&$true)
+        ($true&a)
+        (a&$false)
+        ($false&a)
+        (a&a)
+        (a=>$true)
+        ($true=>a)
+        (a=>$false)
+        ($false=>a)
+        (a=>a)
+        (a<=>$true)
+        ($true<=>a)
+        (a<=>$false)
+        ($false<=>a)
+        (a<=>a)
+        ![X]:(a<=>a)
+        ?[X]:(a<=>a)
+        """
+
+        
        
     def testOpSimplification(self):
+        """
+        Test that operator simplification works.
+        """
+        f,m = formulaOpSimplify(self.f1)
+        self.assert_(m)
+        self.assert_(f.collectOps() <= self.simple_ops)
+
+        f,m = formulaOpSimplify(self.f2)
+        self.assert_(m)
+        self.assert_(f.collectOps() <= self.simple_ops)
+
+        f,m = formulaOpSimplify(self.f3)
+        self.assert_(m)
+        self.assert_(f.collectOps() <= self.simple_ops)
+
+        f,m = formulaOpSimplify(self.f4)
+        self.assert_(m)
+        self.assert_(f.collectOps() <= self.simple_ops)
+
+        f,m = formulaOpSimplify(self.f5)
+        self.assert_(not m)
+        self.assert_(f.collectOps() <= self.simple_ops)
+
+    def checkSimplificationResult(self, f):
+        """
+        A simplified formula has no $true/$false, or it is a literal
+        (in which case it's either true or false).
+        """
+
+        funs = f.collectFuns()
+        if f.isPropConst(True) or f.isPropConst(False):
+            self.assert_(funs in [set(["$true"]), set(["$false"])])
+        else:
+            self.assert_(not "$true" in funs )
+            self.assert_(not "$false" in funs )
+        
+
+    def testSimplification(self):
         """
         Test that simplification works.
         """
         f,m = formulaOpSimplify(self.f1)
-        self.assert_(f.collectOps() <= self.simple_ops)
+        f,m = formulaSimplify(f)
+        self.checkSimplificationResult(f)
+
         f,m = formulaOpSimplify(self.f2)
-        self.assert_(f.collectOps() <= self.simple_ops)
+        f,m = formulaSimplify(f)
+        self.checkSimplificationResult(f)
+
         f,m = formulaOpSimplify(self.f3)
-        self.assert_(f.collectOps() <= self.simple_ops)
+        f,m = formulaSimplify(f)
+        self.checkSimplificationResult(f)
+
         f,m = formulaOpSimplify(self.f4)
-        self.assert_(f.collectOps() <= self.simple_ops)
+        f,m = formulaSimplify(f)
+        self.checkSimplificationResult(f)
 
+        f,m = formulaOpSimplify(self.f5)
+        f,m = formulaSimplify(f)
+        self.checkSimplificationResult(f)
 
-        
+        lex = Lexer(self.covformulas)
+        while not lex.TestTok(Token.EOFToken):
+            f = parseFormula(lex)
+            f,m = formulaOpSimplify(f)
+            f,m = formulaSimplify(f)
+            self.checkSimplificationResult(f)
+
 
 if __name__ == '__main__':
     unittest.main()

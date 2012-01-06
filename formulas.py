@@ -128,7 +128,9 @@ class Formula(object):
             if polarity:
                 return self.child1.isPropTrue()
             else:
-                return self.child1.isPropFalse()                    
+                return self.child1.isPropFalse()
+        else:
+            return False
 
     def isQuantified(self):
         """
