@@ -261,7 +261,115 @@ def formulaSimplify(f):
 
     return f, modified
 
- 
+
+def rootFormulaNNF(f, polarity):
+    """
+    Apply all NNF transformation rules that can be applied at top
+    level. Return result and modification flag.
+    """
+
+    normalform = False
+    modified   = False
+
+    while not normalform:
+        normalform = True
+        m = False
+
+        if f.op == "~":
+            if f.child1.isLiteral():
+                # Move negations into literals
+                f = Formula("", f.child1.child1.negate())
+                m = True
+            elif f.child1.op == "|":
+                # De Morgan: ~(P|Q) -> ~P & ~Q
+                f = Formula("&",
+                            Formula("~", f.child1.child1),
+                            Formula("~", f.child1.child2))
+                m = True
+            elif  f.child1.op == "&":
+                # De Morgan: ~(P&Q) -> ~P | ~Q
+                f = Formula("|",
+                            Formula("~", f.child1.child1),
+                            Formula("~", f.child1.child2))
+                m = True
+            elif f.child1.op == "!":
+                # ~(![X]:P) -> ?[X]:~P
+                f = Formula("?",
+                            f.child1.child1,
+                            Formula("~", f.child1.child2))
+                m = True
+            elif f.child1.op == "?":
+                # ~(?[X]:P) -> ![X]:~P
+                f = Formula("!",
+                            f.child1.child1,
+                            Formula("~", f.child1.child2))
+                m = True
+        elif f.op == "=>":
+            # Expand P=>Q into ~P|Q
+            f = Formula("|",
+                        Formula("~", f.child1),
+                        f.child2)
+            m = True
+        elif f.op == "<=>":
+            if polarity == 1:
+                # P<=>Q -> (P=>Q)&(Q=>P)
+                f = Formula("&",
+                            Formula("=>", f.child1, f.child2),
+                            Formula("=>", f.child2, f.child1))
+                m = True
+            else:                
+                assert polarity == -1
+                # P<=>Q -> (P & Q) | (~P & ~Q)
+                f = Formula("|",
+                            Formula("&", f.child1, f.child2),
+                            Formula("&",
+                                    Formula("~", f.child1),
+                                    Formula("~", f.child2)))
+                m = True
+                
+        normalform = not m
+        modified |= m
+    return f, modified
+
+
+def formulaNNF(f, polarity):
+    """
+    Convert f into a NNF. Equivalences (<=>) are eliminated
+    polarity-dependend, top to bottom. Returns (f', m), where f' is a
+    NNF of f, and m indicates if f!=f'
+    """
+
+    normalform = False
+    modified   = False
+
+    while not normalform:
+        normalform = True
+        f, m = rootFormulaNNF(f, polarity)
+        modified |= m
+        
+        if f.op == "~":
+            handle, m = formulaNNF(f.child1, -polarity)
+            if m:
+                normalform = False
+                f = Formula("~", handle)
+        elif f.op in ["!", "?"]:
+            handle, m = formulaNNF(f.child2, polarity)
+            if m:
+                normalform = False
+                f = Formula(f.op, f.child1, handle)
+        elif f.op in ["|", "&"]:
+            handle1, m1 = formulaNNF(f.child1, polarity)
+            handle2, m2 = formulaNNF(f.child2, polarity)
+            m = m1 or m2
+            if m:
+                normalform = False
+                f = Formula(f.op, handle1, handle2)
+        else:
+            assert f.isLiteral()
+        modified |= m
+
+    return f, modified
+
 
 class TestCNF(unittest.TestCase):
     """
@@ -287,6 +395,7 @@ class TestCNF(unittest.TestCase):
         self.f4 = parseFormula(lex)
         self.f5 = parseFormula(lex)
         self.simple_ops = set(["", "!", "?", "~", "&","|", "=>", "<=>"])
+        self.nnf_ops = set(["", "!", "?", "&","|"])
 
         self.covformulas ="""
         (a|$true)
@@ -383,6 +492,60 @@ class TestCNF(unittest.TestCase):
             f,m = formulaOpSimplify(f)
             f,m = formulaSimplify(f)
             self.checkSimplificationResult(f)
+
+    
+    def checkNNFResult(self, f):
+        """
+        A simplified formula is either $true/$false, or it only
+        contains &, |, !, ? as operators (~ is shifted into the
+        literals).
+        """
+
+        print "NNF:", f
+        if f.isPropConst(True) or f.isPropConst(False):
+            funs = f.collectFuns()
+            self.assert_(funs in [set(["$true"]), set(["$false"])])
+        else:
+            ops = f.collectOps()
+            self.assert_(ops <= self.nnf_ops)
+            
+
+    def testNNF(self):
+        """
+        Test NNF transformation
+        """
+        f,m = formulaOpSimplify(self.f1)
+        f,m = formulaSimplify(f)
+        f,m = formulaNNF(f, 1)
+        self.checkNNFResult(f)
+
+        f,m = formulaOpSimplify(self.f2)
+        f,m = formulaSimplify(f)
+        f,m = formulaNNF(f,1)
+        self.checkNNFResult(f)
+
+        f,m = formulaOpSimplify(self.f3)
+        f,m = formulaSimplify(f)
+        f,m = formulaNNF(f,1)
+        self.checkNNFResult(f)
+
+        f,m = formulaOpSimplify(self.f4)
+        f,m = formulaSimplify(f)
+        f,m = formulaNNF(f,1)
+        self.checkNNFResult(f)
+
+        f,m = formulaOpSimplify(self.f5)
+        f,m = formulaSimplify(f)
+        f,m = formulaNNF(f,1)
+        self.checkNNFResult(f)
+
+        lex = Lexer(self.covformulas)
+        while not lex.TestTok(Token.EOFToken):
+            f = parseFormula(lex)
+            f,m = formulaOpSimplify(f)
+            f,m = formulaSimplify(f)
+            f,m = formulaNNF(f,1)
+            self.checkNNFResult(f)
 
 
 if __name__ == '__main__':
