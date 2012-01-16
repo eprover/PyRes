@@ -281,6 +281,7 @@ class TestSubst(unittest.TestCase):
         t = tau.modifyBinding(("U", self.t1))
         self.assertEqual(t, None)
         self.assert_(tau.isBound("U"))
+        self.assert_(terms.termEqual(tau.value("U"), self.t1))
         t = tau.modifyBinding(("U", None))
         self.assert_(not tau.isBound("U"))
 
