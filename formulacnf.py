@@ -370,6 +370,60 @@ def formulaNNF(f, polarity):
 
     return f, modified
 
+def formulaMiniScope(f):
+    """
+    Perform miniscoping, i.e. move quantors in as far as possible, so
+    that their scope is only the smallest subformula in which the
+    variable occurs. 
+    """
+    res = False
+    if f.isQuantified():
+        op    = f.child2.op
+        quant = f.op
+        var   = f.child1        
+        subf  = f.child2
+        if op == "&" or op == "|":
+            if not var in subf.child1.collectFreeVars():
+                # q[X]:(P op Q)  -> P op (q[X]:Q) if X not free in P
+                arg2 = Formula(quant, var, subf.child2)
+                arg1 = subf.child1
+                f = Formula(op, arg1, arg2)
+                res = True
+            elif not var in subf.child2.collectFreeVars():
+                # q[X]:(P op Q)  -> (q[X]:P) op Q if X not free in Q
+                arg1 = Formula(quant, var, subf.child1)
+                arg2 = subf.child2
+                f = Formula(op, arg1, arg2)
+                res = True
+            else:
+                if op == "&" and quant == "!":
+                    # ![X]:(P&Q) -> ![X]:P & ![X]:Q
+                    arg1 = Formula("!", var, subf.child1)
+                    arg2 = Formula("!", var, subf.child2)
+                    f = Formula("&" , arg1, arg2)
+                    res = True
+                elif  op == "|" and quant == "?":
+                    # ?[X]:(P|Q) -> ?[X]:P | ?[X]:Q
+                    arg1 = Formula("?", var, subf.child1)
+                    arg2 = Formula("?", var, subf.child2)
+                    f = Formula("|", arg1, arg2)
+                    res = True
+    arg1 = f.child1
+    arg2 = f.child2
+    modified = False
+    if f.hasSubform1():
+        arg1, m = formulaMiniScope(f.child1)
+        modified |= m
+    if f.hasSubform2():
+        arg2, m = formulaMiniScope(f.child2)
+        modified |= m
+    if modified:
+        f = Formula(f.op, arg1, arg2)
+        f,m = formulaMiniScope(f)
+        res = True
+    return f, res
+
+
 
 class TestCNF(unittest.TestCase):
     """
@@ -420,6 +474,7 @@ class TestCNF(unittest.TestCase):
         (a<=>a)
         ![X]:(a<=>a)
         ?[X]:(a<=>a)
+        a<=>b
         """
 
         
@@ -547,6 +602,29 @@ class TestCNF(unittest.TestCase):
             f,m = formulaNNF(f,1)
             self.checkNNFResult(f)
 
+    def testMiniScope(self):
+        """
+        Test Miniscoping.
+        """
+        lex = Lexer("""
+        ![X]:(p(X)|q(a))
+        ?[X]:(p(a)&q(X))
+        ![X]:(p(X)&q(X))
+        ?[X]:(p(X)|q(X))
+        ![X]:(p(X)|q(X))
+        ![X,Y]:?[Z]:(p(Z)|q(X))
+        """)
+        res = [True, True, True, True, False, True]
+
+        while not lex.TestTok(Token.EOFToken):
+            expected = res.pop(0)
+            f = parseFormula(lex)
+            f1,m = formulaMiniScope(f)
+            print f, f1, m, expected
+            self.assertEqual(expected, m)
+            if m:
+                self.assert_(not f1.isQuantified())
+            
 
 if __name__ == '__main__':
     unittest.main()
