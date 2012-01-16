@@ -125,6 +125,27 @@ class Substitution(object):
             args = map(lambda x:self.apply(x), terms.termArgs(term))
             res.extend(args)
             return res                      
+
+    def modifyBinding(self, binding):
+        """
+        Modify the substitution by adding a new binding (var,
+        term). If the term is None, remove any binding for var. If it
+        is not, add the binding. In either case, return the previous
+        binding of the variable, or None if it was unbound.
+        """
+        var, term = binding
+        if self.isBound(var):
+            res = self.value(var)
+        else:
+            res = None
+
+        if term == None:
+            if self.isBound(var):
+                del self.subst[var]
+        else:
+            self.subst[var] = term
+
+        return res
         
     def composeBinding(self, binding):
         """
@@ -214,7 +235,7 @@ def freshVar():
     different from input variables. However, it is guaranteed that
     freshVar() will never return the same variable more than once.
     """
-    Substitution.varCounter =  Substitution.varCounter + 1
+    Substitution.varCounter += 1
     return "X%d"%(Substitution.varCounter,)
     
 
@@ -250,11 +271,19 @@ class TestSubst(unittest.TestCase):
         """
         Test basic stuff.
         """
-        tau = self. sigma1.copy()
+        tau = self.sigma1.copy()
         self.assert_(terms.termEqual(tau("X"), self.sigma1("X")))
         self.assert_(terms.termEqual(tau("Y"), self.sigma1("Y")))
         self.assert_(terms.termEqual(tau("Z"), self.sigma1("Z")))
         
+        t = tau.modifyBinding(("X", self.t1))
+        self.assert_(terms.termEqual(t, self.t2))
+        t = tau.modifyBinding(("U", self.t1))
+        self.assertEqual(t, None)
+        self.assert_(tau.isBound("U"))
+        t = tau.modifyBinding(("U", None))
+        self.assert_(not tau.isBound("U"))
+
         
     def testSubstApply(self):
         """

@@ -424,6 +424,50 @@ def formulaMiniScope(f):
     return f, res
 
 
+def formulaVarRename(f, subst = None):
+    """
+    Rename variables in f so that all bound variables are unique.
+    """
+    if subst == None:
+        subst = substitutions.Substitution()
+
+    if f.isQuantified():
+        # New scope of a variable -> add a new binding to a new
+        # variable. Store potential old binding to restore when
+        # leaving the scope later
+        var = f.child1
+        newvar = substitutions.freshVar()
+        print "newvar, f:", newvar, f
+        oldbinding = subst.modifyBinding((var, newvar))
+    
+    if f.isLiteral():
+        # Create copy with the new variables recorded in subst
+        child = f.child1.instantiate(subst)
+        f = Formula("", f.child1.instantiate(subst))
+    else:
+        # This is a compisite formula. Rename it...
+        arg1 = None
+        arg2 = None
+        if f.isQuantified():
+            # Apply new renaming locally to the bound variable and
+            # recusively to the subformula
+            arg1 = newvar
+            arg2 = formulaVarRename(f.child2, subst)
+        else:
+            # Apply renaming to all subformulas
+            if f.hasSubform1():
+                arg1 = formulaVarRename(f.child1, subst)
+            if f.hasSubform2():
+                arg2 = formulaVarRename(f.child2, subst)
+        f = Formula(f.op, arg1, arg2)
+    
+    if f.isQuantified():
+        # We are leaving the scope of the quantifier, so restore
+        # substitution.
+        subst.modifyBinding((var, oldbinding))
+
+    return f
+
 
 class TestCNF(unittest.TestCase):
     """
@@ -624,6 +668,28 @@ class TestCNF(unittest.TestCase):
             self.assertEqual(expected, m)
             if m:
                 self.assert_(not f1.isQuantified())
+
+    def testRenaming(self):
+        """
+        Test variable renaming
+        """
+        lex = Lexer("![X]:(p(X)|![X]:(q(X)&?[X]:r(X)))")
+        f = parseFormula(lex)
+
+        v1 = f.collectVars()
+        self.assertEqual(v1, set(["X"]))
+        v2 = f.collectFreeVars()
+        self.assertEqual(v2, set())
+
+        f1 = formulaVarRename(f)
+        print f, f1
+
+        v1 = f1.collectVars()
+        self.assertEqual(len(v1), 3)
+        v2 = f1.collectFreeVars()
+        self.assertEqual(v2, set())
+        
+        
             
 
 if __name__ == '__main__':
