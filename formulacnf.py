@@ -445,7 +445,7 @@ def formulaVarRename(f, subst = None):
         child = f.child1.instantiate(subst)
         f = Formula("", f.child1.instantiate(subst))
     else:
-        # This is a compisite formula. Rename it...
+        # This is a composite formula. Rename it...
         arg1 = None
         arg2 = None
         if f.isQuantified():
