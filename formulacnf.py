@@ -469,6 +469,30 @@ def formulaVarRename(f, subst = None):
     return f
 
 
+def formulaRekSkolemize(f, variables, subst):
+    """
+    Perform Skolemization of f, which is assumed to be in the scope of
+    the list of variables provided.
+    """
+    pass
+    
+
+def formulaSkolemize(f):
+    """
+    Perform an outermost Skolemization of f, removing all existential
+    quantifiers. Formulas are considered to be universally closed,
+    i.e. free variables (which should not occur) are treated as
+    universally quantified.
+    """
+    vars = f.collectFreeVars()
+    varstack = [v for v in vars]
+
+    res = formulaRekSkolemize(f, varstack, Substitution())
+    
+    return res
+    
+
+
 class TestCNF(unittest.TestCase):
     """
     Test cases for clausification.
