@@ -72,10 +72,52 @@ import unittest
 from lexer import Token,Lexer
 from derivations import Derivable,Derivation,toggleDerivationOutput
 from terms import *
-import substitutions
+from substitutions import Substitution, freshVar
 from literals import Literal
 from formulas import Formula, WFormula, parseWFormula, parseFormula
 
+
+class SkolemSymbols(object):
+    """
+    Class for providing fresh Skolem symbols.    
+    """
+    skolemCount = 0
+
+    def __init__(self):
+        pass
+
+    def newSkolemSymbol(self):
+        """
+        Return a new skolem symbol. This is a simple version, not
+        suitable for a real production system. The symbol is not
+        guaranteed to be globally fresh. It's the user's
+        responsibility to ensure that no symbols of the form
+        "skolemXXXX" are in the input.
+        """
+        SkolemSymbols.skolemCount += 1
+        return "skolem%04d"%(SkolemSymbols.skolemCount,)
+    
+
+    def newSkolemTerm(self, varlist):
+        """
+        Return a new skolem term for the given (list of) variables. 
+        """
+        symbol = self.newSkolemSymbol()
+        res = [symbol]
+        res.extend(varlist)
+        return res
+
+    def __call__(self, varlist):
+        """
+        Nicer interface to make getting new Skolem terms more
+        convenient.
+        """
+        return self.newSkolemTerm(varlist)
+
+
+skolemGenerator = SkolemSymbols()
+
+        
 
 def formulaOpSimplify(f):
     """
@@ -429,21 +471,20 @@ def formulaVarRename(f, subst = None):
     Rename variables in f so that all bound variables are unique.
     """
     if subst == None:
-        subst = substitutions.Substitution()
+        subst = Substitution()
 
     if f.isQuantified():
         # New scope of a variable -> add a new binding to a new
         # variable. Store potential old binding to restore when
         # leaving the scope later
         var = f.child1
-        newvar = substitutions.freshVar()
-        print "newvar, f:", newvar, f
+        newvar = freshVar()
         oldbinding = subst.modifyBinding((var, newvar))
     
     if f.isLiteral():
         # Create copy with the new variables recorded in subst
         child = f.child1.instantiate(subst)
-        f = Formula("", f.child1.instantiate(subst))
+        f = Formula("", child)
     else:
         # This is a composite formula. Rename it...
         arg1 = None
@@ -474,7 +515,31 @@ def formulaRekSkolemize(f, variables, subst):
     Perform Skolemization of f, which is assumed to be in the scope of
     the list of variables provided.
     """
-    pass
+    if f.isLiteral():
+        child = f.child1.instantiate(subst)
+        f = Formula("", child)
+    elif f.op == "?":
+        var = f.child1
+        skTerm = skolemGenerator(variables)
+        oldbinding = subst.modifyBinding((var,skTerm))
+        f = formulaRekSkolemize(f.child2, variables, subst)
+        subst.modifyBinding((var, oldbinding))
+    elif f.op == "!":
+        var = f.child1
+        variables.append(var)
+        handle = formulaRekSkolemize(f.child2, variables, subst)
+        f = Formula("!", var, handle)
+        variables.pop()
+    else:
+        arg1 = None
+        arg2 = None
+        if f.hasSubform1():
+            arg1 = formulaRekSkolemize(f.child1, variables, subst)
+        if f.hasSubform2():
+            arg2 = formulaRekSkolemize(f.child2, variables, subst)
+        f = Formula(f.op, arg1, arg2)
+    return f
+        
     
 
 def formulaSkolemize(f):
@@ -490,7 +555,84 @@ def formulaSkolemize(f):
     res = formulaRekSkolemize(f, varstack, Substitution())
     
     return res
+
+
+def separateQuantors(f, varlist=None):
+    """
+    Remove all quantors from f, returning the quantor-free core of the
+    formula and a list of quanified variables. This will only be
+    applied to Skolemized formulas, thus finding an existential
+    quantor is an error. To be useful, the inpt formula also has to be
+    variable-normalized. 
+    """
+    if varlist == None:
+        varlist = list()
+
+    if f.isQuantified():
+        assert f.op == "!"
+        varlist.append(f.child1)
+        f, dummy = separateQuantors(f.child2, varlist)
+    elif f.isLiteral():
+        pass
+    else:
+        arg1 = None
+        arg2 = None
+        if f.hasSubform1():
+            arg1, dummy = separateQuantors(f.child1, varlist)
+        if f.hasSubform2():
+            arg2, dummy = separateQuantors(f.child2, varlist)
+        f = Formula(f.op, arg1, arg2)
+    return f, varlist
+
+def formulaShitQuantorsOut(f):
+    """
+    Shift all (universal) quantor to the outermost level.
+    """
+    f, varlist = separateQuantors(f)
+
+    while varlist:
+        f = Formula("!", varlist.pop(), f)
+
+    return f
+
+
+def formulaDistributeDisjunctions(f):
+    """
+    Convert a Skolemized formula in prefix-NNF form into Conjunctive
+    Normal Form.
+    """
+    arg1 = None
+    arg2 = None
+    if f.isQuantified():
+        arg1 = f.child1
+        arg2 = formulaDistributeDisjunctions(f.child2)
+        f = Formula(f.op, arg1, arg2)
+    elif f.isLiteral():
+        pass
+    else:
+        if f.hasSubform1():
+            arg1 = formulaDistributeDisjunctions(f.child1)
+        if f.hasSubform2():
+            arg2 = formulaDistributeDisjunctions(f.child2)
+        f = Formula(f.op, arg1, arg2)
+    if f.op == "|":
+        if f.child1.op == "&":
+            # (P&Q)|R -> (P|R) & (Q|R)
+            arg1 = Formula("|", f.child1.child1, f.child2)
+            arg2 = Formula("|", f.child1.child2, f.child2)
+            f    = Formula("&", arg1, arg2)
+            f    = formulaDistributeDisjunctions(f)
+        elif  f.child2.op == "&":
+            # (R|(P&Q) -> (R|P) & (R|Q)
+            arg1 = Formula("|", f.child1, f.child2.child1)
+            arg2 = Formula("|", f.child1, f.child2.child2)
+            f    = Formula("&", arg1, arg2)
+            f    = formulaDistributeDisjunctions(f)
+    return f
+
     
+
+
 
 
 class TestCNF(unittest.TestCase):
@@ -713,8 +855,101 @@ class TestCNF(unittest.TestCase):
         v2 = f1.collectFreeVars()
         self.assertEqual(v2, set())
         
-        
+    def testSkolemSymbols(self):
+        """
+        Check if Skolem symbol construction works.
+        """
+        symbols = []
+        for i in xrange(10):
+            newsymbol = skolemGenerator.newSkolemSymbol()
+            self.assert_(not newsymbol in symbols)
+            symbols.append(newsymbol)
+
+        var = ["X", "Y"]
+        for i in xrange(10):
+            t = skolemGenerator(var)
+            self.assert_(termIsCompound(t))
+            self.assertEqual(termArgs(t), var)
+
+
+    def preprocFormula(self, f):
+        """
+        Bring formula into miniscoped variable normalized NNF.
+        """
+        f,m = formulaOpSimplify(f)
+        f,m = formulaSimplify(f)
+        f,m = formulaNNF(f,1)
+        f,m = formulaMiniScope(f)
+        f   = formulaVarRename(f)
+        return f
+
             
+    def testSkolemization(self):
+        """
+        Test skolemization.
+        """
+        f = self.preprocFormula(self.f2)
+        f = formulaSkolemize(f)
+        self.assert_(not "?" in f.collectOps())
+        print f
+
+        f = self.preprocFormula(self.f3)
+        f = formulaSkolemize(f)
+        self.assert_(not "?" in f.collectOps())
+        print f
+
+        f = self.preprocFormula(self.f4)
+        f = formulaSkolemize(f)
+        self.assert_(not "?" in f.collectOps())
+        print f
+
+    def testShiftQuantors(self):
+        """
+        Test shifting of quantors out.        
+        """
+        f = self.preprocFormula(self.f2)
+        f = formulaSkolemize(f)
+        f = formulaShitQuantorsOut(f)
+        if "!" in f.collectOps():
+            self.assertEqual(f.op, "!")
+
+        f = self.preprocFormula(self.f3)
+        f = formulaSkolemize(f)
+        f = formulaShitQuantorsOut(f)
+        if "!" in f.collectOps():
+            self.assertEqual(f.op, "!")
+
+        f = self.preprocFormula(self.f4)
+        f = formulaSkolemize(f)
+        f = formulaShitQuantorsOut(f)
+        if "!" in f.collectOps():
+            self.assertEqual(f.op, "!")
+
+
+    def testDistributeDisjunctions(self):
+        """
+        Test ConjunctiveNF.
+        """
+        f = self.preprocFormula(self.f2)
+        f = formulaSkolemize(f)
+        f = formulaShitQuantorsOut(f)
+        f = formulaDistributeDisjunctions(f)
+        print f
+        
+        f = self.preprocFormula(self.f3)
+        f = formulaSkolemize(f)
+        f = formulaShitQuantorsOut(f)
+        f = formulaDistributeDisjunctions(f)
+        print f
+
+        f = self.preprocFormula(self.f4)
+        f = formulaSkolemize(f)
+        f = formulaShitQuantorsOut(f)
+        f = formulaDistributeDisjunctions(f)
+        print f
+        
+
+        
 
 if __name__ == '__main__':
     unittest.main()
