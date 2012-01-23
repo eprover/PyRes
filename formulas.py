@@ -150,6 +150,39 @@ class Formula(object):
         """
         return self.op == "~"
 
+    def isLiteralDisjunction(self):
+        """
+        Return True iff the formula is a disjunction of literals.    
+        """
+        if self.isLiteral():
+            return True
+        if self.op == "|":
+            return self.child1.isLiteralDisjunction() and \
+                   self.child2.isLiteralDisjunction() 
+        return False
+
+    def isClauseConjunction(self):
+        """
+        Return True if the formula is a conjunction of disjunction of
+        literals.
+        """
+        if self.isLiteral():
+            return True
+        if self.op == "|":
+            return self.isLiteralDisjunction()
+        if self.op == "&":
+            return self.child1.isClauseConjunction() and \
+                   self.child2.isClauseConjunction() 
+        return False
+
+    def isCNF(self):
+        """
+        Return True if the formula is in conjunctive normal form.
+        """
+        if self.op == "!":
+            return self.child2.isCNF()
+        return self.isClauseConjunction()       
+
     def hasSubform1(self):
         """
         Return True if self has a proper subformula as the first
@@ -492,11 +525,30 @@ class TestFormulas(unittest.TestCase):
         self.assertEqual(f.collectOps(),
                          set(["", "~&", "~|", "!", "<~>", "=>"]))
         self.assertEqual(f.collectFuns(), set(["a", "b", "c", "d", "e"]))
+
+    def testCNFTest(self):
+        """
+        Check the CNF test.
+        """
+        lex = Lexer("""
+        a=>b
+        a & (a|(b=>c))
+        ![X]:((a|b)&c)
+        ![X]:![Y]:((a|b)&(?[X]:c(X)))
+        ![X]:(a & (a|b|c) & (a|b|c|d))        
+        """)
+        expected = [False, False, True, False, True]
+        while not lex.TestTok(Token.EOFToken):
+            f = parseFormula(lex)
+            res = expected.pop(0)
+            self.assertEqual(f.isCNF(), res)
         
 
 
-
     def testWrappedFormula(self):
+        """
+        Test basic parsing and output of wrapped formulae.
+        """
         lex = Lexer(self.wformulas)
         f1 = parseWFormula(lex)
         print f1
