@@ -4,7 +4,7 @@
 # Module prover.py
 
 """
-prover.py 0.1
+prover02.py 0.1
 
 Usage: prover.py [options] <problem_file>
 

@@ -183,6 +183,35 @@ class Formula(object):
             return self.child2.isCNF()
         return self.isClauseConjunction()       
 
+    def getMatrix(self):
+        """
+        Return the formula without any leading quantifiers (if the
+        formula is in prefix normal form, this is the matrix of the
+        formuma). 
+        """
+        f = self
+        while f.isQuantified():
+            f = f.child2
+        return f
+
+    def conj2List(self):
+        """
+        Return a list of the subformula connected by top-level "&".
+        """
+        if self.op == "&":
+            return self.child1.conj2List()+self.child2.conj2List()
+        return [self]
+
+    def disj2List(self):
+        """
+        Return a list of the subformula connected by top-level "|".
+        """
+        if self.op == "|":
+            return self.child1.disj2List()+self.child2.disj2List()
+        return [self]
+        
+
+
     def hasSubform1(self):
         """
         Return True if self has a proper subformula as the first
@@ -424,8 +453,10 @@ def parseWFormula(lexer):
     return res
 
 
+# ------------------------------------------------------------------
+#                  Unit test section
+# ------------------------------------------------------------------
  
-
 class TestFormulas(unittest.TestCase):
     """
     Unit test class for clauses. Test clause and literal
@@ -535,7 +566,7 @@ class TestFormulas(unittest.TestCase):
         a & (a|(b=>c))
         ![X]:((a|b)&c)
         ![X]:![Y]:((a|b)&(?[X]:c(X)))
-        ![X]:(a & (a|b|c) & (a|b|c|d))        
+        ![X]:(a & (a|b|c) & (a|b|c|d))
         """)
         expected = [False, False, True, False, True]
         while not lex.TestTok(Token.EOFToken):
@@ -543,7 +574,35 @@ class TestFormulas(unittest.TestCase):
             res = expected.pop(0)
             self.assertEqual(f.isCNF(), res)
         
+    def testSplitter(self):
+        """
+        Test splitting of conjunctions/disjunktions.
+        """
+        lex = Lexer("""
+        a=>b
+        a & (a|(b=>c))
+        ![X]:((a|b)&c)
+        ![X]:![Y]:((a|b)&(?[X]:c(X)))
+        ![X]:(a & (a|b|c) & (a|b|c|d))        
+        a|(b&c)|(b<=>d)|![X]:p(X)
+        """)
+        cexpected = [1, 2, 2, 2, 3, 1]
+        dexpected = [1, 1, 1, 1, 1, 4]        
+        
+        while not lex.TestTok(Token.EOFToken):
+            f = parseFormula(lex)
+            f = f.getMatrix()
 
+            cs = f.conj2List()
+            res = cexpected.pop(0)
+            self.assertEqual(len(cs),res)
+            
+            ds = f.disj2List()
+            res = dexpected.pop(0)
+            self.assertEqual(len(ds),res)
+
+
+        
 
     def testWrappedFormula(self):
         """

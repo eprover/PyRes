@@ -162,7 +162,7 @@ class Derivation(object):
     reference to an existing Derivable object ("reference"), or an
     inference with a list of premises. 
     """
-    def __init__(self, operator, parents=None):
+    def __init__(self, operator, parents=None, status="status(thm)"):
         """
         Initialize  a derivation object with the operator and a list
         of parents (which can be Derivations or, in the case of
@@ -170,6 +170,7 @@ class Derivation(object):
         """
         self.operator = operator
         self.parents  = parents
+        self.status   = status
  
     def __repr__(self):
         """
@@ -177,15 +178,14 @@ class Derivation(object):
         """
         if self.operator == "input":
             return "input"
-        elif self.operator == "binres":
-            return "inference(resolution, [status(thm)], "\
-                   +repr(self.parents)+")"    
-        elif self.operator == "factor":
-            return "inference(factor, [status(thm)], "\
-                   +repr(self.parents)+")"    
         elif self.operator == "reference":
             assert(len(self.parents)==1)
             return self.parents[0].name
+        else:   
+            return "inference(%s,%s,%s)"%\
+                   (self.operator, self.status, repr(self.parents))
+
+
 
     def getParents(self):
         """
@@ -205,13 +205,13 @@ class Derivation(object):
                 
 
         
-def flatDerivation(operator, parents):
+def flatDerivation(operator, parents, status="status(thm)"):
     """
     Simple convenience function: Create a derivation which directly
     references all parents. 
     """
     parentlist = [Derivation("reference", [p]) for p in parents]
-    return Derivation(operator, parentlist)
+    return Derivation(operator, parentlist, status)
     
 
 
@@ -228,7 +228,7 @@ class TestDerivations(unittest.TestCase):
         o1 = Derivable()
         o2 = Derivable()
         o3 = Derivable()
-        o3.setDerivation(flatDerivation("binres", [o1, o2]))
+        o3.setDerivation(flatDerivation("resolution", [o1, o2]))
         self.assertEqual(o1.getParents(),[])
         self.assertEqual(o2.getParents(),[])
         self.assertEqual(len(o3.getParents()), 2)
@@ -253,9 +253,9 @@ class TestDerivations(unittest.TestCase):
         o2.setDerivation(Derivation("input"))
         o3.setDerivation(flatDerivation("factor", [o1]))
         o4.setDerivation(flatDerivation("factor", [o3]))
-        o5.setDerivation(flatDerivation("binres", [o1,o2]))
+        o5.setDerivation(flatDerivation("resolution", [o1,o2]))
         o6.setDerivation(Derivation("reference", [o5]))
-        o7.setDerivation(flatDerivation("binres", [o5,o1]))
+        o7.setDerivation(flatDerivation("resolution", [o5,o1]))
         proof = o7.orderedDerivation()
         print proof
         self.assertEqual(len(proof),4)
@@ -274,7 +274,7 @@ class TestDerivations(unittest.TestCase):
         o4 = Derivable()
         o1.setDerivation(Derivation("input"))
         o2.setDerivation(Derivation("input"))
-        o3.setDerivation(flatDerivation("binres", [o1, o2]))
+        o3.setDerivation(flatDerivation("resolution", [o1, o2]))
         enableDerivationOutput()
         self.assert_(o3.strDerivation()!="")
         self.assert_(o4.strDerivation()=="")

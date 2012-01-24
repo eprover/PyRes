@@ -70,10 +70,11 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Token,Lexer
-from derivations import Derivable,Derivation,toggleDerivationOutput
+from derivations import Derivable,Derivation,flatDerivation,enableDerivationOutput,toggleDerivationOutput
 from terms import *
 from substitutions import Substitution, freshVar
 from literals import Literal
+from clauses import Clause
 from formulas import Formula, WFormula, parseWFormula, parseFormula
 
 
@@ -630,10 +631,95 @@ def formulaDistributeDisjunctions(f):
             f    = formulaDistributeDisjunctions(f)
     return f
 
+
+
+
+def formulaCNFSplit(f):
+    """
+    Given a formula in CNF, convert it to a set of clauses.
+    """
+    matrix = f.formula.getMatrix()
+
+    res = []
+    conjuncts = matrix.conj2List()
+
+    for c in conjuncts:
+        litlist = [l.child1 for l in c.disj2List()]
+        clause = Clause(litlist, f.type)
+        res.append(clause)
+
+    return res   
+    
+    
+    
+def wFormulaCNF(wf):
+    """
+    Convert a (wrapped) formula to Conjunctive Normal Form.
+    """    
+    f, m0 = formulaOpSimplify(wf.formula)
+    f, m1 = formulaSimplify(f)
+    if m0 or m1:
+        tmp = WFormula(f, wf.type)
+        tmp.setDerivation(flatDerivation("fof_simplification", [wf]))
+        wf = tmp
+
+    f,m = formulaNNF(f,1)
+    if m:
+        tmp = WFormula(f, wf.type)
+        tmp.setDerivation(flatDerivation("fof_nnf", [wf]))
+        wf = tmp
+        
+    f,m = formulaMiniScope(f)
+    if m:
+        tmp = WFormula(f, wf.type)
+        tmp.setDerivation(flatDerivation("shift_quantors", [wf]))
+        wf = tmp
+    
+    f = formulaVarRename(f)
+    if not f.isEqual(wf.formula):
+        tmp = WFormula(f, wf.type)
+        tmp.setDerivation(flatDerivation("variable_rename", [wf]))
+        wf = tmp
+
+    f = formulaSkolemize(f)
+    if not f.isEqual(wf.formula):
+        tmp = WFormula(f, wf.type)
+        tmp.setDerivation(flatDerivation("skolemize", [wf], "status(esa)"))
+        wf = tmp
+        
+    f = formulaShitQuantorsOut(f)
+    if not f.isEqual(wf.formula):
+        tmp = WFormula(f, wf.type)
+        tmp.setDerivation(Derivation("shift_quantors", [wf]))
+        wf = tmp
+    
+    f = formulaDistributeDisjunctions(f)
+    if not f.isEqual(wf.formula):
+        tmp = WFormula(f, wf.type)
+        tmp.setDerivation(flatDerivation("distribute", [wf]))
+        wf = tmp
+
+    return wf
+
+def wFormulaClausify(wf):
+    """
+    Convert a formula into Clause Normal Form.
+    """
+    wf = wFormulaCNF(wf)
+
+    clauses = formulaCNFSplit(wf)
+
+    for c in clauses:
+        c.setDerivation(flatDerivation("split_conjunct", [wf]))
+
+    return clauses
     
 
 
 
+# ------------------------------------------------------------------
+#                  Unit test section
+# ------------------------------------------------------------------
 
 class TestCNF(unittest.TestCase):
     """
@@ -685,6 +771,49 @@ class TestCNF(unittest.TestCase):
         ![X]:(a<=>a)
         ?[X]:(a<=>a)
         a<=>b
+        """
+
+        self.testformulas = """
+ fof(t12_autgroup,conjecture,(
+    ! [A] :
+      ( ( ~ v3_struct_0(A)
+        & v1_group_1(A)
+        & v3_group_1(A)
+        & v4_group_1(A)
+        & l1_group_1(A) )
+     => r1_tarski(k4_autgroup(A),k1_fraenkel(u1_struct_0(A),u1_struct_0(A))) ) )).
+
+fof(abstractness_v1_group_1,axiom,(
+    ! [A] :
+      ( l1_group_1(A)
+     => ( v1_group_1(A)
+       => A = g1_group_1(u1_struct_0(A),u1_group_1(A)) ) ) )).
+
+fof(antisymmetry_r2_hidden,axiom,(
+    ! [A,B] :
+      ( r2_hidden(A,B)
+     => ~ r2_hidden(B,A) ) )).
+fof(cc1_fraenkel,axiom,(
+    ! [A] :
+      ( v1_fraenkel(A)
+     => ! [B] :
+          ( m1_subset_1(B,A)
+         => ( v1_relat_1(B)
+            & v1_funct_1(B) ) ) ) )).
+
+fof(cc1_funct_1,axiom,(
+    ! [A] :
+      ( v1_xboole_0(A)
+     => v1_funct_1(A) ) )).
+
+fof(cc1_funct_2,axiom,(
+    ! [A,B,C] :
+      ( m1_relset_1(C,A,B)
+     => ( ( v1_funct_1(C)
+          & v1_partfun1(C,A,B) )
+       => ( v1_funct_1(C)
+          & v1_funct_2(C,A,B) ) ) ) )).
+fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).     
         """
 
         
@@ -935,21 +1064,56 @@ class TestCNF(unittest.TestCase):
         f = formulaShitQuantorsOut(f)
         f = formulaDistributeDisjunctions(f)
         print f
+        self.assert_(f.isCNF())
         
         f = self.preprocFormula(self.f3)
         f = formulaSkolemize(f)
         f = formulaShitQuantorsOut(f)
         f = formulaDistributeDisjunctions(f)
         print f
+        self.assert_(f.isCNF())
 
         f = self.preprocFormula(self.f4)
         f = formulaSkolemize(f)
         f = formulaShitQuantorsOut(f)
         f = formulaDistributeDisjunctions(f)
         print f
+        self.assert_(f.isCNF())
+       
+    def testCNFization(self):
+        """
+        Test conversion of wrapped formulas into conjunctive normal
+        form.
+        """
+        lex = Lexer(self.testformulas)
+
+        while not lex.TestTok(Token.EOFToken):
+            wf = parseWFormula(lex)
+            wf = wFormulaCNF(wf)
+            enableDerivationOutput()
+            self.assert_(wf.formula.isCNF())
+            deriv = wf.orderedDerivation()
+            print "=================="
+            for s in deriv:
+                print s
+            toggleDerivationOutput()
+
+    def testClausification(self):
+        """
+        Test conversion of wrapped formulas into lists of clauses. 
+        """
+        lex = Lexer(self.testformulas)
+
+        while not lex.TestTok(Token.EOFToken):
+            wf = parseWFormula(lex)
+            clauses = wFormulaClausify(wf)
+            enableDerivationOutput()
+            print "=================="
+            for c in clauses:
+                print c
+            toggleDerivationOutput()
         
 
-        
 
 if __name__ == '__main__':
     unittest.main()
