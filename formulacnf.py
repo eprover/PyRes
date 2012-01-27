@@ -585,7 +585,7 @@ def separateQuantors(f, varlist=None):
         f = Formula(f.op, arg1, arg2)
     return f, varlist
 
-def formulaShitQuantorsOut(f):
+def formulaShiftQuantorsOut(f):
     """
     Shift all (universal) quantor to the outermost level.
     """
@@ -687,7 +687,7 @@ def wFormulaCNF(wf):
         tmp.setDerivation(flatDerivation("skolemize", [wf], "status(esa)"))
         wf = tmp
         
-    f = formulaShitQuantorsOut(f)
+    f = formulaShiftQuantorsOut(f)
     if not f.isEqual(wf.formula):
         tmp = WFormula(f, wf.type)
         tmp.setDerivation(Derivation("shift_quantors", [wf]))
@@ -1038,19 +1038,19 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         """
         f = self.preprocFormula(self.f2)
         f = formulaSkolemize(f)
-        f = formulaShitQuantorsOut(f)
+        f = formulaShiftQuantorsOut(f)
         if "!" in f.collectOps():
             self.assertEqual(f.op, "!")
 
         f = self.preprocFormula(self.f3)
         f = formulaSkolemize(f)
-        f = formulaShitQuantorsOut(f)
+        f = formulaShiftQuantorsOut(f)
         if "!" in f.collectOps():
             self.assertEqual(f.op, "!")
 
         f = self.preprocFormula(self.f4)
         f = formulaSkolemize(f)
-        f = formulaShitQuantorsOut(f)
+        f = formulaShiftQuantorsOut(f)
         if "!" in f.collectOps():
             self.assertEqual(f.op, "!")
 
@@ -1061,21 +1061,21 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         """
         f = self.preprocFormula(self.f2)
         f = formulaSkolemize(f)
-        f = formulaShitQuantorsOut(f)
+        f = formulaShiftQuantorsOut(f)
         f = formulaDistributeDisjunctions(f)
         print f
         self.assert_(f.isCNF())
         
         f = self.preprocFormula(self.f3)
         f = formulaSkolemize(f)
-        f = formulaShitQuantorsOut(f)
+        f = formulaShiftQuantorsOut(f)
         f = formulaDistributeDisjunctions(f)
         print f
         self.assert_(f.isCNF())
 
         f = self.preprocFormula(self.f4)
         f = formulaSkolemize(f)
-        f = formulaShitQuantorsOut(f)
+        f = formulaShiftQuantorsOut(f)
         f = formulaDistributeDisjunctions(f)
         print f
         self.assert_(f.isCNF())
