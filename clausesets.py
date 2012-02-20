@@ -44,11 +44,11 @@ class ClauseSet(object):
     A class representing a clause set (or, more precisely,
     a multi-set of clauses). 
     """
-    def __init__(self):
+    def __init__(self, clauses = []):
         """
         Initialize the clause.
-        """
-        self.clauses = []
+        """        
+        self.clauses = list(clauses)
               
     def __repr__(self):
         """
