@@ -32,7 +32,11 @@ Options:
 --backward-subsumption
   Discard processed clauses if they are subsumed by the given clause.
 
-Copyright 2011 Stephan Schulz, schulz@eprover.org
+ -H <heuristic>
+--given-clause-heuristic=<heuristic>
+  Use the specified heuristic for given-clause selection.
+
+Copyright 2011, 2012 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
