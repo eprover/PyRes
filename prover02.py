@@ -6,7 +6,7 @@
 """
 prover02.py 0.1
 
-Usage: prover.py [options] <problem_file>
+Usage: prover02.py [options] <problem_file>
 
 This is a straightforward implementation of a simple resolution-based
 prover for first-order clausal logic. Problem file should be in
