@@ -119,6 +119,7 @@ class Token(object):
     Universal      = Ident("!")
     Existential    = Ident("?")
     Negation       = Ident("~")
+    SQString       = Ident("String in 'single quotes'")
     EOFToken       = Ident("*EOF*")
    
     def __init__(self, type, literal, source, pos):
@@ -175,7 +176,8 @@ class Lexer(object):
         (re.compile("[_A-Z][_a-z0-9_A-Z]*"),  Token.IdentUpper),
         (re.compile("\$[_a-z0-9_A-Z]*"),      Token.DefFunctor),
         (re.compile("#[^\n]*"),               Token.Comment),
-        (re.compile("%[^\n]*"),               Token.Comment)
+        (re.compile("%[^\n]*"),               Token.Comment),
+        (re.compile("'[^']*'"),               Token.SQString)
         ]
     
     def __init__(self, source, name="user string"):
@@ -252,7 +254,7 @@ class Lexer(object):
         next token's string value is among them, False otherwise.
         """
         if type(litvals) == type([]):
-            self.LookLit() in litvals
+            return self.LookLit() in litvals
         else:
             return self.LookLit() == litvals
 
