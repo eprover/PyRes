@@ -40,6 +40,7 @@ import os.path
 
 from lexer import Lexer, Token
 from clauses import Clause, parseClause
+from clausesets import ClauseSet
 from formulas import WFormula, parseWFormula
 from formulacnf import wFormulaClausify
 
@@ -143,8 +144,7 @@ class FOFSpec(object):
             tmp = wFormulaClausify(form)
             self.clauses.extend(tmp)
 
-        return self.clauses
-        
+        return ClauseSet(self.clauses)
    
 
 
