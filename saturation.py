@@ -129,13 +129,13 @@ class ProofState(object):
         """
         given_clause = self.unprocessed.extractBest()
         given_clause = given_clause.freshVarCopy()
-        print "#", given_clause
+        print "#"
         if given_clause.isEmpty():
             # We have found an explicit contradiction
             return given_clause
         if self.params.delete_tautologies and \
            given_clause.isTautology():
-            self.tautologies_deleted = self.tautologies_deleted+1
+            self.tautologies_deleted += 1
             return None        
         if self.params.forward_subsumption and \
            forwardSubsumption(self.processed, given_clause):
@@ -144,7 +144,7 @@ class ProofState(object):
             # done with that more general clause. So we can discard
             # the given clause. We do keep count of how many clauses
             # we have dropped this way.
-            self.forward_subsumed = self.forward_subsumed+1
+            self.forward_subsumed += 1
             return None
 
         if self.params.backward_subsumption:
@@ -160,7 +160,7 @@ class ProofState(object):
             tmp = backwardSubsumption(given_clause, self.processed)
             self.backward_subsumed = self.backward_subsumed+tmp
 
-            
+        print "#", given_clause            
         new = []
         factors    = computeAllFactors(given_clause)
         new.extend(factors)
