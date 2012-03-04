@@ -39,10 +39,12 @@ import os
 import os.path
 
 from lexer import Lexer, Token
+from signature import Signature
 from clauses import Clause, parseClause
 from clausesets import ClauseSet
 from formulas import WFormula, parseWFormula
 from formulacnf import wFormulaClausify
+from eqaxioms import generateEquivAxioms, generateCompatAxioms
 
 def tptpLexer(source, refdir):
     """
@@ -146,8 +148,25 @@ class FOFSpec(object):
 
         return ClauseSet(self.clauses)
    
+    def addEqAxioms(self):
+        """
+        Add equality axioms (if necessary). This currently only goes
+        through the clausal part of the spec. Return True if equality
+        is present, false otherwise.
+        """
+        sig = Signature()
+        for c in self.clauses:
+            c.collectSig(sig)
 
+        for f in self.formulas:
+            f.collectSig(sig)
 
+        if sig.isPred("="):            
+            res = generateEquivAxioms()
+            res.extend(generateCompatAxioms(sig))
+            self.clauses.extend(res)
+            return True
+        return False
         
 
 # ------------------------------------------------------------------
@@ -187,6 +206,13 @@ class TestFormulas(unittest.TestCase):
         fp.write(inctext)
         fp.close()
 
+        self.testeq = """
+        fof(eqab, axiom, a=b).
+        fof(pa, axiom, p(a)).
+        fof(fb, axiom, ![X]:f(X)=b).
+        fof(pa, conjecture, ?[X]:p(f(X))).
+        """
+
     def testParse(self):
         """
         Test the parsing and printing of a FOF spec.
@@ -211,7 +237,18 @@ class TestFormulas(unittest.TestCase):
         print "CNF:\n==="
         print spec
 
+    def testEqAxioms(self):
+        """
+        Test equality handling.
+        """
+        lex = Lexer(self.testeq)
+        spec = FOFSpec()
+        spec.parse(lex)
 
+        spec.addEqAxioms()
+
+        print "EQ:\n==="
+        print spec
         
 
 if __name__ == '__main__':

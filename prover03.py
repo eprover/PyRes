@@ -35,7 +35,7 @@ Options:
 --given-clause-heuristic=<heuristic>
   Use the specified heuristic for given-clause selection.
 
-Copyright 2011 Stephan Schulz, schulz@eprover.org
+Copyright 2011-2012 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -110,12 +110,11 @@ if __name__ == '__main__':
     for file in args:
         problem.parse(file)
 
+    problem.addEqAxioms()
     cnf = problem.clausify()
 
     state = ProofState(params, cnf)
     res = state.saturate()
-
-
     
     print state.statisticsStr()
     if res != None:

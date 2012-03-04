@@ -165,7 +165,7 @@ class Literal(object):
 
     def isEquational(self):
         """
-        Returm true if the literal is equational.
+        Return true if the literal is equational.
         """
         return termFunc(self.atom)=="="
 
@@ -276,7 +276,8 @@ class Literal(object):
         if self.isNegative()!=other.isNegative():
             return False
         else:
-            return match(self.atom, other.atom, subst)
+            res =  match(self.atom, other.atom, subst)
+            return res
 
 def parseLiteral(lexer):
     """
