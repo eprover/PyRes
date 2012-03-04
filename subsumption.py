@@ -64,7 +64,7 @@ def subsumeLitLists(subsumer, subsumed, subst):
     for lit in subsumed:
         btstate = subst.getState()
         if subsumer[0].match(lit, subst):
-            rest = [l for l in subsumer if l != lit]
+            rest = [l for l in subsumed if l != lit]
             if subsumeLitLists(subsumer[1:], rest, subst):
                 return True
         subst.backtrackToState(btstate)
@@ -122,6 +122,8 @@ cnf(axiom, c2, p(a)).
 cnf(axiom, c3, p(X)).
 cnf(axiom, c4, p(a)|q(f(X))).
 cnf(axiom, c5, p(a)|q(f(b))|p(X)).
+cnf(axiom, c6, X=X).
+cnf(axiom, c7, Y=Y).
 """
         lex = Lexer(self.spec)
         self.c1 = parseClause(lex)
@@ -129,6 +131,8 @@ cnf(axiom, c5, p(a)|q(f(b))|p(X)).
         self.c3 = parseClause(lex)
         self.c4 = parseClause(lex)
         self.c5 = parseClause(lex)
+        self.c6 = parseClause(lex)
+        self.c7 = parseClause(lex)
         
     def testSubsumption(self):
         """
@@ -163,6 +167,13 @@ cnf(axiom, c5, p(a)|q(f(b))|p(X)).
         
         res = subsumes(self.c5, self.c4)
         self.assert_(not res)
+
+        res = subsumes(self.c6, self.c6)
+        self.assert_(res)
+
+        res = subsumes(self.c6, self.c7)
+        self.assert_(res)
+
         
 if __name__ == '__main__':
     unittest.main()
