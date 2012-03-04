@@ -129,7 +129,6 @@ class Clause(Derivable):
             res = i.collectVars(res)
         return res
 
-
     def collectSig(self, sig=None):
         """
         Collect function- and predicate symbols into the signature. If

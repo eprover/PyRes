@@ -35,6 +35,7 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Lexer
+from literals import Signature
 from clauses import Clause, parseClause
 from heuristics import PickGiven2
 
@@ -74,6 +75,19 @@ class ClauseSet(object):
         """
         self.clauses.remove(clause)
         return clause
+
+    def collectSig(self, sig=None):
+        """
+        Collect function- and predicate symbols into the signature. If
+        none exists, create it. Return the signature
+        """
+        if not sig:
+            sig = Signature()
+
+        for i in self.clauses:
+            i.collectSig(sig)
+        return sig    
+
 
     def extractFirst(self):
         """
@@ -269,6 +283,10 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         c = clauses.clauses[0]
         clauses.extractClause(c)
         self.assertEqual(len(clauses), oldlen-1)
+
+        sig = Signature()
+        clauses.collectSig(sig)
+        print sig        
         
 
     def testClauseSetHeuristics(self):
@@ -315,6 +333,7 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
 
         pos = clauses.getResolutionLiterals(["p"])
         print pos
+        
         
 
 if __name__ == '__main__':
