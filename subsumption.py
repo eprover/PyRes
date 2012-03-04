@@ -51,7 +51,7 @@ from substitutions import BTSubst
 from matching import match
 from literals import Literal
 from clauses import Clause, parseClause
-
+from clausesets import ClauseSet
 
 
 def subsumeLitLists(subsumer, subsumed, subst):
@@ -133,6 +133,14 @@ cnf(axiom, c7, Y=Y).
         self.c5 = parseClause(lex)
         self.c6 = parseClause(lex)
         self.c7 = parseClause(lex)
+
+        self.cset = ClauseSet()
+        self.cset.addClause(self.c2)
+        self.cset.addClause(self.c3)
+        self.cset.addClause(self.c4)
+        self.cset.addClause(self.c5)
+        self.cset.addClause(self.c6)
+        self.cset.addClause(self.c7)
         
     def testSubsumption(self):
         """
@@ -174,6 +182,16 @@ cnf(axiom, c7, Y=Y).
         res = subsumes(self.c6, self.c7)
         self.assert_(res)
 
+    def testSetSubsumption(self):
+        """
+        Test set subsumption.
+        """
+        self.assert_(not forwardSubsumption(self.cset, self.c1))
+        self.assert_(forwardSubsumption(self.cset, self.c2))
+
+        tmp = backwardSubsumption(self.c1, self.cset)
+        self.assertEqual(tmp, 6)
+        
         
 if __name__ == '__main__':
     unittest.main()
