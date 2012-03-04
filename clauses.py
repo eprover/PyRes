@@ -49,9 +49,11 @@ Email: schulz@eprover.org
 import unittest
 from lexer import Token,Lexer
 from derivations import Derivable,Derivation
+from signature import Signature
+
 from terms import *
 import substitutions
-from literals import Signature, Literal, parseLiteral, parseLiteralList,\
+from literals import Literal, parseLiteral, parseLiteralList,\
      literalList2String, litInLitList, oppositeInLitList
 
 

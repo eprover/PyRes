@@ -73,6 +73,7 @@ Email: schulz@eprover.org
 import unittest
 from lexer import Token,Lexer
 from derivations import Derivable,Derivation
+from signature import Signature
 from terms import *
 from literals import Literal
 from clauses import Clause,parseClause
@@ -150,7 +151,25 @@ def generatePredCompatAx(p, arity):
     return Clause(res)
 
 
+def generateCompatAxioms(sig):
+    """
+    Given a signature, generate and return all the compatibility
+    axioms. 
+    """
+    res = []
+    for f in sig.funs:
+        arity = sig.getArity(f)
+        if arity>0:
+            c = generateFunCompatAx(f, arity)
+            res.append(c)
 
+    for p in sig.preds:
+        arity = sig.getArity(p)
+        if arity>0 and p!="=":
+            c = generatePredCompatAx(p, arity)
+            res.append(c)
+
+    return res
 
 
 # ------------------------------------------------------------------
@@ -194,7 +213,7 @@ class TestEqAxioms(unittest.TestCase):
 
     def testCompatibility(self):
         """
-        Test that compatibility axioms are generated as         
+        Test that compatibility axioms are generated as expected.
         """
         ax = generateFunCompatAx("f", 3)
         self.assertEqual(len(ax),4)
@@ -203,7 +222,16 @@ class TestEqAxioms(unittest.TestCase):
         ax = generatePredCompatAx("p", 5)
         self.assertEqual(len(ax),7)
         print ax
-        
+
+        sig = Signature()
+        sig.addFun("f", 2)
+        sig.addPred("p", 3)
+        sig.addFun("a", 0)
+
+        tmp = generateCompatAxioms(sig)
+        # Note: No axiom for a
+        self.assertEqual(len(tmp), 2)
+
 
 if __name__ == '__main__':
     unittest.main()

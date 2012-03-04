@@ -67,6 +67,7 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Token,Lexer
+from signature import Signature
 
 
 def termIsVar(t):
@@ -236,19 +237,19 @@ def termCollectFuns(t, res=None):
     return res
 
 
-def termCollectSig(t, res=None):
+def termCollectSig(t, sig=None):
     """
     Insert all function symbols and their associated arities in t into
-    the dictionary res. For convenience, return res. If res is not
-    given, create and return it. 
+    the signature sig. For convenience, return it. If sig is not
+    given, create it. 
     """
-    if res == None:
-        res = {}
+    if sig == None:
+        sig = Signature()
     if termIsCompound(t):
-        res[termFunc(t)] = len(t)-1
+        sig.addFun(termFunc(t), len(t)-1)
         for s in termArgs(t):
-            termCollectSig(s, res)
-    return res
+            termCollectSig(s, sig)
+    return sig
 
 
 def termWeight(t, fweight, vweight):
@@ -439,10 +440,10 @@ class TestTerms(unittest.TestCase):
         sig = termCollectSig(self.t5, sig)
         sig = termCollectSig(self.t6, sig)
 
-        self.assertEqual(sig["f"], 1)
-        self.assertEqual(sig["g"], 2)
-        self.assertEqual(sig["a"], 0)
-        self.assertEqual(sig["b"], 0)
+        self.assertEqual(sig.getArity("f"), 1)
+        self.assertEqual(sig.getArity("g"), 2)
+        self.assertEqual(sig.getArity("a"), 0)
+        self.assertEqual(sig.getArity("b"), 0)
 
 
     def testWeight(self):

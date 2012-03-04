@@ -35,7 +35,7 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Lexer
-from literals import Signature
+from signature import Signature
 from clauses import Clause, parseClause
 from heuristics import PickGiven2
 

@@ -71,70 +71,11 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Token,Lexer
+from signature import Signature
 from terms import *
 from substitutions import BTSubst
 from matching import match
 
-
-
-class Signature(object):
-    """
-    A signature object, containing function symbols, predicate
-    symbols, and their associated arities.
-    """
-    def __init__(self):
-        """
-        Initialize the signature.
-        """
-        self.funs  = {}
-        self.preds = {}
-
-    def __repr__(self):
-        """
-        Return a printable representation of the signture.
-        """
-        res = ["Predicates:\n-----------"]
-        funs = [ "%s: %d"%(f, self.preds[f]) for f in self.preds.keys()]
-        res.extend(funs)
-
-        res.append("Functions:\n-----------")
-        funs = [ "%s: %d"%(f, self.funs[f]) for f in self.funs.keys()]
-        res.extend(funs)
-
-        return "\n".join(res)
-
-    def addFun(self, f, arity):
-        """
-        Add a function symbol with associated arity.
-        """
-        self.funs[f] = arity
-
-
-    def addPred(self, p, arity):
-        """
-        Add a predicate symbol with associated arity.
-        """
-        self.preds[p] = arity
-
-    def isPred(self, p):
-        """
-        Return True if p is a known predicate symbol.
-        """
-        return p in self.preds
-
-    def isFun(self, f):
-        """
-        Return True if d is a known function symbol.
-        """
-        return f in self.funs
-
-    def getArity(self, symbol):
-        """
-        Return the arity of a (known) symbol.
-        """
-        if self.isFun(symbol):
-            return self.funs[symbol]
-        return self.preds[symbol]
 
 
 def parseAtom(lexer):
@@ -303,7 +244,7 @@ class Literal(object):
             
         sig.addPred(termFunc(self.atom), len(self.atom)-1)
         for s in termArgs(self.atom):
-            termCollectSig(s, sig.funs)            
+            termCollectSig(s, sig)            
         return sig    
 
 
@@ -410,8 +351,7 @@ def oppositeInLitList(lit, litlist):
 
 class TestLiterals(unittest.TestCase):
     """
-    Unit test class for clauses. Test clause and literal
-    functionality.
+    Unit test class for literals.
     """
     def setUp(self):
         """
@@ -586,10 +526,9 @@ class TestLiterals(unittest.TestCase):
 
     def testSig(self):
         """
+        Test signature collection.
         """
-        sig = Signature()
-
-        self.a1.collectSig(sig)
+        sig = self.a1.collectSig()
         self.a2.collectSig(sig)
         self.a3.collectSig(sig)
         self.a4.collectSig(sig)
