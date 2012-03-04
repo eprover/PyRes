@@ -91,7 +91,6 @@ def match(matcher, target, subst):
     result = True
 
     if termIsVar(matcher):
-        print "Var: ", matcher, target
         if subst.isBound(matcher):
             if not termEqual(subst.value(matcher), target):
                 result = False
