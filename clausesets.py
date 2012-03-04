@@ -88,7 +88,6 @@ class ClauseSet(object):
             i.collectSig(sig)
         return sig    
 
-
     def extractFirst(self):
         """
         Extract and return the first clause.
@@ -98,7 +97,6 @@ class ClauseSet(object):
             return clause
         else:
             return None
-
 
     def getResolutionLiterals(self, lit):
         """
