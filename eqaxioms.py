@@ -32,6 +32,7 @@ describes the compatibility of the equality relation with p. Note that
 we do not need to specify the symmetric case p(X1,...Xn)<-p(Y1,...Yn)
 because it follows from the contrapositive (~p(Y1,...Yn)->~p(X1,...Xn)
 and the symmetry of equality.
+[* Make easier *]
 
 The axioms can be directly converted into clausal logic, yielding:
 

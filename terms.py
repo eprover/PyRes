@@ -236,6 +236,21 @@ def termCollectFuns(t, res=None):
     return res
 
 
+def termCollectSig(t, res=None):
+    """
+    Insert all function symbols and their associated arities in t into
+    the dictionary res. For convenience, return res. If res is not
+    given, create and return it. 
+    """
+    if res == None:
+        res = {}
+    if termIsCompound(t):
+        res[termFunc(t)] = len(t)-1
+        for s in termArgs(t):
+            termCollectSig(s, res)
+    return res
+
+
 def termWeight(t, fweight, vweight):
     """
     Return the weight of the term, counting fweight for each function
@@ -412,6 +427,23 @@ class TestTerms(unittest.TestCase):
 
         funs = termCollectFuns(self.t6)
         self.assertEqual(funs, set(["g", "b"]))
+
+    def testCollectSig(self):
+        """
+        Test signature collection.
+        """
+        sig = termCollectSig(self.t1)
+        sig = termCollectSig(self.t2, sig)
+        sig = termCollectSig(self.t3, sig)
+        sig = termCollectSig(self.t4, sig)
+        sig = termCollectSig(self.t5, sig)
+        sig = termCollectSig(self.t6, sig)
+
+        self.assertEqual(sig["f"], 1)
+        self.assertEqual(sig["g"], 2)
+        self.assertEqual(sig["a"], 0)
+        self.assertEqual(sig["b"], 0)
+
 
     def testWeight(self):
         """

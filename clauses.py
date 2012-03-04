@@ -51,7 +51,7 @@ from lexer import Token,Lexer
 from derivations import Derivable,Derivation
 from terms import *
 import substitutions
-from literals import Literal, parseLiteral, parseLiteralList,\
+from literals import Signature, Literal, parseLiteral, parseLiteralList,\
      literalList2String, litInLitList, oppositeInLitList
 
 
@@ -128,6 +128,21 @@ class Clause(Derivable):
         for i in self.literals:
             res = i.collectVars(res)
         return res
+
+
+    def collectSig(self, sig=None):
+        """
+        Collect function- and predicate symbols into the signature. If
+        none exists, create it. Return the signature
+        """
+        if not sig:
+            sig = Signature()
+            
+        
+        for i in self.literals:
+            i.collectSig(sig)
+        return sig    
+
 
     def weight(self, fweight, vweight):
         """
@@ -288,6 +303,14 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         oldlen = len(c5)
         c5.removeDupLits()
         self.assert_(len(c5)<oldlen)
+
+        
+        sig = c1.collectSig()
+        c2.collectSig(sig)
+        c3.collectSig(sig)
+        c4.collectSig(sig)
+        c5.collectSig(sig)
+        print sig
         
         
 if __name__ == '__main__':

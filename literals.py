@@ -77,6 +77,66 @@ from matching import match
 
 
 
+class Signature(object):
+    """
+    A signature object, containing function symbols, predicate
+    symbols, and their associated arities.
+    """
+    def __init__(self):
+        """
+        Initialize the signature.
+        """
+        self.funs  = {}
+        self.preds = {}
+
+    def __repr__(self):
+        """
+        Return a printable representation of the signture.
+        """
+        res = ["Predicates:\n-----------"]
+        funs = [ "%s: %d"%(f, self.preds[f]) for f in self.preds.keys()]
+        res.extend(funs)
+
+        res.append("Functions:\n-----------")
+        funs = [ "%s: %d"%(f, self.funs[f]) for f in self.funs.keys()]
+        res.extend(funs)
+
+        return "\n".join(res)
+
+    def addFun(self, f, arity):
+        """
+        Add a function symbol with associated arity.
+        """
+        self.funs[f] = arity
+
+
+    def addPred(self, p, arity):
+        """
+        Add a predicate symbol with associated arity.
+        """
+        self.preds[p] = arity
+
+    def isPred(self, p):
+        """
+        Return True if p is a known predicate symbol.
+        """
+        return p in self.preds
+
+    def isFun(self, f):
+        """
+        Return True if d is a known function symbol.
+        """
+        return f in self.funs
+
+    def getArity(self, symbol):
+        """
+        Return the arity of a (known) symbol.
+        """
+        if self.isFun(symbol):
+            return self.funs[symbol]
+        return self.preds[symbol]
+
+
 def parseAtom(lexer):
     """
     Parse an atom. An atom is either a conventional atom, in which
@@ -227,11 +287,25 @@ class Literal(object):
 
     def collectFuns(self, res=None):
         """
-        Insert all variables in self into the set res and return
-        it. If res is not given, create it.
+        Insert all function symbols in self into the set res and
+        return it. If res is not given, create it.
         """
         res = termCollectFuns(self.atom, res)
         return res
+
+    def collectSig(self, sig=None):
+        """
+        Collect function- and predicate symbols into the signature. If
+        none exists, create it. Return the signature
+        """
+        if not sig:
+            sig = Signature()
+            
+        sig.addPred(termFunc(self.atom), len(self.atom)-1)
+        for s in termArgs(self.atom):
+            termCollectSig(s, sig.funs)            
+        return sig    
+
 
     def instantiate(self, subst):
         """
@@ -509,6 +583,32 @@ class TestLiterals(unittest.TestCase):
         
         self.assert_(oppositeInLitList(self.a7, l2))
         self.assert_(not oppositeInLitList(self.a7, l4))
+
+    def testSig(self):
+        """
+        """
+        sig = Signature()
+
+        self.a1.collectSig(sig)
+        self.a2.collectSig(sig)
+        self.a3.collectSig(sig)
+        self.a4.collectSig(sig)
+        self.a5.collectSig(sig)
+        self.a6.collectSig(sig)
+        self.a7.collectSig(sig)
+        self.a8.collectSig(sig)
+        sig.addFun("mult", 2)
+
+        print sig
+        self.assert_(sig.isPred("q"))
+        self.assert_(not sig.isPred("unknown"))
+        self.assert_(not sig.isPred("a"))
+        self.assert_(sig.isFun("a"))
+        self.assert_(not sig.isFun("unknown"))
+        self.assert_(not sig.isFun("q"))
+
+        self.assertEqual(sig.getArity("b"),0)
+        self.assertEqual(sig.getArity("p"),1)
 
 
 if __name__ == '__main__':
