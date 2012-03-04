@@ -91,22 +91,23 @@ def match(matcher, target, subst):
     result = True
 
     if termIsVar(matcher):
-       if subst.isBound(matcher):
-          if not termEqual(subst.value(match), target):
-             result = False
-             # No else case - variable is already bound correctly
-       else:
-          subst.addBinding((matcher, target))
+        print "Var: ", matcher, target
+        if subst.isBound(matcher):
+            if not termEqual(subst.value(matcher), target):
+                result = False
+            # No else case - variable is already bound correctly
+        else:
+            subst.addBinding((matcher, target))
     else:
-       if termIsVar(target) or termFunc(matcher) != termFunc(target):
-          result = False
-       else:
-          for (s,t) in zip(termArgs(matcher), termArgs(target)):
-             result = match(s, t, subst)
-             if not result:
-                break
+        if termIsVar(target) or termFunc(matcher) != termFunc(target):
+            result = False
+        else:
+            for (s,t) in zip(termArgs(matcher), termArgs(target)):
+                result = match(s, t, subst)
+                if not result:
+                    break
     if result:
-       return True
+        return True
     subst.backtrackToState(bt_state)
     return False
              
@@ -132,7 +133,7 @@ def match_norec(t1, t2, subst):
 
        if termIsVar(matcher):
           if subst.isBound(matcher):
-             if not termEqual(subst.value(match), target):
+             if not termEqual(subst.value(matcher), target):
                 result = False
                 break
              # No else case - variable is already bound correctly
@@ -221,6 +222,10 @@ class TestMatching(unittest.TestCase):
         self.match_test(match, self.t6, self.s6, False)
         self.match_test(match, self.t7, self.s7, False)
 
+        self.match_test(match, self.t6, self.t6, True)
+
+        
+
     def testMatchNoRec(self):
         """
         Test Matching.
@@ -241,6 +246,8 @@ class TestMatching(unittest.TestCase):
         self.match_test(match_norec, self.t5, self.s5, True)
         self.match_test(match_norec, self.t6, self.s6, False)
         self.match_test(match_norec, self.t7, self.s7, False)
+
+        self.match_test(match_norec, self.t6, self.t6, True)
 
 
 
