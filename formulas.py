@@ -72,6 +72,7 @@ Email: schulz@eprover.org
 import unittest
 from lexer import Token,Lexer
 from derivations import Derivable,Derivation,toggleDerivationOutput
+from signature import Signature
 from terms import *
 import substitutions
 from literals import Literal, parseLiteral, parseLiteralList,\
@@ -283,6 +284,25 @@ class Formula(object):
             res |= self.child2.collectFuns()
         return res   
 
+    def collectSig(self, sig = None):
+        """
+        Return the set of all function and predicate symbols used in
+        the formula. 
+        """
+        if not sig:
+            sig = Signature()
+            
+        if self.isLiteral():
+            self.child1.collectSig(sig)
+        elif self.isUnary():
+            self.child1.collectSig(sig)
+        elif self.isBinary():
+            self.child1.collectSig(sig)
+            self.child2.collectSig(sig)
+        else:
+            assert self.isQuantified()
+            self.child2.collectSig(sig)
+        return sig
 
     def collectVars(self):
         """
@@ -417,7 +437,12 @@ class WFormula(Derivable):
         res = "fof(%s,%s,%s%s)."%(self.name, self.type,
                                    repr(self.formula),self.strDerivation())
         return res
-    
+
+    def collectSig(self, sig = None):
+        """
+        Collect formula signature.
+        """
+        return self.formula.collectSig(sig)
             
 def parseWFormula(lexer):
     """
@@ -477,9 +502,9 @@ class TestFormulas(unittest.TestCase):
 """
         self.wformulas = """
         fof(small, axiom, ![X]:(p(X) | ~a=b)).
-        fof(complex, conjecture, (![X]:a(X)|b(X)|?[X,Y]:(p(X,f(Y))))<=>q(g(a),X)).
+        fof(complex, conjecture, (![X]:r(X)|p(X)|?[X,Y]:(p(X,f(Y))))<=>q(g(a),X)).
         fof(clean, conjecture,
-                   ((((![X]:a(X))|b(X))|(?[X]:(?[Y]:p(X,f(Y)))))<=>q(g(a),X))).
+                   ((((![X]:p(X))|r(X))|(?[X]:(?[Y]:p(X,f(Y)))))<=>q(g(a),X))).
         fof(weird, weird, ![X]:(p(X) | ~q(X))).
 
 """
@@ -601,9 +626,7 @@ class TestFormulas(unittest.TestCase):
             res = dexpected.pop(0)
             self.assertEqual(len(ds),res)
 
-
         
-
     def testWrappedFormula(self):
         """
         Test basic parsing and output of wrapped formulae.
@@ -622,9 +645,18 @@ class TestFormulas(unittest.TestCase):
         print f2
         print f3
         print f4
-
         toggleDerivationOutput()
         
+        sig = f1.collectSig()
+        f2.collectSig(sig)
+        f3.collectSig(sig)
+        f4.collectSig(sig)
+
+        print sig
+        sig.isPred("q")
+        sig.isPred("r")
+        sig.isFun("a")
+        sig.isConstant("a")
 
 if __name__ == '__main__':
     unittest.main()
