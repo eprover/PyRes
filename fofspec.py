@@ -42,7 +42,7 @@ from lexer import Lexer, Token
 from signature import Signature
 from clauses import Clause, parseClause
 from clausesets import ClauseSet
-from formulas import WFormula, parseWFormula
+from formulas import WFormula, parseWFormula, negateConjecture
 from formulacnf import wFormulaClausify
 from eqaxioms import generateEquivAxioms, generateCompatAxioms
 
@@ -143,6 +143,7 @@ class FOFSpec(object):
         """
         while self.formulas:
             form = self.formulas.pop()
+            form = negateConjecture(form)
             tmp = wFormulaClausify(form)
             self.clauses.extend(tmp)
 
@@ -150,8 +151,7 @@ class FOFSpec(object):
    
     def addEqAxioms(self):
         """
-        Add equality axioms (if necessary). This currently only goes
-        through the clausal part of the spec. Return True if equality
+        Add equality axioms (if necessary). Return True if equality
         is present, false otherwise.
         """
         sig = Signature()

@@ -71,7 +71,7 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Token,Lexer
-from derivations import Derivable,Derivation,toggleDerivationOutput
+from derivations import Derivable,Derivation,flatDerivation,toggleDerivationOutput
 from signature import Signature
 from terms import *
 import substitutions
@@ -476,6 +476,23 @@ def parseWFormula(lexer):
     res.setDerivation(Derivation("input"))
 
     return res
+
+def negateConjecture(wform):
+    """
+    If wform is a conjecture, return its negation. Otherwise
+    return it unchanged.
+    """
+    
+    if wform.type == "conjecture":
+        negf = Formula("~", wform.formula)
+        negw = WFormula(negf, "negated_conjecture")
+        negw.setDerivation(flatDerivation("assume_negation",\
+                                          [wform],\
+                                          "status(cth)"))
+        return negw
+    else:
+        return wform
+
 
 
 # ------------------------------------------------------------------

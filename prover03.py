@@ -9,7 +9,7 @@ prover03.py 0.1
 Usage: prover03.py [options] <problem_file>
 
 This is a straightforward implementation of a simple resolution-based
-prover for full first-order logic. Problem file should be in TPTP-3
+prover for full first-order logic. The problem file should be in TPTP-3
 CNF/FOF syntax. Unsupported features include single- and double quoted
 strings. Equality is parsed, but not interpreted so far.
 
