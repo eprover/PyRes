@@ -66,6 +66,7 @@ import getopt
 from lexer import Token,Lexer
 from derivations import enableDerivationOutput,disableDerivationOutput
 from clausesets import ClauseSet
+from clauses import firstLit, varSizeLit, eqResVarSizeLit
 from fofspec import FOFSpec
 from heuristics import GivenClauseHeuristics
 from saturation import SearchParams,ProofState
@@ -86,24 +87,27 @@ def processOptions(opts):
             params.forward_subsumption = True
         elif opt=="-b" or opt == "--backward_subsumption":
             params.backward_subsuption = True
-        elif opt=="-H" or opr == "--given-clause-heuristic":
+        elif opt=="-H" or opt == "--given-clause-heuristic":
             try:
                 params.heuristics = GivenClauseHeuristics[optarg]
             except KeyError:
                 print "Unknown clause evaluation function", optarg
                 sys.exit(1)
+        elif opt=="-n" or opt == "--neg-lit-selection":
+            params.literal_selection = eqResVarSizeLit
                 
 
     return params
 
 if __name__ == '__main__':
     opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                   "htfbH:",
+                                   "htfbH:n",
                                    ["help",
                                     "delete-tautologies",
                                     "forward-subsumption",
                                     "backward-subsumption"
-                                    "given-clause-heuristic="])
+                                    "given-clause-heuristic=",
+                                    "neg-lit-selection"])
     params = processOptions(opts)
     
     problem = FOFSpec()

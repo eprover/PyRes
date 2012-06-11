@@ -57,6 +57,47 @@ from literals import Literal, parseLiteral, parseLiteralList,\
      literalList2String, litInLitList, oppositeInLitList
 
 
+def firstLit(litlist):
+    """
+    Return the first element of the list (as a sublist).
+    """
+    assert(litlist)
+    return litlist[0:1]
+
+
+def varSizeEval(lit):
+    """
+    Return a tuple <number of vars, weight>.
+    """
+    return (len(lit.collectVars()), lit.weight(1,1))
+
+def varSizeLit(litlist):
+    """
+    Return the largest literal among those with the smallest
+    variable list.    
+    """
+    assert(litlist)
+    litlist.sort(key=varSizeEval)
+    return litlist[0:1]
+        
+
+def eqResVarSizeLit(litlist):
+    """
+    Return the first literal of the form X=Y, or the largest literal
+    among those with the smallest variable set if no pure variable
+    literal exists.    
+    """
+    assert(litlist)
+    for l in litlist:
+        if l.isPureVarLit():
+            return [l]
+        
+    litlist.sort(key=varSizeEval)
+    return litlist[0:1]
+        
+
+
+
 class Clause(Derivable):
     """
     A class representing a clause. A clause at the moment comprises
@@ -120,6 +161,12 @@ class Clause(Derivable):
         assert position < len(self)
         return self.literals[position]
 
+    def getNegativeLits(self):
+        """
+        Return a list of all negative literals in the clause.
+        """
+        return [l for l in self.literals if l.isNegative()]
+
     def collectVars(self, res=None):
         """
         Insert all variables in self into the set res and return
@@ -139,7 +186,6 @@ class Clause(Derivable):
         if not sig:
             sig = Signature()
             
-        
         for i in self.literals:
             i.collectSig(sig)
         return sig    
@@ -153,6 +199,25 @@ class Clause(Derivable):
         for l in self.literals:
             res = res + l.weight(fweight, vweight)
         return res
+
+    def selectInferenceLits(self, lit_selection_fun=firstLit):
+        """
+        Perform negative literal selection. lit_selection_function is
+        a function that takes a list of literals and returns a sublist
+        of literals (normally of length 1) that should be selected.
+        """
+        candidates = self.getNegativeLits()
+        if not candidates:
+            return
+        # print "Got: ", candidates
+        
+        for l in self.literals:
+            l.setInferenceLit(False)
+        # print "Resert: ", self.literals
+
+        selected = lit_selection_fun(candidates)
+        for l in selected:
+            l.setInferenceLit(True)
 
     def instantiate(self, subst):
         """
@@ -313,6 +378,34 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         c5.collectSig(sig)
         print sig
         
+        negs = c1.getNegativeLits()
+        self.assertEqual(len(negs), 0)
+        negs = c2.getNegativeLits()
+        self.assertEqual(len(negs), 0)
+        negs = c3.getNegativeLits()
+        self.assertEqual(len(negs), 1)
+        negs = c4.getNegativeLits()
+        self.assertEqual(len(negs), 1)
+        negs = c5.getNegativeLits()
+        self.assertEqual(len(negs), 0)
+
+        c2.selectInferenceLits()
+        for l in c2.literals:
+            self.assert_(l.isInferenceLit())
+
+        c3.selectInferenceLits()
+        for l in c3.literals:
+            self.assertEqual(l.isNegative(), l.isInferenceLit())
+
+
+        c2.selectInferenceLits(varSizeLit)
+        for l in c2.literals:
+            self.assert_(l.isInferenceLit())
+
+        c3.selectInferenceLits(varSizeLit)
+        for l in c3.literals:
+            self.assertEqual(l.isNegative(), l.isInferenceLit())
+
         
 if __name__ == '__main__':
     unittest.main()

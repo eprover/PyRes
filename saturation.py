@@ -61,7 +61,8 @@ class SearchParams(object):
                  heuristics = heuristics.PickGiven5,
                  delete_tautologies   = False,
                  forward_subsumption  = False,
-                 backward_subsumption = False):                        
+                 backward_subsumption = False,
+                 literal_selection    = None):                        
         """
         Initialize heuristic parameters.
         """        
@@ -86,6 +87,12 @@ class SearchParams(object):
         Backwars subsumption checks the processed clauses against the
         given clause, and discards all processed clauses that are
         subsumed. 
+        """
+        self.literal_selection = literal_selection
+        """
+        Either None, or a function that selects a subset of negative
+        literals from a set of negative literals (both represented as
+        lists, not Python sets) as the inference literal.
         """
         
 
@@ -160,7 +167,9 @@ class ProofState(object):
             tmp = backwardSubsumption(given_clause, self.processed)
             self.backward_subsumed = self.backward_subsumed+tmp
 
-        print "#", given_clause            
+        if(self.params.literal_selection):
+            given_clause.selectInferenceLits(self.params.literal_selection)
+        print "#", given_clause
         new = []
         factors    = computeAllFactors(given_clause)
         new.extend(factors)

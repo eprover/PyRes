@@ -106,7 +106,8 @@ class ClauseSet(object):
         implementation, this simply returns a list of all
         literal-indices for all clauses.
         """
-        res = [(c, i) for c in self.clauses for i in xrange(len(c))]
+        res = [(c, i) for c in self.clauses for i in xrange(len(c)) if               
+               c.getLiteral(i).isInferenceLit()]
         return res
                     
     def parse(self, lexer):

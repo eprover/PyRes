@@ -143,6 +143,7 @@ class Literal(object):
         else:
             self.negative = negative
             self.atom = atom
+        self.setInferenceLit(True)
         
     def __repr__(self):
         """
@@ -161,6 +162,8 @@ class Literal(object):
                 result = "~"+term2String(self.atom)
             else:
                 result = term2String(self.atom)
+        if(self.isInferenceLit()):
+            result = result
         return result
 
     def isEquational(self):
@@ -168,6 +171,15 @@ class Literal(object):
         Return true if the literal is equational.
         """
         return termFunc(self.atom)=="="
+
+    def isPureVarLit(self):
+        """
+        Return True iff the literal is of the form X=Y
+        """
+        if self.isEquational():
+            return termIsVar(termArgs(self.atom)[0]) and \
+                   termIsVar(termArgs(self.atom)[1])
+        return False
 
     def isNegative(self):
         """
@@ -180,6 +192,23 @@ class Literal(object):
         Return true if the literal is positive.
         """
         return not self.negative
+
+    def setInferenceLit(self, inference_lit = True):
+        """
+        Set the status of the literal as an inference literal. In
+        standard biary resolution, all literals are inference
+        literals. However, with ordered resolution, literal selection,
+        and superposition, only some literals need to be considered
+        for generating inferences.
+        """
+        self.inference_lit = inference_lit
+
+    def isInferenceLit(self):
+        """
+        Return the status of a literal as inference literal (see
+        above). 
+        """
+        return self.inference_lit
 
     def isPropTrue(self):
         """
@@ -389,6 +418,9 @@ class TestLiterals(unittest.TestCase):
         self.a1.collectVars(vars)
         self.assertEqual(len(vars), 1)
         self.assertEqual(self.a1.collectFuns(), set(["p"]))
+        self.assert_(self.a1.isInferenceLit())
+        self.a1.setInferenceLit(False)
+        self.assert_(not self.a1.isInferenceLit())
         
         print self.a2
         self.assert_(self.a2.isNegative())
@@ -421,7 +453,7 @@ class TestLiterals(unittest.TestCase):
         self.assert_(self.a6.isOpposite(self.a7))
         self.assert_(self.a7.isOpposite(self.a6))
         self.assert_(not self.a6.isOpposite(self.a6))
-        self.assert_(not self.a6.isOpposite(self.a1))
+        self.assert_(not self.a6.isOpposite(self.a1))        
 
     def testPropProps(self):
         """
@@ -457,7 +489,6 @@ class TestLiterals(unittest.TestCase):
         l7 = l2.negate()
         self.assert_(l7.isPropTrue())
         self.assert_(not l7.isPropFalse())
-
         
 
     def testAtoms(self):
@@ -494,7 +525,7 @@ class TestLiterals(unittest.TestCase):
 
         self.assert_(not self.a1.match(self.a2, BTSubst()))
         self.assert_(not self.a2.match(self.a1, BTSubst()))
-        1
+        
     def testLitList(self):
         """
         Test literal list parsing and printing.
