@@ -55,46 +55,7 @@ from terms import *
 import substitutions
 from literals import Literal, parseLiteral, parseLiteralList,\
      literalList2String, litInLitList, oppositeInLitList
-
-
-def firstLit(litlist):
-    """
-    Return the first element of the list (as a sublist).
-    """
-    assert(litlist)
-    return litlist[0:1]
-
-
-def varSizeEval(lit):
-    """
-    Return a tuple <number of vars, weight>.
-    """
-    return (len(lit.collectVars()), lit.weight(1,1))
-
-def varSizeLit(litlist):
-    """
-    Return the largest literal among those with the smallest
-    variable list.    
-    """
-    assert(litlist)
-    litlist.sort(key=varSizeEval)
-    return litlist[0:1]
-        
-
-def eqResVarSizeLit(litlist):
-    """
-    Return the first literal of the form X=Y, or the largest literal
-    among those with the smallest variable set if no pure variable
-    literal exists.    
-    """
-    assert(litlist)
-    for l in litlist:
-        if l.isPureVarLit():
-            return [l]
-        
-    litlist.sort(key=varSizeEval)
-    return litlist[0:1]
-        
+from litselection import firstLit, varSizeLit, eqResVarSizeLit
 
 
 

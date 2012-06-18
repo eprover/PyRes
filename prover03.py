@@ -70,6 +70,7 @@ from clauses import firstLit, varSizeLit, eqResVarSizeLit
 from fofspec import FOFSpec
 from heuristics import GivenClauseHeuristics
 from saturation import SearchParams,ProofState
+from litselection import LiteralSelectors
 
 
 def processOptions(opts):
@@ -94,20 +95,22 @@ def processOptions(opts):
                 print "Unknown clause evaluation function", optarg
                 sys.exit(1)
         elif opt=="-n" or opt == "--neg-lit-selection":
-            params.literal_selection = eqResVarSizeLit
-                
-
+            try:
+                params.literal_selection = LiteralSelectors[optarg]
+            except KeyError:
+                print "Unknown clause evaluation function", optarg
+                sys.exit(1)
     return params
 
 if __name__ == '__main__':
     opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                   "htfbH:n",
+                                   "htfbH:n:",
                                    ["help",
                                     "delete-tautologies",
                                     "forward-subsumption",
                                     "backward-subsumption"
                                     "given-clause-heuristic=",
-                                    "neg-lit-selection"])
+                                    "neg-lit-selection="])
     params = processOptions(opts)
     
     problem = FOFSpec()
