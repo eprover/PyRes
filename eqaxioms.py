@@ -129,7 +129,9 @@ def generateFunCompatAx(f, arity):
     concl = Literal(["=", lterm, rterm], False)
     res.append(concl)
 
-    return Clause(res)
+    resclause = Clause(res)
+    resclause.setDerivation(Derivation("eq_axiom"))
+    return resclause
     
 
 def generatePredCompatAx(p, arity):
@@ -148,7 +150,9 @@ def generatePredCompatAx(p, arity):
     posp.extend(generateVarList("Y",arity))
     res.append(Literal(posp, False))
     
-    return Clause(res)
+    resclause = Clause(res)
+    resclause.setDerivation(Derivation("eq_axiom"))
+    return resclause
 
 
 def generateCompatAxioms(sig):

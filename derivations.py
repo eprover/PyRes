@@ -178,6 +178,8 @@ class Derivation(object):
         """
         if self.operator == "input":
             return "input"
+        elif self.operator == "eq_axiom":
+            return "eq_axiom"
         elif self.operator == "reference":
             assert(len(self.parents)==1)
             return self.parents[0].name
@@ -193,6 +195,8 @@ class Derivation(object):
         derivation. 
         """
         if self.operator == "input":
+            return []
+        elif self.operator == "eq_axiom":
             return []
         elif self.operator == "reference":
             assert(len(self.parents)==1)
