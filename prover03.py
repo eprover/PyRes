@@ -35,6 +35,16 @@ Options:
 --given-clause-heuristic=<heuristic>
   Use the specified heuristic for given-clause selection.
 
+ -n 
+--neg-lit-selection
+  Use the specified negative literal selection function.
+
+ -S
+--suppress-eq-axioms
+  Do not add equality axioms. This makes the prover incomplete for
+  equality problems.
+ 
+
 Copyright 2011-2012 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
@@ -73,6 +83,8 @@ from saturation import SearchParams,ProofState
 from litselection import LiteralSelectors
 
 
+suppressEqAxioms = False
+
 def processOptions(opts):
     """
     Process the options given
@@ -93,31 +105,38 @@ def processOptions(opts):
                 params.heuristics = GivenClauseHeuristics[optarg]
             except KeyError:
                 print "Unknown clause evaluation function", optarg
+                print "Supported:", GivenClauseHeuristics.keys()
                 sys.exit(1)
         elif opt=="-n" or opt == "--neg-lit-selection":
             try:
                 params.literal_selection = LiteralSelectors[optarg]
             except KeyError:
                 print "Unknown clause evaluation function", optarg
+                print "Supported:", LiteralSelectors.keys()
                 sys.exit(1)
+        elif opt=="-S" or opt=="--suppress-eq-axioms":
+            suppressEqAxioms = True
+            
     return params
 
 if __name__ == '__main__':
     opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                   "htfbH:n:",
+                                   "htfbH:n:S",
                                    ["help",
                                     "delete-tautologies",
                                     "forward-subsumption",
                                     "backward-subsumption"
                                     "given-clause-heuristic=",
-                                    "neg-lit-selection="])
+                                    "neg-lit-selection="
+                                    "supress-eq-axioms"])
     params = processOptions(opts)
     
     problem = FOFSpec()
     for file in args:
         problem.parse(file)
 
-    problem.addEqAxioms()
+    if not suppressEqAxioms:
+        problem.addEqAxioms()
     cnf = problem.clausify()
 
     state = ProofState(params, cnf)

@@ -223,6 +223,9 @@ class TestUnification(unittest.TestCase):
         self.s7 = terms.string2Term("g(X)")
         self.t7 = terms.string2Term("g(f(g(X),b))")
 
+        self.s8 = terms.string2Term("p(X,X,X)")
+        self.t8 = terms.string2Term("p(Y,Y,e)")
+
     def unif_test(self, s,t, success_expected):
        """
        Test if s and t can be unified. If yes, report the
@@ -251,6 +254,7 @@ class TestUnification(unittest.TestCase):
         self.unif_test(self.s5, self.t5, True)
         self.unif_test(self.s6, self.t6, True)
         self.unif_test(self.s7, self.t7, False)
+        self.unif_test(self.s8, self.t8, True)
 
         # Unification should be symmetrical
         self.unif_test(self.t1, self.s1, True)
@@ -260,6 +264,7 @@ class TestUnification(unittest.TestCase):
         self.unif_test(self.t5, self.s5, True)
         self.unif_test(self.t6, self.s6, True)
         self.unif_test(self.t7, self.s7, False)
+        self.unif_test(self.t8, self.s8, True)
 
 
 if __name__ == '__main__':

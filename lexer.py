@@ -172,6 +172,7 @@ class Lexer(object):
         (re.compile("!"),                     Token.Universal),
         (re.compile("\?"),                    Token.Existential),
 	(re.compile("\s+"),                   Token.WhiteSpace),
+        (re.compile("[0-9][0-9]*"),           Token.IdentLower),
         (re.compile("[a-z][_a-z0-9_A-Z]*"),   Token.IdentLower),
         (re.compile("[_A-Z][_a-z0-9_A-Z]*"),  Token.IdentUpper),
         (re.compile("\$[_a-z0-9_A-Z]*"),      Token.DefFunctor),

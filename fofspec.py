@@ -117,7 +117,7 @@ class FOFSpec(object):
         """
 
         if not isinstance(source, Lexer):
-            source, refdir = tptpLexer(source, refdir)                        
+            source, refdir = tptpLexer(source, refdir)
 
         while not source.TestTok(Token.EOFToken):
             source.CheckLit(["cnf", "fof", "include"])
