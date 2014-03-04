@@ -25,7 +25,7 @@ will make s and t equal.
 The unification algorithm picks an arbitray equation and tries to
 handle it by one of the following rules. It terminates either when the
 set of equations is empty (in that case the resulting substitution is
-the most general unifiert), or if it derives FAIL, in which case the
+the most general unifier), or if it derives FAIL, in which case the
 two original terms are not unifiable.
 
 The "Bind" rules handle the case that one of the two terms of the
@@ -37,12 +37,12 @@ equations, and records it in sigma.
 Bind 1
 {X=t} \cup R, sigma
 ========================= if X does not occur in t
-{X<-t}(R), sigma \circ R
+{X<-t}(R), sigma \circ {X<-t}
 
 Bind 2
 {t=X} \cup R, sigma
 =========================  if X does not occur in t
-{X<-t}(R), sigma \circ R
+{X<-t}(R), sigma \circ {X<-t}
 
 
 The "Decompose" rule handles two terms with the same top function
@@ -56,6 +56,16 @@ Decompose:
 {f(s1, ..., sn)=f(t1, ..., tn)} \cup R, sigma
 ==============================================
 {s1=t1, ..., sn=tn} \cup R, sigma
+
+
+A trivial case easily overlooked is the case of an equation between
+two variables that are already equal:
+
+
+Solved:
+{X=X} \cup R, sigma
+========================= 
+R, sigma
 
 
 If none of the above rules is applicable, then we cannot solve the
@@ -93,7 +103,7 @@ FAIL
 
 
 
-Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2014 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -151,6 +161,7 @@ def mguTermList(l1, l2, subst):
        t2 = l2.pop(0)
        if termIsVar(t1):
           if t1==t2:
+             # This implements the "Solved" rule.
              # We could always test this upfront, but that would
              # require an expensive check every time. 
              # We descend recursively anyway, so we only check this on
@@ -158,6 +169,7 @@ def mguTermList(l1, l2, subst):
              continue
           if occursCheck(t1, t2):
              return None
+          # Here is the core of the "Bind" rule
           # We now create a new substitution that binds t2 to t1, and
           # apply it to the remaining unification problem. We know
           # that every variable will only ever be bound once, because
@@ -178,11 +190,14 @@ def mguTermList(l1, l2, subst):
           subst.composeBinding((t2, t1))
        else: 
           assert termIsCompound(t1) and termIsCompound(t2)
+          # Try to apply "Decompose"
           # For f(s1, ..., sn) = g(t1, ..., tn), first f and g have to
           # be equal...
           if termFunc(t1) != termFunc(t2):
+             # Nope, "Structural fail":
              return None
-          # ...and then we need to ensure that for all i si=ti get
+          # But if the symbols are equal, here is the decomposition:
+          # We need to ensure that for all i si=ti get
           # added to the list of equations to be solved.
           l1.extend(termArgs(t1))
           l2.extend(termArgs(t2))
