@@ -97,7 +97,7 @@ def processOptions(opts):
             try:
                 params.literal_selection = LiteralSelectors[optarg]
             except KeyError:
-                print "Unknown clause evaluation function", optarg
+                print "Unknown literal selection function", optarg
                 sys.exit(1)
     return params
 

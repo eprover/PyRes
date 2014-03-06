@@ -1,0 +1,27 @@
+This code implements simple, resolution-based theorem provers for
+first-order logic. 
+
+prover01.py
+===========
+
+This is the simplest example of a prover for the clausal fragment of
+first-order logic. It implements the basic given-clause loop with
+first-in-first-out clause selection and without any redundancy
+elimination.
+
+
+prover02.py
+===========
+
+This version of the prover processes the same logic as prover01.py,
+but adds some performance-enhancing features. This include better
+clause selection heuristics, subsumption, and negative literal
+selection. 
+
+
+
+prover03.py
+===========
+
+This prover adds a simple clausifier, so it is able to process full
+first-order logic. Otherwise, it is similar to prover02. 
