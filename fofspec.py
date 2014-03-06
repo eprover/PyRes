@@ -48,7 +48,7 @@ from eqaxioms import generateEquivAxioms, generateCompatAxioms
 
 def tptpLexer(source, refdir):
     """
-    Create a lexer for reading a file using the TPTP convention if
+    Create a lexer for reading a file using the TPTP convention. If
     refdir exists, interpret name relative to it. If this does not
     exist, interpret it relative to $TPTP. Return lexer, new refdir.
     """

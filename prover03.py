@@ -111,7 +111,7 @@ def processOptions(opts):
             try:
                 params.literal_selection = LiteralSelectors[optarg]
             except KeyError:
-                print "Unknown clause evaluation function", optarg
+                print "Unknown literal selection function", optarg
                 print "Supported:", LiteralSelectors.keys()
                 sys.exit(1)
         elif opt=="-S" or opt=="--suppress-eq-axioms":
