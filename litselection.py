@@ -128,7 +128,7 @@ LiteralSelectors = {
     "eqleastvars" : eqResVarSizeLit
     }
 """
-Table associating name and selectiob function, so that we can select
+Table associating name and selection function, so that we can select
 the function by name.
 """
 
