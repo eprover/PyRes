@@ -1,0 +1,83 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body><hr><!------------------------------------------------------------------------>
+
+<P>
+<A NAME="PyRes---1.0">
+<HR><!------------------------------------------------------------------------>
+<H2>PyRes 1.0</H2>
+Stephan Schulz<BR>
+DHBW Stuttgart, Germany
+
+<H3>Architecture</H3>
+
+PyRes is a simple resolution-style theorem prover for first-order
+logic, implemented in very clear and well-commented Python. It has
+been written as a pedagogical tool to illustrate the architecture and
+basic algorithms of a saturation-style theorem prover.
+
+The prover consists of a parser for (most of) TPTP-3 format, a simple
+clausifier to convert full first-order format into clause normal form,
+and a saturation core trying to derive the empty clause from the
+resulting clause set.
+
+The saturation core is based on the DISCOUNT-loop variant of
+the <EM>given-clause</EM> algorithm, i.e., a strict separation of
+active and passive facts. It implements simple binary resolution and
+factoring [Ro65], optionally with selection of negative literals
+[BG2001]. Redundancy elimination is restricted to forward and backward
+subsumption and tautology deletion. There are no inference rules for
+equality - if equality is detected, the necessary axioms are added.
+
+
+<H3>Strategies</H3>
+
+The prover supports several negative literal selection strategies, as
+well as selection of the given clause from a set of differently
+weighted priority queues in the style of E [SCV2019]. In the
+competition, it will always select the syntactically largest literal,
+and will use weight-age interleaved clause selection with a pick-given
+ration of 5 to 1.
+
+
+<H3>Implementation</H3>
+
+The prover is implemented in Python 2.7, with maximal emphasis on
+clear and well-documented code. Terms are represented as nested lists
+(equivalent to LISP style s-expressions), Literals, clauses, and
+formulas are implemented as classes using an object-oriented style.
+
+The system does not use any indexing or other advanced techniques.
+
+PyRes builds a proof object on the fly, and can print a TPTP-3 style
+proof or saturation derivation.
+
+<H3>Expected Competition Performance</H3>
+
+Performance is expected to be mediocre for non-equational problems and
+abysmal for problems with equality.
+
+<P>
+
+<a NAME="References">
+<h3>References</h3>
+<dl>
+<dt> SCV2019
+<dd> Schulz S., Cruanes, S., Vukmirovic, P. (2019),
+     <strong>Faster, Higher, Stronger: E 2.3</strong>,
+     <em>Proc. of the 27th CADE, Natal</em>,
+     LNAI 11716, Springer (to appear)
+</dd>
+<dt> BG2001
+<dd> Bachmair, Leo and Ganzinger, Harald (2001)
+     <strong>Resolution theorem proving</strong>,
+     <em>Handbook of Automated Reasining</em>, pp. 19-99, Elsevier
+</dd>
+<dt> Rob1965
+<dd> Robinson, J.A. (1965(
+     <strong>A Machine-Oriented Logic Based on the Resolution Principle</strong>,
+     <em>Journal of the ACM</em> 12(1), pp. 23-41, Elsevier
+</dd>
+</dl>
+<p>
+
+</p><hr><!------------------------------------------------------------------------>
+</body></html>
