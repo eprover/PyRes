@@ -5,7 +5,7 @@
 
 """
 A simple implementation of first-order formulas and their associated
-meta-information. 
+meta-information.
 
 See literals.py for the definition of atoms.
 
@@ -43,7 +43,7 @@ some code for parsing and printing infix equality, but also to
 represent a formula in Negation Normal Form without any negations in
 the frame of the formula.
 
-Copyright 2011 Stephan Schulz, schulz@eprover.org
+Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -58,13 +58,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
 Stephan Schulz
-Hirschstrasse 35
-76133 Karlsruhe
+Auf der Altenburg 7
+70376 Stuttgart
 Germany
 Email: schulz@eprover.org
 """
@@ -89,7 +89,7 @@ class Formula(object):
     child1 is a plain string (i.e. the term representing the variable)
     and child2 is the formula quantified over.
     """
-        
+
     def __init__(self, op, child1, child2=None):
         """
         Initialize the formula.
@@ -97,7 +97,7 @@ class Formula(object):
         self.op     = op
         self.child1 = child1
         self.child2 = child2
-        
+
     def __repr__(self):
         """
         Return a string representation of the formula.
@@ -112,7 +112,7 @@ class Formula(object):
             assert self.op in ["!", "?"]
             res = "("+self.op+"["+term2String(self.child1)+\
                   "]:"+repr(self.child2)+")"
-        return res   
+        return res
 
     def isLiteral(self):
         """
@@ -153,13 +153,13 @@ class Formula(object):
 
     def isLiteralDisjunction(self):
         """
-        Return True iff the formula is a disjunction of literals.    
+        Return True iff the formula is a disjunction of literals.
         """
         if self.isLiteral():
             return True
         if self.op == "|":
             return self.child1.isLiteralDisjunction() and \
-                   self.child2.isLiteralDisjunction() 
+                   self.child2.isLiteralDisjunction()
         return False
 
     def isClauseConjunction(self):
@@ -173,7 +173,7 @@ class Formula(object):
             return self.isLiteralDisjunction()
         if self.op == "&":
             return self.child1.isClauseConjunction() and \
-                   self.child2.isClauseConjunction() 
+                   self.child2.isClauseConjunction()
         return False
 
     def isCNF(self):
@@ -182,13 +182,13 @@ class Formula(object):
         """
         if self.op == "!":
             return self.child2.isCNF()
-        return self.isClauseConjunction()       
+        return self.isClauseConjunction()
 
     def getMatrix(self):
         """
         Return the formula without any leading quantifiers (if the
         formula is in prefix normal form, this is the matrix of the
-        formuma). 
+        formuma).
         """
         f = self
         while f.isQuantified():
@@ -210,13 +210,13 @@ class Formula(object):
         if self.op == "|":
             return self.child1.disj2List()+self.child2.disj2List()
         return [self]
-        
+
 
 
     def hasSubform1(self):
         """
         Return True if self has a proper subformula as the first
-        argument. This is false for quantified formulas and literals. 
+        argument. This is false for quantified formulas and literals.
         """
         return self.isUnary() or self.isBinary()
 
@@ -225,7 +225,7 @@ class Formula(object):
         """
         Return True if self has a proper subformula as the first
         argument. This is the case for quantified formulas and binary
-        formulas. 
+        formulas.
         """
         return self.isQuantified() or self.isBinary()
 
@@ -251,7 +251,7 @@ class Formula(object):
         """
         Return the set of all (first-order) operators and quantors
         used in the formula. This is mostly for unit-testing
-        transformations later on. 
+        transformations later on.
         """
         res = set([self.op])
         if self.isLiteral():
@@ -264,12 +264,12 @@ class Formula(object):
         else:
             assert self.isQuantified()
             res |= self.child2.collectOps()
-        return res   
+        return res
 
     def collectFuns(self):
         """
         Return the set of all function and predicate symbols used in
-        the formula. 
+        the formula.
         """
         res = set()
         if self.isLiteral():
@@ -282,16 +282,16 @@ class Formula(object):
         else:
             assert self.isQuantified()
             res |= self.child2.collectFuns()
-        return res   
+        return res
 
     def collectSig(self, sig = None):
         """
         Return the set of all function and predicate symbols used in
-        the formula. 
+        the formula.
         """
         if not sig:
             sig = Signature()
-            
+
         if self.isLiteral():
             self.child1.collectSig(sig)
         elif self.isUnary():
@@ -319,7 +319,7 @@ class Formula(object):
             assert self.isQuantified()
             res = termCollectVars(self.child1)
             res |= self.child2.collectVars()
-        return res   
+        return res
 
 
     def collectFreeVars(self):
@@ -336,19 +336,19 @@ class Formula(object):
         else:
             # Quantor case. We first collect all free variables in
             # the quantified formula, then remove the one bound by the
-            # quantifier. 
+            # quantifier.
             assert self.isQuantified()
             res = self.child2.collectFreeVars()
             res.discard(self.child1)
-        return res   
-        
-        
+        return res
+
+
 
 
 def parseQuantified(lexer, quantor):
     """
     Parse the "remainder" of a formula starting with the given
-    quantor. 
+    quantor.
     """
     lexer.CheckTok(Token.IdentUpper)
     var = parseTerm(lexer)
@@ -361,7 +361,7 @@ def parseQuantified(lexer, quantor):
         rest = parseUnitaryFormula(lexer)
     res = Formula(quantor, var, rest)
     return res
-    
+
 
 def parseUnitaryFormula(lexer):
     """
@@ -386,7 +386,7 @@ def parseUnitaryFormula(lexer):
         lit = parseLiteral(lexer)
         res = Formula("", lit, None)
     return res
-    
+
 
 def parseAssocFormula(lexer, head):
     """
@@ -403,7 +403,7 @@ def parseAssocFormula(lexer, head):
 
 def parseFormula(lexer):
     """
-    Parse a (naked) formula. 
+    Parse a (naked) formula.
     """
     res = parseUnitaryFormula(lexer)
     if lexer.TestTok([Token.Or, Token.And]):
@@ -443,11 +443,11 @@ class WFormula(Derivable):
         Collect formula signature.
         """
         return self.formula.collectSig(sig)
-            
+
 def parseWFormula(lexer):
     """
     Parse a formula in (slightly simplified) TPTP-3 syntax. It is
-    written 
+    written
        fof(<name>, <type>, <lformula>).
     where <name> is a lower-case ident, type is a lower-case ident
     from a specific list, and <lformula> is a Formula.
@@ -482,7 +482,7 @@ def negateConjecture(wform):
     If wform is a conjecture, return its negation. Otherwise
     return it unchanged.
     """
-    
+
     if wform.type == "conjecture":
         negf = Formula("~", wform.formula)
         negw = WFormula(negf, "negated_conjecture")
@@ -498,7 +498,7 @@ def negateConjecture(wform):
 # ------------------------------------------------------------------
 #                  Unit test section
 # ------------------------------------------------------------------
- 
+
 class TestFormulas(unittest.TestCase):
     """
     Unit test class for clauses. Test clause and literal
@@ -525,7 +525,7 @@ class TestFormulas(unittest.TestCase):
         fof(weird, weird, ![X]:(p(X) | ~q(X))).
 
 """
-       
+
     def testNakedFormula(self):
         """
         Test that basic parsing and functionality works.
@@ -548,7 +548,7 @@ class TestFormulas(unittest.TestCase):
         self.assertEqual(f1.collectFreeVars(), set())
         self.assertEqual(f2.collectFreeVars(), set(["X"]))
         self.assertEqual(f3.collectFreeVars(), set(["X"]))
-        
+
         self.assertEqual(f1.collectVars(), set(["X"]))
         self.assertEqual(f2.collectVars(), set(["X","Y"]))
         self.assertEqual(f3.collectVars(), set(["X","Y"]))
@@ -562,7 +562,7 @@ class TestFormulas(unittest.TestCase):
         self.assert_(f1.hasSubform2())
         self.assert_(f2.hasSubform2())
         self.assert_(f3.hasSubform2())
-        
+
     def testPropositional(self):
         """
         Check propositional literal recognition and manipulation.
@@ -589,7 +589,7 @@ class TestFormulas(unittest.TestCase):
         f = parseFormula(lex)
         self.assertEqual(f.collectOps(), set(["", "&", "|", "~"]))
         self.assertEqual(f.collectFuns(), set(["a", "b", "c"]))
-        
+
         f = parseFormula(lex)
         self.assertEqual(f.collectOps(), set(["", "=>", "<=", "?", "<=>"]))
         self.assertEqual(f.collectFuns(), set(["a", "b", "c", "p"]))
@@ -615,7 +615,7 @@ class TestFormulas(unittest.TestCase):
             f = parseFormula(lex)
             res = expected.pop(0)
             self.assertEqual(f.isCNF(), res)
-        
+
     def testSplitter(self):
         """
         Test splitting of conjunctions/disjunktions.
@@ -625,12 +625,12 @@ class TestFormulas(unittest.TestCase):
         a & (a|(b=>c))
         ![X]:((a|b)&c)
         ![X]:![Y]:((a|b)&(?[X]:c(X)))
-        ![X]:(a & (a|b|c) & (a|b|c|d))        
+        ![X]:(a & (a|b|c) & (a|b|c|d))
         a|(b&c)|(b<=>d)|![X]:p(X)
         """)
         cexpected = [1, 2, 2, 2, 3, 1]
-        dexpected = [1, 1, 1, 1, 1, 4]        
-        
+        dexpected = [1, 1, 1, 1, 1, 4]
+
         while not lex.TestTok(Token.EOFToken):
             f = parseFormula(lex)
             f = f.getMatrix()
@@ -638,12 +638,12 @@ class TestFormulas(unittest.TestCase):
             cs = f.conj2List()
             res = cexpected.pop(0)
             self.assertEqual(len(cs),res)
-            
+
             ds = f.disj2List()
             res = dexpected.pop(0)
             self.assertEqual(len(ds),res)
 
-        
+
     def testWrappedFormula(self):
         """
         Test basic parsing and output of wrapped formulae.
@@ -663,7 +663,7 @@ class TestFormulas(unittest.TestCase):
         print f3
         print f4
         toggleDerivationOutput()
-        
+
         sig = f1.collectSig()
         f2.collectSig(sig)
         f3.collectSig(sig)

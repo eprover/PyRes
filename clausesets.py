@@ -7,7 +7,7 @@
 Clause sets for maintaining sets of clauses, possibly sorted by
 heuristical evaluation.
 
-Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,13 +22,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
 Stephan Schulz
-Hirschstrasse 35
-76133 Karlsruhe
+Auf der Altenburg 7
+70376 Stuttgart
 Germany
 Email: schulz@eprover.org
 """
@@ -43,14 +43,14 @@ from heuristics import PickGiven2
 class ClauseSet(object):
     """
     A class representing a clause set (or, more precisely,
-    a multi-set of clauses). 
+    a multi-set of clauses).
     """
     def __init__(self, clauses = []):
         """
         Initialize the clause.
-        """        
+        """
         self.clauses = list(clauses)
-              
+
     def __repr__(self):
         """
         Return a string representation of the clause set.
@@ -86,7 +86,7 @@ class ClauseSet(object):
 
         for i in self.clauses:
             i.collectSig(sig)
-        return sig    
+        return sig
 
     def extractFirst(self):
         """
@@ -106,10 +106,10 @@ class ClauseSet(object):
         implementation, this simply returns a list of all
         literal-indices for all clauses.
         """
-        res = [(c, i) for c in self.clauses for i in xrange(len(c)) if               
+        res = [(c, i) for c in self.clauses for i in xrange(len(c)) if
                c.getLiteral(i).isInferenceLit()]
         return res
-                    
+
     def parse(self, lexer):
         """
         Parse a sequence of clauses from lex and add them to the
@@ -121,12 +121,12 @@ class ClauseSet(object):
             self.addClause(clause)
             count = count+1
         return count
-    
+
 
 class HeuristicClauseSet(ClauseSet):
     """
     A class representing a clause set (or, more precisely, a multi-set
-    of clauses) with heuristic evaluations.  
+    of clauses) with heuristic evaluations.
 
     All clauses inserted into the set are evaluated
     according to all criteria. The clause set support extraction of
@@ -138,13 +138,13 @@ class HeuristicClauseSet(ClauseSet):
         """
         self.clauses  = []
         self.eval_functions = eval_functions
-              
+
 
     def addClause(self, clause):
         """
         Add a clause to the clause set. If the clause set supports
         heuristic evaluations, add the relevant evaluations to the
-        clause. 
+        clause.
         """
         evals = self.eval_functions.evaluate(clause)
         clause.addEval(evals)
@@ -172,7 +172,7 @@ class HeuristicClauseSet(ClauseSet):
         evaluation scheme.
         """
         return self.extractBestByEval(self.eval_functions.nextEval())
-        
+
 
 class TestClauseSets(unittest.TestCase):
     """
@@ -269,7 +269,7 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
 
 %------------------------------------------------------------------------------
 """
-       
+
     def testClauseSetChanges(self):
         """
         Test that clause set initialization and parsing work.
@@ -285,8 +285,8 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
 
         sig = Signature()
         clauses.collectSig(sig)
-        print sig        
-        
+        print sig
+
 
     def testClauseSetHeuristics(self):
         """
@@ -307,7 +307,7 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         self.assertEqual(c2.name, "butler")
         c3 = clauses.extractFirst()
         self.assertEqual(c3.name, "charles")
-        c = clauses.extractBestByEval(0)        
+        c = clauses.extractBestByEval(0)
         while c != None:
             c = clauses.extractBestByEval(0)
 
@@ -332,8 +332,8 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
 
         pos = clauses.getResolutionLiterals(["p"])
         print pos
-        
-        
+
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -45,7 +45,7 @@ Options:
   equality problems.
 
 
-Copyright 2011-2012 Stephan Schulz, schulz@eprover.org
+Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -65,8 +65,8 @@ MA  02111-1307 USA
 The original copyright holder can be contacted as
 
 Stephan Schulz
-Hirschstrasse 35
-76133 Karlsruhe
+Auf der Altenburg 7
+70376 Stuttgart
 Germany
 Email: schulz@eprover.org
 """

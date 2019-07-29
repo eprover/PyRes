@@ -20,7 +20,7 @@ structure contains additional information that is useful, but not
 strictly necessary from a clogic/alculus point of view.
 
 
-Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,13 +35,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
 Stephan Schulz
-Hirschstrasse 35
-76133 Karlsruhe
+Auf der Altenburg 7
+70376 Stuttgart
 Germany
 Email: schulz@eprover.org
 """
@@ -66,7 +66,7 @@ class Clause(Derivable):
     - The literal list.
     - The type ("plain" if none given)
     - The name (generated automatically if not given)
-    """       
+    """
     def __init__(self, literals, type="plain", name=None):
         """
         Initialize the clause.
@@ -76,7 +76,7 @@ class Clause(Derivable):
         self.evaluation = None
         Derivable.__init__(self, name)
 
-        
+
     def __repr__(self):
         """
         Return a string representation of the clause.
@@ -87,7 +87,7 @@ class Clause(Derivable):
         if self.evaluation:
             res = res+"/* %s */"%(repr(self.evaluation),)
         return res
-    
+
     def __len__(self):
         """
         Return the number of literals in the clause.
@@ -146,10 +146,10 @@ class Clause(Derivable):
         """
         if not sig:
             sig = Signature()
-            
+
         for i in self.literals:
             i.collectSig(sig)
-        return sig    
+        return sig
 
 
     def weight(self, fweight, vweight):
@@ -171,7 +171,7 @@ class Clause(Derivable):
         if not candidates:
             return
         # print "Got: ", candidates
-        
+
         for l in self.literals:
             l.setInferenceLit(False)
         # print "Resert: ", self.literals
@@ -225,9 +225,9 @@ class Clause(Derivable):
             if oppositeInLitList(self.literals[i],
                                  self.literals[i+1:]):
                 return True
-        return False                
-        
-   
+        return False
+
+
 
 def parseClause(lexer):
     """
@@ -265,7 +265,7 @@ def parseClause(lexer):
     res.setDerivation(Derivation("input"))
     return res
 
-    
+
 
 class TestClauses(unittest.TestCase):
     """
@@ -285,7 +285,7 @@ cnf(test3,lemma,(p(a)|~p(f(X)))).
 cnf(taut,axiom,p(a)|q(a)|~p(a)).
 cnf(dup,axiom,p(a)|q(a)|p(a)).
 """
-       
+
     def testClauses(self):
         """
         Test that basic literal parsing works correctly.
@@ -295,7 +295,7 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         c2 = parseClause(lex)
         c3 = parseClause(lex)
         c4 = parseClause(lex)
-        c5 = parseClause(lex)        
+        c5 = parseClause(lex)
 
         print c1
         print c2
@@ -331,14 +331,14 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         c5.removeDupLits()
         self.assert_(len(c5)<oldlen)
 
-        
+
         sig = c1.collectSig()
         c2.collectSig(sig)
         c3.collectSig(sig)
         c4.collectSig(sig)
         c5.collectSig(sig)
         print sig
-        
+
         negs = c1.getNegativeLits()
         self.assertEqual(len(negs), 0)
         negs = c2.getNegativeLits()
@@ -367,6 +367,6 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         for l in c3.literals:
             self.assertEqual(l.isNegative(), l.isInferenceLit())
 
-        
+
 if __name__ == '__main__':
     unittest.main()

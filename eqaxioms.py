@@ -64,8 +64,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 The original copyright holder can be contacted as
 
 Stephan Schulz
-Hirschstrasse 35
-76133 Karlsruhe
+Auf der Altenburg 7
+70376 Stuttgart
 Germany
 Email: schulz@eprover.org
 """

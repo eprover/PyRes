@@ -5,9 +5,9 @@
 
 """
 A simple lexical analyser that converts a string into a sequence of
-tokens. 
+tokens.
 
-Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,13 +22,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
 Stephan Schulz
-Hirschstrasse 35
-76133 Karlsruhe
+Auf der Altenburg 7
+70376 Stuttgart
 Germany
 Email: schulz@eprover.org
 """
@@ -44,8 +44,8 @@ class ScannerError(Exception):
     """
     def __init__(self):
         self.name = "ScannerError"
-        self.value = "<none>"        
-    
+        self.value = "<none>"
+
     def __repr__(self):
         return self.name+"("+repr(self.value)+")"
 
@@ -60,7 +60,7 @@ class IllegalCharacterError(ScannerError):
     def __init__(self, char):
         self.name  = "Illegal character"
         self.value = char
-    
+
 
 class UnexpectedTokenError(ScannerError):
     """
@@ -80,12 +80,12 @@ class UnexpectedIdentError(ScannerError):
         self.name  = "Unexpected identifier"
         self.value = token
 
-    
+
 
 
 nl_re  = re.compile("\n")
 
-   
+
 
 class Token(object):
     """
@@ -98,7 +98,7 @@ class Token(object):
     IdentUpper     = Ident("Identifier starting with capital letter")
     IdentLower     = Ident("Identifier starting with lower case letter")
     DefFunctor     = Ident("Defined symbol (starting with a $)")
-    Integer        = Ident("Positive or negative Integer")         
+    Integer        = Ident("Positive or negative Integer")
     FullStop       = Ident(". (full stop)")
     OpenPar        = Ident("(")
     ClosePar       = Ident(")")
@@ -112,8 +112,8 @@ class Token(object):
     Nor            = Ident("~|")
     Or             = Ident("|")
     And            = Ident("&")
-    Implies        = Ident("=>")    
-    BImplies       = Ident("<=")    
+    Implies        = Ident("=>")
+    BImplies       = Ident("<=")
     Equiv          = Ident("<=>")
     Xor            = Ident("<~>")
     Universal      = Ident("!")
@@ -121,7 +121,7 @@ class Token(object):
     Negation       = Ident("~")
     SQString       = Ident("String in 'single quotes'")
     EOFToken       = Ident("*EOF*")
-   
+
     def __init__(self, type, literal, source, pos):
         self.type    = type;
         self.literal = literal;
@@ -137,7 +137,7 @@ class Token(object):
         newlines in the position up to the current token.
         """
         return len(nl_re.findall(self.source[:self.pos]))+1
-    
+
 
 class Lexer(object):
     """
@@ -150,7 +150,7 @@ class Lexer(object):
     # This list is traversed in order, the first match is
     # returned. This makes it much easier than "longest match", and
     # I have not yet seen a grammar where this causes trouble.
-    token_defs = [        
+    token_defs = [
         (re.compile("\."),                    Token.FullStop),
         (re.compile("\("),                    Token.OpenPar),
         (re.compile("\)"),                    Token.ClosePar),
@@ -180,7 +180,7 @@ class Lexer(object):
         (re.compile("%[^\n]*"),               Token.Comment),
         (re.compile("'[^']*'"),               Token.SQString)
         ]
-    
+
     def __init__(self, source, name="user string"):
         """
         Initialize the lexer with the string (=sequence of bytes) to
@@ -213,7 +213,7 @@ class Lexer(object):
         generating the token.
         """
         return self.Look().literal
-        
+
     def TestTok(self, tokens):
         """
         Take a list of expected token types. Return True if the
@@ -232,7 +232,7 @@ class Lexer(object):
         """
         Take a list of expected token types. If the next token is
         not among the expected ones, exit with an error. Otherwise do
-        nothing. 
+        nothing.
         """
         if not self.TestTok(tokens):
             raise UnexpectedTokenError(
@@ -263,7 +263,7 @@ class Lexer(object):
         """
         Take a list of expected literal strings. If the next token's
         literal is not among the expected ones, exit with an
-        error. Otherwise do nothing. 
+        error. Otherwise do nothing.
         """
         if not self.TestLit(litvals):
             raise UnexpectedIdentError(
@@ -279,7 +279,7 @@ class Lexer(object):
         self.CheckLit(litvals)
         return self.Next()
 
-    
+
     def Next(self):
         """
         Return next semantically relevant token.
@@ -292,7 +292,7 @@ class Lexer(object):
     def NextUnfiltered(self):
         """
         Return next token, including tokens ignored by most
-        languages. 
+        languages.
         """
         if len(self.token_stack) > 0:
             return self.token_stack.pop()
@@ -335,14 +335,14 @@ class TestLexer(unittest.TestCase):
         self.example3 = "cnf(test,axiom,p(a)|p(f(X)))."
         self.example4 = "^"
         self.example5 = "fof(test,axiom,![X,Y]:?[Z]:~p(X,Y,Z))."
-        
+
     def testLex(self):
         """
         Test that comments and whitespace are normally ignored.
         """
         lex1=Lexer(self.example1)
         lex2=Lexer(self.example2)
-        res1 = [(i.type, i.literal) for i in lex1.Lex()] 
+        res1 = [(i.type, i.literal) for i in lex1.Lex()]
         res2 = [(i.type, i.literal) for i in lex2.Lex()]
         self.assertEqual(res1, res2)
 
@@ -410,19 +410,19 @@ class TestLexer(unittest.TestCase):
         lex.AcceptLit("f")
         lex.AcceptLit("(")
         # That should be enoug ;-)
-        
+
     def testErrors(self):
         """
         Provoke different errors.
         """
         lex = Lexer(self.example4)
-        self.assertRaises(IllegalCharacterError, lex.Look) 
+        self.assertRaises(IllegalCharacterError, lex.Look)
 
         lex = Lexer(self.example1)
-        self.assertRaises(UnexpectedTokenError, lex.CheckTok, Token.EqualSign) 
+        self.assertRaises(UnexpectedTokenError, lex.CheckTok, Token.EqualSign)
 
         lex = Lexer(self.example1)
-        self.assertRaises(UnexpectedIdentError, lex.CheckLit, "abc") 
+        self.assertRaises(UnexpectedIdentError, lex.CheckLit, "abc")
 
 
 if __name__ == '__main__':

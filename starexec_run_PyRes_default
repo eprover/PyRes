@@ -1,4 +1,11 @@
 #!/bin/tcsh
+#
+# This is a StarExec runscript for PyRes. See https://www.starexec.org.
+#
+# To use this, build a StarExec package with "make starexec" and
+# upload it to a StarExec cluster - then follow local instructions
+# ;-).
+#
 echo -n "% Problem    : " ; head -2 $1 | tail -1 | sed -e "s/.*  : //"
 set ProblemSPC=`grep " SPC " $1 | sed -e "s/.* : //"`
 set flags="-tfbs -nlargest -HPickGiven5 "

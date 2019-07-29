@@ -10,7 +10,7 @@ derivation can be the trivial derivation (the clause or formula is
 read directly from the input), or it consists of an operator (the
 inference rule) and a list of parents.
 
-Copyright 2011 Stephan Schulz, schulz@eprover.org
+Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,13 +25,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
 Stephan Schulz
-Hirschstrasse 35
-76133 Karlsruhe
+Auf der Altenburg 7
+70376 Stuttgart
 Germany
 Email: schulz@eprover.org
 """
@@ -76,7 +76,7 @@ class Derivable(object):
             self.name = name
         else:
             self.name = "c%d"%(Derivable.derivedIdCounter,)
-            Derivable.derivedIdCounter=Derivable.derivedIdCounter+1        
+            Derivable.derivedIdCounter=Derivable.derivedIdCounter+1
 
     def setDerivation(self, derivation):
         self.derivation = derivation
@@ -97,7 +97,7 @@ class Derivable(object):
         derivation graph coming from the children).
         """
         self.refCount = self.refCount+1
-        
+
     def decRefCount(self):
         """
         See above.
@@ -160,7 +160,7 @@ class Derivation(object):
     """
     A derivation object. A derivation is either trivial ("input"), a
     reference to an existing Derivable object ("reference"), or an
-    inference with a list of premises. 
+    inference with a list of premises.
     """
     def __init__(self, operator, parents=None, status="status(thm)"):
         """
@@ -171,7 +171,7 @@ class Derivation(object):
         self.operator = operator
         self.parents  = parents
         self.status   = status
- 
+
     def __repr__(self):
         """
         Return a string for the derivation in TPTP-3 format.
@@ -183,7 +183,7 @@ class Derivation(object):
         elif self.operator == "reference":
             assert(len(self.parents)==1)
             return self.parents[0].name
-        else:   
+        else:
             return "inference(%s,%s,%s)"%\
                    (self.operator, self.status, repr(self.parents))
 
@@ -192,7 +192,7 @@ class Derivation(object):
     def getParents(self):
         """
         Return a list of all derived objects that are used in this
-        derivation. 
+        derivation.
         """
         if self.operator == "input":
             return []
@@ -206,17 +206,17 @@ class Derivation(object):
             for p in self.parents:
                 res.extend(p.getParents())
             return res
-                
 
-        
+
+
 def flatDerivation(operator, parents, status="status(thm)"):
     """
     Simple convenience function: Create a derivation which directly
-    references all parents. 
+    references all parents.
     """
     parentlist = [Derivation("reference", [p]) for p in parents]
     return Derivation(operator, parentlist, status)
-    
+
 
 
 class TestDerivations(unittest.TestCase):
@@ -224,7 +224,7 @@ class TestDerivations(unittest.TestCase):
     """
     def setUp(self):
         print
-        
+
     def testDerivable(self):
         """
         Test basic properties of derivations.
@@ -288,8 +288,8 @@ class TestDerivations(unittest.TestCase):
         toggleDerivationOutput()
         self.assert_(o3.strDerivation()!="")
         self.assert_(o4.strDerivation()=="")
-        
-        
+
+
 
 if __name__ == '__main__':
     unittest.main()
