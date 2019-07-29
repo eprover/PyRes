@@ -1,5 +1,7 @@
 This code implements simple, resolution-based theorem provers for
-first-order logic.
+first-order logic. It is released as free software under the GNU GPL
+version 2, and without any warranty. See the file COPYING for
+details and the individual source headers for copyright information.
 
 prover01.py
 ===========
