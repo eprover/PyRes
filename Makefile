@@ -16,7 +16,7 @@ STAREXECPATH=$(HOME)/StarExec
 all:
 
 clean:
-	-rm *.pyc *~
+	-rm -f *.pyc *~
 
 
 testcov: *.py
