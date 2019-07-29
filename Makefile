@@ -40,5 +40,5 @@ starexec:
 	mkdir -p $(STAREXECPATH)/bin
 	find . -name ".#*"  -exec rm {} \;
 	cp *.py starexec_run_PyRes $(STAREXECPATH)/bin
-
+	cp README $(STAREXECPATH)
 	cd $(STAREXECPATH); zip -r PyRes.zip bin

@@ -64,7 +64,7 @@ two variables that are already equal:
 
 Solved:
 {X=X} \cup R, sigma
-========================= 
+=========================
 R, sigma
 
 
@@ -118,7 +118,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -137,21 +137,21 @@ def occursCheck(x, t):
    """
    Perform an occurs-check, i.e. determine if the variable x occurs in
    the term t. If that is the case (and t != x), the two can never be
-   unified. 
+   unified.
    """
    if termIsCompound(t):
         for i in t[1:]:
             if occursCheck(x, i):
                 return True
         return False
-   else: 
+   else:
        return x == t
-    
+
 
 def mguTermList(l1, l2, subst):
     """
     Unify all terms in l1 with the corresponding terms in l2 with a
-    common substitution variable "subst". 
+    common substitution variable "subst".
     """
     assert len(l1)==len(l2)
     while(len(l1)!=0):
@@ -163,9 +163,9 @@ def mguTermList(l1, l2, subst):
           if t1==t2:
              # This implements the "Solved" rule.
              # We could always test this upfront, but that would
-             # require an expensive check every time. 
+             # require an expensive check every time.
              # We descend recursively anyway, so we only check this on
-             # the terminal case.  
+             # the terminal case.
              continue
           if occursCheck(t1, t2):
              return None
@@ -175,7 +175,7 @@ def mguTermList(l1, l2, subst):
           # that every variable will only ever be bound once, because
           # we eliminate all occurances of it in this step - remember
           # that by the failed occurs-check, t2 cannot contain t1.
-          new_binding = Substitution([(t1, t2)])          
+          new_binding = Substitution([(t1, t2)])
           l1 = [new_binding(t) for t in l1]
           l2 = [new_binding(t) for t in l2]
           subst.composeBinding((t1, t2))
@@ -184,11 +184,11 @@ def mguTermList(l1, l2, subst):
           # We know that t1!=t2, so we can drop this check
           if occursCheck(t2, t1):
              return None
-          new_binding = Substitution([(t2, t1)])          
+          new_binding = Substitution([(t2, t1)])
           l1 = [new_binding(t) for t in l1]
           l2 = [new_binding(t) for t in l2]
           subst.composeBinding((t2, t1))
-       else: 
+       else:
           assert termIsCompound(t1) and termIsCompound(t2)
           # Try to apply "Decompose"
           # For f(s1, ..., sn) = g(t1, ..., tn), first f and g have to
@@ -208,9 +208,7 @@ def mgu(t1, t2):
     """
     Try to unify t1 and t2, return substitution on success, or None on failure.
     """
-    print "mgu(",   term2String(t1), "  -   ", term2String(t2)
     res =  mguTermList([t1], [t2], Substitution())
-    print "res = ", res
     return res
 
 
@@ -302,4 +300,3 @@ class TestUnification(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
