@@ -11,7 +11,7 @@ Definition: Let F be a finite set of function symbols and V be an
 enumerable set of variable symbols. Let ar:F->N be the arity function
 associating a natural number (the "arity") with each function
 symbol. The set of all terms over F and V, Terms(F,V) is defined as
-follows: 
+follows:
 - For all X in V, X in Term(F,V)
 - For all f|n in F and t1,..,tn in Term(F,V), f(t1, ..., tn) in
   Term(F,V).
@@ -32,7 +32,7 @@ A composite term f(t1, ..., tn) is represented by the list
 subterms. See below for exmples:
 
 "X"          -> "X"
-"a"          -> ["a"] 
+"a"          -> ["a"]
 "g(a,b)"     -> ["g", ["a"], ["b"]]
 "g(X, f(Y))" -> ["g", "X", ["f", "Y"]]
 
@@ -54,7 +54,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -99,7 +99,7 @@ def termArgs(t):
     Return the argument list of the compound term t.
     """
     assert termIsCompound(t)
-    return t[1:]    
+    return t[1:]
 
 
 def term2String(t):
@@ -109,7 +109,7 @@ def term2String(t):
     if termIsVar(t):
         return t
     else:
-        # We need to handle the case of constants separatly 
+        # We need to handle the case of constants separatly
         if not termArgs(t):
             return termFunc(t)
         else:
@@ -137,7 +137,7 @@ def parseTerm(lexer):
         res = lexer.Next().literal
     else:
         res = []
-        lexer.CheckTok([Token.IdentLower,Token.DefFunctor])
+        lexer.CheckTok([Token.IdentLower,Token.DefFunctor,Token.SQString])
         res.append(lexer.Next().literal)
         if lexer.TestTok(Token.OpenPar):
             # It's a term with proper subterms, so parse them
@@ -167,9 +167,9 @@ def termListEqual(l1, l2):
     for i in range(len(l1)):
         if not termEqual(l1[i], l2[i]):
             return False
-    return True        
-    
-    
+    return True
+
+
 def termEqual(t1, t2):
     """
     Compare two terms for syntactic equality.
@@ -205,7 +205,7 @@ def termIsGround(t):
             if not termIsGround(term):
                 return False
         return True
-        
+
 
 def termCollectVars(t, res=None):
     """
@@ -226,7 +226,7 @@ def termCollectFuns(t, res=None):
     """
     Insert all function symbols in t into the set res. For
     convenience, return res. If res is not given, create and return
-    it. 
+    it.
     """
     if res == None:
         res = set()
@@ -241,7 +241,7 @@ def termCollectSig(t, sig=None):
     """
     Insert all function symbols and their associated arities in t into
     the signature sig. For convenience, return it. If sig is not
-    given, create it. 
+    given, create it.
     """
     if sig == None:
         sig = Signature()
@@ -256,7 +256,7 @@ def termWeight(t, fweight, vweight):
     """
     Return the weight of the term, counting fweight for each function
     symbol occurance, vweight for each variable occurance.
-    Examples: 
+    Examples:
       termWeight(f(a,b), 1, 1) = 3
       termWeight(f(a,b), 2, 1) = 6
       termWeight(f(X,Y), 2, 1) = 4
@@ -277,7 +277,7 @@ def subterm(t, pos):
     """
     Return the subterm of t at position pos (or None if pos is not a
     position in term). pos is a list of integers denoting branches,
-    e.g. 
+    e.g.
        subterm(f(a,b), [])        = f(a,b)
        subterm(f(a,g(b)), [0])    = a
        subterm(f(a,g(b)), [1])    = g(b)
@@ -300,28 +300,30 @@ class TestTerms(unittest.TestCase):
         self.example1 = "X"
         self.example2 = "a"
         self.example3 = "g(a,b)"
-        self.example4 = "g(X, f(Y))"     
-        self.example5 = "g(X, f(Y))"     
-        self.example6 = "g(b,b)"     
+        self.example4 = "g(X, f(Y))"
+        self.example5 = "g(X, f(Y))"
+        self.example6 = "g(b,b)"
+        self.example7 = "'g'(b,b)"
         self.t1 = string2Term(self.example1)
         self.t2 = string2Term(self.example2)
         self.t3 = string2Term(self.example3)
         self.t4 = string2Term(self.example4)
         self.t5 = string2Term(self.example5)
         self.t6 = string2Term(self.example6)
-        
+        self.t7 = string2Term(self.example7)
+
 
     def testToString(self):
         """
         Test that stringTerm and term2String are dual. Start with
         terms, so that we are sure to get the canonical string
-        representation. 
+        representation.
         """
         self.assertEqual(string2Term(term2String(self.t1)), self.t1)
         self.assertEqual(string2Term(term2String(self.t2)), self.t2)
         self.assertEqual(string2Term(term2String(self.t3)), self.t3)
         self.assertEqual(string2Term(term2String(self.t4)), self.t4)
-
+        self.assertEqual(string2Term(term2String(self.t7)), self.t7)
 
     def testIsVar(self):
         """
@@ -331,7 +333,7 @@ class TestTerms(unittest.TestCase):
         self.assert_(not termIsVar(self.t2))
         self.assert_(not termIsVar(self.t3))
         self.assert_(not termIsVar(self.t4))
-        
+
 
     def testIsCompound(self):
         """
@@ -358,11 +360,11 @@ class TestTerms(unittest.TestCase):
         self.assert_(not termEqual(self.t1, self.t4))
         self.assert_(not termEqual(self.t3, self.t4))
         self.assert_(not termEqual(self.t3, self.t6))
-        
+
         l1 = []
         l2 = [self.t1]
         self.assert_(not termListEqual(l1,l2))
-        
+
 
     def testCopy(self):
         """
@@ -376,7 +378,7 @@ class TestTerms(unittest.TestCase):
         self.assert_(termEqual(t3, self.t3))
         t4 = termCopy(self.t4)
         self.assert_(termEqual(t4, self.t4))
-        
+
 
     def testIsGround(self):
         """
@@ -459,7 +461,7 @@ class TestTerms(unittest.TestCase):
     def testSubterm(self):
         """
         Test if subterm() works as expected.
-        self.example5 = "g(X, f(Y))"  
+        self.example5 = "g(X, f(Y))"
         """
         self.assert_(subterm(self.t5,[]) == ['g', 'X', ['f', 'Y']])
         self.assert_(subterm(self.t5,[0]) == 'g')

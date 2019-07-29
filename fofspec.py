@@ -22,7 +22,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -81,32 +81,39 @@ class FOFSpec(object):
     A datastructure for representing a mixed set of clauses and
     formulas, with support for clausification of the clauses.
     """
-        
+
     def __init__(self):
         """
         Initialize the specification.
         """
         self.clauses  = []
         self.formulas = []
-        
+        self.isFof    = False
+        self.hasConj  = False
+
     def __repr__(self):
         """
         Return a string representation of the spec.
         """
         res= "\n".join([repr(c) for c in self.clauses]+
                        [repr(f) for f in self.formulas])
-        return res   
+        return res
 
     def addClause(self,clause):
         """
         Add a clause to the specification.
         """
+        if clause.type == "negated_conjecture":
+            self.hasConj = True
         self.clauses.append(clause)
 
     def addFormula(self,formula):
         """
         Add a clause to the specification.
         """
+        if formula.type in ["conjecture", "negated_conjecture"] :
+            self.hasConj = True
+        self.isFof = True
         self.formulas.append(formula)
 
     def parse(self, source, refdir=None):
@@ -123,10 +130,10 @@ class FOFSpec(object):
             source.CheckLit(["cnf", "fof", "include"])
             if source.TestLit("cnf"):
                 clause = parseClause(source)
-                self.clauses.append(clause)
+                self.addClause(clause)
             elif source.TestLit("fof"):
                 formula = parseWFormula(source)
-                self.formulas.append(formula)
+                self.addFormula(formula)
             else:
                 source.AcceptLit("include")
                 source.AcceptTok(Token.OpenPar)
@@ -148,7 +155,7 @@ class FOFSpec(object):
             self.clauses.extend(tmp)
 
         return ClauseSet(self.clauses)
-   
+
     def addEqAxioms(self):
         """
         Add equality axioms (if necessary). Return True if equality
@@ -161,18 +168,18 @@ class FOFSpec(object):
         for f in self.formulas:
             f.collectSig(sig)
 
-        if sig.isPred("="):            
+        if sig.isPred("="):
             res = generateEquivAxioms()
             res.extend(generateCompatAxioms(sig))
             self.clauses.extend(res)
             return True
         return False
-        
+
 
 # ------------------------------------------------------------------
 #                  Unit test section
 # ------------------------------------------------------------------
- 
+
 class TestFormulas(unittest.TestCase):
     """
     Unit test class for clauses. Test clause and literal
@@ -184,7 +191,7 @@ class TestFormulas(unittest.TestCase):
         variables needed throughout the tests.
         """
         print
-        
+
         self.seed = """
         cnf(agatha,plain,lives(agatha)).
         cnf(butler,plain,lives(butler)).
@@ -227,9 +234,9 @@ class TestFormulas(unittest.TestCase):
 
     def testCNF(self):
         """
-        Test CNFization.        
+        Test CNFization.
         """
-        
+
         lex = Lexer(self.seed)
         spec = FOFSpec()
         spec.parse(lex)
@@ -249,7 +256,7 @@ class TestFormulas(unittest.TestCase):
 
         print "EQ:\n==="
         print spec
-        
+
 
 if __name__ == '__main__':
     unittest.main()

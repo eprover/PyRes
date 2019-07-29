@@ -32,7 +32,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -55,17 +55,17 @@ from subsumption import forwardSubsumption, backwardSubsumption
 class SearchParams(object):
     """
     A simple container for different parameter settings for the proof
-    search.    
+    search.
     """
     def __init__(self,
                  heuristics = heuristics.PickGiven5,
                  delete_tautologies   = False,
                  forward_subsumption  = False,
                  backward_subsumption = False,
-                 literal_selection    = None):                        
+                 literal_selection    = None):
         """
         Initialize heuristic parameters.
-        """        
+        """
         self.heuristics           = heuristics
         """
         This defines the clause selection heuristic, i.e. the order in
@@ -86,7 +86,7 @@ class SearchParams(object):
         """
         Backwars subsumption checks the processed clauses against the
         given clause, and discards all processed clauses that are
-        subsumed. 
+        subsumed.
         """
         self.literal_selection = literal_selection
         """
@@ -94,7 +94,7 @@ class SearchParams(object):
         literals from a set of negative literals (both represented as
         lists, not Python sets) as the inference literal.
         """
-        
+
 
 
 class ProofState(object):
@@ -107,17 +107,17 @@ class ProofState(object):
     several new clauses, which are direct consequences of the given
     clause and the processed claues. These new clauses are added to
     the set of unprocessed clauses.
-    
+
     In addition to the clause sets, this data structure also maintains
     a number of counters for statistics on the proof search.
     """
-    def __init__(self, params, clauses):
+    def __init__(self, params, clauses, silent=False):
         """
         Initialize the proof state with a set of clauses.
         """
         self.params = params
         self.unprocessed = HeuristicClauseSet(params.heuristics)
-                                     
+
         self.processed   = ClauseSet()
         for c in clauses.clauses:
             self.unprocessed.addClause(c)
@@ -128,7 +128,8 @@ class ProofState(object):
         self.tautologies_deleted  = 0
         self.forward_subsumed     = 0
         self.backward_subsumed    = 0
-        
+        self.silent               = silent
+
     def processClause(self):
         """
         Pick a clause from unprocessed and process it. If the empty
@@ -136,14 +137,15 @@ class ProofState(object):
         """
         given_clause = self.unprocessed.extractBest()
         given_clause = given_clause.freshVarCopy()
-        print "#"
+        if not self.silent:
+            print "#"
         if given_clause.isEmpty():
             # We have found an explicit contradiction
             return given_clause
         if self.params.delete_tautologies and \
            given_clause.isTautology():
             self.tautologies_deleted += 1
-            return None        
+            return None
         if self.params.forward_subsumption and \
            forwardSubsumption(self.processed, given_clause):
             # If the given clause is subsumed by an already processed
@@ -169,7 +171,8 @@ class ProofState(object):
 
         if(self.params.literal_selection):
             given_clause.selectInferenceLits(self.params.literal_selection)
-        print "#", given_clause
+        if not self.silent:
+            print "#", given_clause
         new = []
         factors    = computeAllFactors(given_clause)
         new.extend(factors)
@@ -218,7 +221,7 @@ class ProofState(object):
       self.tautologies_deleted,
       self.forward_subsumed,
       self.backward_subsumed)
-        
+
 
 class TestProver(unittest.TestCase):
     """
@@ -353,9 +356,9 @@ cnf(not_p, axiom, ~p(a)).
                 print "# Bug: Should not have  found a proof!"
             else:
                 print "# No proof found"
-                
+
         print prover.statisticsStr()
-        
+
     def testSaturation(self):
         """
         Test that saturation works.
@@ -367,7 +370,7 @@ cnf(not_p, axiom, ~p(a)).
 
     def testParamSet(self):
         """
-        Test that parameter setting code works.        
+        Test that parameter setting code works.
         """
         pm = SearchParams()
         self.assertEqual(pm.heuristics, heuristics.PickGiven5)

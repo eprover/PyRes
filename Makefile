@@ -11,10 +11,11 @@
 #
 #------------------------------------------------------------------------
 
+STAREXECPATH=$(HOME)/StarExec
 
-all: 
+all:
 
-clean:	
+clean:
 	-rm *.pyc *~
 
 
@@ -31,3 +32,13 @@ tags: TAGS
 
 TAGS: *.py
 	etags *.py
+
+
+starexec:
+	echo $(STAREXECPATH)
+	rm -rf $(STAREXECPATH)
+	mkdir -p $(STAREXECPATH)/bin
+	find . -name ".#*"  -exec rm {} \;
+	cp *.py starexec_run_PyRes $(STAREXECPATH)/bin
+
+	cd $(STAREXECPATH); zip -r PyRes.zip bin

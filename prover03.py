@@ -35,7 +35,7 @@ Options:
 --given-clause-heuristic=<heuristic>
   Use the specified heuristic for given-clause selection.
 
- -n 
+ -n
 --neg-lit-selection
   Use the specified negative literal selection function.
 
@@ -43,7 +43,7 @@ Options:
 --suppress-eq-axioms
   Do not add equality axioms. This makes the prover incomplete for
   equality problems.
- 
+
 
 Copyright 2011-2012 Stephan Schulz, schulz@eprover.org
 
@@ -60,7 +60,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -74,7 +74,7 @@ Email: schulz@eprover.org
 import sys
 import getopt
 from lexer import Token,Lexer
-from derivations import enableDerivationOutput,disableDerivationOutput
+from derivations import enableDerivationOutput,disableDerivationOutput,Derivable,flatDerivation
 from clausesets import ClauseSet
 from clauses import firstLit, varSizeLit, eqResVarSizeLit
 from fofspec import FOFSpec
@@ -84,16 +84,21 @@ from litselection import LiteralSelectors
 
 
 suppressEqAxioms = False
+silent           = False
 
 def processOptions(opts):
     """
     Process the options given
     """
+    global silent, suppressEqAxioms
+
     params = SearchParams()
     for opt, optarg in opts:
         if opt == "-h" or opt == "--help":
             print __doc__
             sys.exit()
+        elif opt=="-s" or opt == "--silent":
+            silent = True
         elif opt=="-t" or opt == "--delete-tautologies":
             params.delete_tautologies = True
         elif opt=="-f" or opt == "--forward-subsumption":
@@ -116,13 +121,14 @@ def processOptions(opts):
                 sys.exit(1)
         elif opt=="-S" or opt=="--suppress-eq-axioms":
             suppressEqAxioms = True
-            
+
     return params
 
 if __name__ == '__main__':
     opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                   "htfbH:n:S",
+                                   "hstfbH:n:S",
                                    ["help",
+                                    "silent",
                                     "delete-tautologies",
                                     "forward-subsumption",
                                     "backward-subsumption"
@@ -130,7 +136,7 @@ if __name__ == '__main__':
                                     "neg-lit-selection="
                                     "supress-eq-axioms"])
     params = processOptions(opts)
-    
+
     problem = FOFSpec()
     for file in args:
         problem.parse(file)
@@ -139,16 +145,34 @@ if __name__ == '__main__':
         problem.addEqAxioms()
     cnf = problem.clausify()
 
-    state = ProofState(params, cnf)
+    state = ProofState(params, cnf, silent)
     res = state.saturate()
-    
-    print state.statisticsStr()
+
     if res != None:
-        print "# SZS status Unsatisfiable"
+        if problem.isFof and problem.hasConj:
+            print "# SZS status Theorem"
+        else:
+            print "# SZS status Unsatisfiable"
         proof = res.orderedDerivation()
         enableDerivationOutput()
+        print "# SZS output start CNFRefutation"
         for s in proof:
             print s
+        print "# SZS output end CNFRefutation"
         disableDerivationOutput()
     else:
-        print "# SZS status Satisfiable"
+        print problem.isFof
+        print problem.hasConj
+        if problem.isFof and problem.hasConj:
+            print "# SZS status CounterSatisfiable"
+        else:
+            print "# SZS status Satisfiable"
+        dummy = Derivable("dummy", flatDerivation("pseudoreference", state.processed.clauses))
+        sat = dummy.orderedDerivation()
+        enableDerivationOutput()
+        print "# SZS output start Saturation"
+        for s in sat[:-1]:
+            print s
+        print "# SZS output end Saturation"
+        disableDerivationOutput()
+    print state.statisticsStr()
