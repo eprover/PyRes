@@ -161,8 +161,6 @@ if __name__ == '__main__':
         print "# SZS output end CNFRefutation"
         disableDerivationOutput()
     else:
-        print problem.isFof
-        print problem.hasConj
         if problem.isFof and problem.hasConj:
             print "# SZS status CounterSatisfiable"
         else:
