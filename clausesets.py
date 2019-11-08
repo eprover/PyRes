@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module clausesets.py
@@ -106,7 +106,7 @@ class ClauseSet(object):
         implementation, this simply returns a list of all
         literal-indices for all clauses.
         """
-        res = [(c, i) for c in self.clauses for i in xrange(len(c)) if
+        res = [(c, i) for c in self.clauses for i in range(len(c)) if
                c.getLiteral(i).isInferenceLit()]
         return res
 
@@ -158,7 +158,7 @@ class HeuristicClauseSet(ClauseSet):
         if self.clauses:
             best = 0
             besteval = self.clauses[0].evaluation[heuristic_index]
-            for i in xrange(1, len(self.clauses)):
+            for i in range(1, len(self.clauses)):
                 if self.clauses[i].evaluation[heuristic_index] < besteval:
                     besteval = self.clauses[i].evaluation[heuristic_index]
                     best     = i
@@ -183,7 +183,7 @@ class TestClauseSets(unittest.TestCase):
         Setup function for clause/literal unit tests. Initialize
         variables needed throughout the tests.
         """
-        print
+        print()
         self.spec ="""
 %------------------------------------------------------------------------------
 % File     : PUZ001-1 : TPTP v4.1.0. Released v1.0.0.
@@ -277,7 +277,7 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         lexer = Lexer(self.spec)
         clauses = ClauseSet()
         clauses.parse(lexer)
-        print clauses
+        print(clauses)
         oldlen = len(clauses)
         c = clauses.clauses[0]
         clauses.extractClause(c)
@@ -285,19 +285,19 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
 
         sig = Signature()
         clauses.collectSig(sig)
-        print sig
+        print(sig)
 
 
     def testClauseSetHeuristics(self):
         """
         Test the evaluation and heuristic methods.
         """
-        print "=========================================="
+        print("==========================================")
         clauses = HeuristicClauseSet(PickGiven2)
         lexer = Lexer(self.spec)
         parsed = clauses.parse(lexer)
         self.assertEqual(parsed, 12)
-        print clauses
+        print(clauses)
 
         # Check if FIFO returns clauses in order.
         self.assertEqual(len(clauses), 12)
@@ -311,13 +311,13 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         while c != None:
             c = clauses.extractBestByEval(0)
 
-        print "=========================================="
+        print("==========================================")
         clauses = HeuristicClauseSet(PickGiven2)
         lexer = Lexer(self.spec)
         parsed = clauses.parse(lexer)
         c = clauses.extractBest()
         while c != None:
-            print c
+            print(c)
             c = clauses.extractBest()
         c = clauses.extractFirst()
         self.assertEqual(c, None)
@@ -331,7 +331,7 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         clauses.parse(lexer)
 
         pos = clauses.getResolutionLiterals(["p"])
-        print pos
+        print(pos)
 
 
 

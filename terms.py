@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module terms.py
@@ -39,7 +39,7 @@ subterms. See below for exmples:
 Note in particular that constant terms are lists with one elements,
 not plain strings.
 
-Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -190,7 +190,7 @@ def termCopy(t):
     """
     if type(t) == type([]):
         # t is a list, so we copy the elements of the list
-        return map(termCopy, t)
+        return [termCopy(x) for x in t]
     return t
 
 
@@ -329,41 +329,41 @@ class TestTerms(unittest.TestCase):
         """
         Test if the classification function work as expected.
         """
-        self.assert_(termIsVar(self.t1))
-        self.assert_(not termIsVar(self.t2))
-        self.assert_(not termIsVar(self.t3))
-        self.assert_(not termIsVar(self.t4))
+        self.assertTrue(termIsVar(self.t1))
+        self.assertTrue(not termIsVar(self.t2))
+        self.assertTrue(not termIsVar(self.t3))
+        self.assertTrue(not termIsVar(self.t4))
 
 
     def testIsCompound(self):
         """
         Test if the classification function work as expected.
         """
-        self.assert_(not termIsCompound(self.t1))
-        self.assert_(termIsCompound(self.t2))
-        self.assert_(termIsCompound(self.t3))
-        self.assert_(termIsCompound(self.t4))
+        self.assertTrue(not termIsCompound(self.t1))
+        self.assertTrue(termIsCompound(self.t2))
+        self.assertTrue(termIsCompound(self.t3))
+        self.assertTrue(termIsCompound(self.t4))
 
 
     def testEquality(self):
         """
         Test if term equality works as expected.
         """
-        self.assert_(termEqual(self.t1, self.t1))
-        self.assert_(termEqual(self.t2, self.t2))
-        self.assert_(termEqual(self.t3, self.t3))
-        self.assert_(termEqual(self.t4, self.t4))
-        self.assert_(termEqual(self.t5, self.t5))
+        self.assertTrue(termEqual(self.t1, self.t1))
+        self.assertTrue(termEqual(self.t2, self.t2))
+        self.assertTrue(termEqual(self.t3, self.t3))
+        self.assertTrue(termEqual(self.t4, self.t4))
+        self.assertTrue(termEqual(self.t5, self.t5))
 
-        self.assert_(termEqual(self.t4, self.t5))
+        self.assertTrue(termEqual(self.t4, self.t5))
 
-        self.assert_(not termEqual(self.t1, self.t4))
-        self.assert_(not termEqual(self.t3, self.t4))
-        self.assert_(not termEqual(self.t3, self.t6))
+        self.assertTrue(not termEqual(self.t1, self.t4))
+        self.assertTrue(not termEqual(self.t3, self.t4))
+        self.assertTrue(not termEqual(self.t3, self.t6))
 
         l1 = []
         l2 = [self.t1]
-        self.assert_(not termListEqual(l1,l2))
+        self.assertTrue(not termListEqual(l1,l2))
 
 
     def testCopy(self):
@@ -371,24 +371,24 @@ class TestTerms(unittest.TestCase):
         Test if term copying works.
         """
         t1 = termCopy(self.t1)
-        self.assert_(termEqual(t1, self.t1))
+        self.assertTrue(termEqual(t1, self.t1))
         t2 = termCopy(self.t2)
-        self.assert_(termEqual(t2, self.t2))
+        self.assertTrue(termEqual(t2, self.t2))
         t3 = termCopy(self.t3)
-        self.assert_(termEqual(t3, self.t3))
+        self.assertTrue(termEqual(t3, self.t3))
         t4 = termCopy(self.t4)
-        self.assert_(termEqual(t4, self.t4))
+        self.assertTrue(termEqual(t4, self.t4))
 
 
     def testIsGround(self):
         """
         Test if isGround() works as expected.
         """
-        self.assert_(not termIsGround(self.t1))
-        self.assert_(termIsGround(self.t2))
-        self.assert_(termIsGround(self.t3))
-        self.assert_(not termIsGround(self.t4))
-        self.assert_(not termIsGround(self.t5))
+        self.assertTrue(not termIsGround(self.t1))
+        self.assertTrue(termIsGround(self.t2))
+        self.assertTrue(termIsGround(self.t3))
+        self.assertTrue(not termIsGround(self.t4))
+        self.assertTrue(not termIsGround(self.t5))
 
     def testCollectVars(self):
         """
@@ -405,8 +405,8 @@ class TestTerms(unittest.TestCase):
         termCollectVars(self.t5, vars)
         self.assertEqual(len(vars),2)
 
-        self.assert_("X" in vars)
-        self.assert_("Y" in vars)
+        self.assertTrue("X" in vars)
+        self.assertTrue("Y" in vars)
 
 
     def testCollectFuns(self):
@@ -452,22 +452,22 @@ class TestTerms(unittest.TestCase):
         """
         Test if termWeight() works as expected.
         """
-        self.assert_(termWeight(self.t1,1,2) == 2)
-        self.assert_(termWeight(self.t2,1,2) == 1)
-        self.assert_(termWeight(self.t3,1,2) == 3)
-        self.assert_(termWeight(self.t4,1,2) == 6)
-        self.assert_(termWeight(self.t5,2,1) == 6)
+        self.assertTrue(termWeight(self.t1,1,2) == 2)
+        self.assertTrue(termWeight(self.t2,1,2) == 1)
+        self.assertTrue(termWeight(self.t3,1,2) == 3)
+        self.assertTrue(termWeight(self.t4,1,2) == 6)
+        self.assertTrue(termWeight(self.t5,2,1) == 6)
 
     def testSubterm(self):
         """
         Test if subterm() works as expected.
         self.example5 = "g(X, f(Y))"
         """
-        self.assert_(subterm(self.t5,[]) == ['g', 'X', ['f', 'Y']])
-        self.assert_(subterm(self.t5,[0]) == 'g')
-        self.assert_(subterm(self.t5,[1]) == 'X')
-        self.assert_(subterm(self.t5,[2,0]) == 'f')
-        self.assert_(subterm(self.t5,[5,0]) == None)
+        self.assertTrue(subterm(self.t5,[]) == ['g', 'X', ['f', 'Y']])
+        self.assertTrue(subterm(self.t5,[0]) == 'g')
+        self.assertTrue(subterm(self.t5,[1]) == 'X')
+        self.assertTrue(subterm(self.t5,[2,0]) == 'f')
+        self.assertTrue(subterm(self.t5,[5,0]) == None)
 
 if __name__ == '__main__':
     unittest.main()

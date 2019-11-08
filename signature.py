@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module signature.py
@@ -8,7 +8,7 @@ First-order signatures describe which names (for functions, including
 constants, and predicates) are available in a given first-order
 language. Very often, signatures are given implicitly. In other words,
 the symbols used in terms and formulas implictly make up the
-formula. For implementations of standard untyped predicate logic, we
+signature. For implementations of standard untyped predicate logic, we
 can always extract the necessary information directly from the
 formulae. 
 
@@ -25,7 +25,7 @@ A signature is a triple (F,P,ar), with the following properties:
   symbols.
 
 
-Copyright 2012 Stephan Schulz, schulz@eprover.org
+Copyright 2012-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -136,7 +136,7 @@ class TestSignature(unittest.TestCase):
         sig.addPred("weird", 4)
         
 
-        print sig
+        print(sig)
         self.assert_(sig.isPred("weird"))
         self.assert_(not sig.isPred("unknown"))
         self.assert_(not sig.isPred("a"))

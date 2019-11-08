@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module lexer.py
@@ -329,7 +329,7 @@ class TestLexer(unittest.TestCase):
     Test the lexer functions.
     """
     def setUp(self):
-        print
+        print()
         self.example1 = "f(X,g(a,b))"
         self.example2 = "# Comment\nf(X,g(a,b))"
         self.example3 = "cnf(test,axiom,p(a)|p(f(X)))."
@@ -370,7 +370,7 @@ class TestLexer(unittest.TestCase):
         """
         lex = Lexer(self.example3)
         toks = lex.Lex()
-        print toks
+        print(toks)
         self.assertEqual(len(toks), 20)
         tmp = [i.literal for i in toks]
         rebuild = "".join([i.literal for i in toks])
@@ -383,7 +383,7 @@ class TestLexer(unittest.TestCase):
         """
         lex = Lexer(self.example5)
         toks = lex.Lex()
-        print toks
+        print(toks)
         self.assertEqual(len(toks), 29)
         tmp = [i.literal for i in toks]
         rebuild = "".join([i.literal for i in toks])

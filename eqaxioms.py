@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module eqaxioms.py
@@ -44,7 +44,7 @@ X1!=Y1|...|Xn!=Yn|f(X1,...,Xn)=f(Y1,...Yn) for all f|n in F.
 X1!=Y1|...|Xn!=Yn|~p(X1,...Xn)|p(Y1,...,Yn) for all p|n in P.
 
 
-Copyright 2011 Stephan Schulz, schulz@eprover.org
+Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ def generateVarList(x, n):
     Generate a list of variables of the form x1,...,xn, where x is any
     string, and n is >= 0.
     """
-    return [x+"%d"%(i) for i in xrange(1,n+1)]
+    return [x+"%d"%(i) for i in range(1,n+1)]
     
 
 def generateEqPremise(arity):
@@ -187,7 +187,7 @@ class TestEqAxioms(unittest.TestCase):
     def setUp(self):
         """
         """
-        print
+        print()
         
        
     def testEquivAxioms(self):
@@ -196,7 +196,7 @@ class TestEqAxioms(unittest.TestCase):
         provide coverage ;-).
         """
         ax = generateEquivAxioms()
-        print ax
+        print(ax)
         self.assertEqual(len(ax), 3)
 
     def testVarStuff(self):
@@ -204,16 +204,16 @@ class TestEqAxioms(unittest.TestCase):
         Test variable and premise generation.
         """
         vars = generateVarList("X", 4)
-        self.assert_("X1" in vars)
-        self.assert_("X4" in vars)
-        self.assert_(not "X5" in vars)
-        self.assert_(not "Y1" in vars)
+        self.assertTrue("X1" in vars)
+        self.assertTrue("X4" in vars)
+        self.assertTrue(not "X5" in vars)
+        self.assertTrue(not "Y1" in vars)
         self.assertEqual(len(vars), 4)
-        print vars
+        print(vars)
 
         lits = generateEqPremise(3)
         self.assertEqual(len(lits), 3)
-        print lits
+        print(lits)
 
     def testCompatibility(self):
         """
@@ -221,11 +221,11 @@ class TestEqAxioms(unittest.TestCase):
         """
         ax = generateFunCompatAx("f", 3)
         self.assertEqual(len(ax),4)
-        print ax
+        print(ax)
 
         ax = generatePredCompatAx("p", 5)
         self.assertEqual(len(ax),7)
-        print ax
+        print(ax)
 
         sig = Signature()
         sig.addFun("f", 2)

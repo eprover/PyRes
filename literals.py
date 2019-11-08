@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module literal.py
@@ -43,7 +43,7 @@ forms internally. In other words, the symbol != only occurs during
 parsing and printing.
 
 
-Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -388,7 +388,7 @@ class TestLiterals(unittest.TestCase):
         Setup function for clause/literal unit tests. Initialize
         variables needed throughout the tests.
         """
-        print
+        print()
         self.input1="p(X)  ~q(f(X,a), b)  ~a=b  a!=b  ~a!=f(X,b) p(X) ~p(X) p(a)"
         self.input2="p(X)|~q(f(X,a), b)|~a=b|a!=b|~a!=f(X,b)"
         self.input3="$false"
@@ -412,7 +412,7 @@ class TestLiterals(unittest.TestCase):
         """
 
         vars = set()
-        print self.a1
+        print(self.a1)
         self.assert_(self.a1.isPositive())
         self.assert_(not self.a1.isEquational())
         self.a1.collectVars(vars)
@@ -422,34 +422,34 @@ class TestLiterals(unittest.TestCase):
         self.a1.setInferenceLit(False)
         self.assert_(not self.a1.isInferenceLit())
         
-        print self.a2
+        print(self.a2)
         self.assert_(self.a2.isNegative())
         self.assert_(not self.a2.isEquational())
         self.a2.collectVars(vars)
         self.assertEqual(len(vars), 1)
         self.assertEqual(self.a2.collectFuns(), set(["q", "f", "a", "b"]))
 
-        print self.a3
+        print(self.a3)
         self.assert_(self.a3.isNegative())
         self.assert_(self.a3.isEquational())
         self.assert_(self.a3.isEqual(self.a4))
         self.a3.collectVars(vars)
         self.assertEqual(len(vars), 1)
         
-        print self.a4
+        print(self.a4)
         self.assert_(self.a4.isNegative())
         self.assert_(self.a4.isEquational())
         self.assert_(self.a4.isEqual(self.a3))
         self.a4.collectVars(vars)
         self.assertEqual(len(vars), 1)
         
-        print self.a5
+        print(self.a5)
         self.assert_(not self.a5.isNegative())
         self.assert_(self.a5.isEquational())
         self.a5.collectVars(vars)
         self.assertEqual(len(vars), 1)
 
-        print self.a6, self.a7
+        print(self.a6, self.a7)
         self.assert_(self.a6.isOpposite(self.a7))
         self.assert_(self.a7.isOpposite(self.a6))
         self.assert_(not self.a6.isOpposite(self.a6))
@@ -497,11 +497,11 @@ class TestLiterals(unittest.TestCase):
         """
         lex = Lexer("p(a) a=b a!=b")
         a = parseAtom(lex)
-        print atom2String(a)
+        print(atom2String(a))
         a = parseAtom(lex)
-        print atom2String(a)
+        print(atom2String(a))
         a = parseAtom(lex)
-        print atom2String(a)
+        print(atom2String(a))
 
     def testLitWeight(self):
         """
@@ -532,22 +532,22 @@ class TestLiterals(unittest.TestCase):
         """
         lexer = Lexer(self.input2)
         l2 = parseLiteralList(lexer)
-        print literalList2String(l2)
+        print(literalList2String(l2))
         self.assertEqual(len(l2),5) 
 
         lexer = Lexer(self.input3)
         l3 = parseLiteralList(lexer)
-        print literalList2String(l3)
+        print(literalList2String(l3))
         self.assertEqual(len(l3),0) 
 
         lexer = Lexer(self.input4)
         l4 = parseLiteralList(lexer)
-        print literalList2String(l4)
+        print(literalList2String(l4))
         self.assertEqual(len(l4),1)
         
         lexer = Lexer(self.input5)
         l5 = parseLiteralList(lexer)
-        print literalList2String(l5)
+        print(literalList2String(l5))
         self.assertEqual(len(l5),2)
 
         self.assert_(litInLitList(l4[0], l4))
@@ -570,7 +570,7 @@ class TestLiterals(unittest.TestCase):
         self.a8.collectSig(sig)
         sig.addFun("mult", 2)
 
-        print sig
+        print(sig)
         self.assert_(sig.isPred("q"))
         self.assert_(not sig.isPred("unknown"))
         self.assert_(not sig.isPred("a"))

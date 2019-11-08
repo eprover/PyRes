@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module unification.py
@@ -258,22 +258,22 @@ class TestUnification(unittest.TestCase):
        Test if s and t can be unified. If yes, report the
        result. Compare to the expected result.
        """
-       print "Trying to unify", term2String(s), "and", term2String(t)
+       print("Trying to unify", term2String(s), "and", term2String(t))
        sigma = mgu(s,t)
        if success_expected:
-          self.assert_(sigma)
-          self.assert_(termEqual(sigma(s), sigma(t)))
-          print term2String(sigma(s)), term2String(sigma(t)), sigma
+          self.assertTrue(sigma)
+          self.assertTrue(termEqual(sigma(s), sigma(t)))
+          print(term2String(sigma(s)), term2String(sigma(t)), sigma)
        else:
-          print "Failure"
-          self.assert_(not sigma)
-       print
+          print("Failure")
+          self.assertTrue(not sigma)
+       print()
 
     def testMGU(self):
         """
         Test basic stuff.
         """
-        print
+        print()
         self.unif_test(self.s1, self.t1, True)
         self.unif_test(self.s2, self.t2, False)
         self.unif_test(self.s3, self.t3, True)

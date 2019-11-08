@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module derivations.py
@@ -223,7 +223,7 @@ class TestDerivations(unittest.TestCase):
     """
     """
     def setUp(self):
-        print
+        print()
 
     def testDerivable(self):
         """
@@ -236,10 +236,10 @@ class TestDerivations(unittest.TestCase):
         self.assertEqual(o1.getParents(),[])
         self.assertEqual(o2.getParents(),[])
         self.assertEqual(len(o3.getParents()), 2)
-        print o3
-        print o3.derivation
+        print(o3)
+        print(o3.derivation)
         o3.setDerivation(flatDerivation("factor", [o1]))
-        print o3.derivation
+        print(o3.derivation)
         self.assertEqual(len(o3.getParents()), 1)
 
     def testProofExtraction(self):
@@ -261,7 +261,7 @@ class TestDerivations(unittest.TestCase):
         o6.setDerivation(Derivation("reference", [o5]))
         o7.setDerivation(flatDerivation("resolution", [o5,o1]))
         proof = o7.orderedDerivation()
-        print proof
+        print(proof)
         self.assertEqual(len(proof),4)
         self.assert_(o1 in proof)
         self.assert_(o2 in proof)

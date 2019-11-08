@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module formulas.py
@@ -509,7 +509,7 @@ class TestFormulas(unittest.TestCase):
         Setup function for clause/literal unit tests. Initialize
         variables needed throughout the tests.
         """
-        print
+        print()
         self.nformulas = """
         ![X]:(p(X) | ~a=b)
         (![X]:a(X)|b(X)|?[X,Y]:(p(X,f(Y))))<=>q(g(a),X)
@@ -532,18 +532,18 @@ class TestFormulas(unittest.TestCase):
         """
         lex = Lexer(self.nformulas)
         f1 = parseFormula(lex)
-        print "f1:", f1
+        print("f1:", f1)
         f2 = parseFormula(lex)
-        print "f2:", f2
+        print("f2:", f2)
         f3 = parseFormula(lex)
-        print "f3:", f3
+        print("f3:", f3)
         f4 = parseFormula(lex)
-        print "f4:", f4
-        self.assert_(f2.isEqual(f3))
-        self.assert_(f3.isEqual(f2))
-        self.assert_(not f1.isEqual(f2))
-        self.assert_(not f2.isEqual(f1))
-        self.assert_(not f1.isEqual(f4))
+        print("f4:", f4)
+        self.assertTrue(f2.isEqual(f3))
+        self.assertTrue(f3.isEqual(f2))
+        self.assertTrue(not f1.isEqual(f2))
+        self.assertTrue(not f2.isEqual(f1))
+        self.assertTrue(not f1.isEqual(f4))
 
         self.assertEqual(f1.collectFreeVars(), set())
         self.assertEqual(f2.collectFreeVars(), set(["X"]))
@@ -553,15 +553,15 @@ class TestFormulas(unittest.TestCase):
         self.assertEqual(f2.collectVars(), set(["X","Y"]))
         self.assertEqual(f3.collectVars(), set(["X","Y"]))
 
-        self.assert_(f1.isQuantified())
-        self.assert_(not f2.isQuantified())
-        self.assert_(not f3.isQuantified())
-        self.assert_(not f1.hasSubform1())
-        self.assert_(f2.hasSubform1())
-        self.assert_(f3.hasSubform1())
-        self.assert_(f1.hasSubform2())
-        self.assert_(f2.hasSubform2())
-        self.assert_(f3.hasSubform2())
+        self.assertTrue(f1.isQuantified())
+        self.assertTrue(not f2.isQuantified())
+        self.assertTrue(not f3.isQuantified())
+        self.assertTrue(not f1.hasSubform1())
+        self.assertTrue(f2.hasSubform1())
+        self.assertTrue(f3.hasSubform1())
+        self.assertTrue(f1.hasSubform2())
+        self.assertTrue(f2.hasSubform2())
+        self.assertTrue(f3.hasSubform2())
 
     def testPropositional(self):
         """
@@ -571,13 +571,13 @@ class TestFormulas(unittest.TestCase):
         t = parseFormula(lex)
         f = parseFormula(lex)
         c = parseFormula(lex)
-        self.assert_(t.isPropConst(True))
-        self.assert_(not t.isPropConst(False))
-        self.assert_(f.isPropConst(False))
-        self.assert_(not f.isPropConst(True))
+        self.assertTrue(t.isPropConst(True))
+        self.assertTrue(not t.isPropConst(False))
+        self.assertTrue(f.isPropConst(False))
+        self.assertTrue(not f.isPropConst(True))
 
-        self.assert_(not c.isPropConst(True))
-        self.assert_(not c.isPropConst(False))
+        self.assertTrue(not c.isPropConst(True))
+        self.assertTrue(not c.isPropConst(False))
 
     def testCollectOps(self):
         """
@@ -650,18 +650,18 @@ class TestFormulas(unittest.TestCase):
         """
         lex = Lexer(self.wformulas)
         f1 = parseWFormula(lex)
-        print f1
+        print(f1)
         f2 = parseWFormula(lex)
-        print f2
+        print(f2)
         f3 = parseWFormula(lex)
-        print f3
+        print(f3)
         f4 = parseWFormula(lex)
-        print f4
+        print(f4)
         toggleDerivationOutput()
-        print f1
-        print f2
-        print f3
-        print f4
+        print(f1)
+        print(f2)
+        print(f3)
+        print(f4)
         toggleDerivationOutput()
 
         sig = f1.collectSig()
@@ -669,7 +669,7 @@ class TestFormulas(unittest.TestCase):
         f3.collectSig(sig)
         f4.collectSig(sig)
 
-        print sig
+        print(sig)
         sig.isPred("q")
         sig.isPred("r")
         sig.isFun("a")

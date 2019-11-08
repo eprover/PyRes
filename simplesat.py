@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module simplesat.py
@@ -7,7 +7,7 @@
 Minimalistic implementation of the given-clause algorithm for
 saturation of clause sets under the rules of the resolution calculus.
 
-Copyright 2011 Stephan Schulz, schulz@eprover.org
+Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ class SimpleProofState(object):
         """
         given_clause = self.unprocessed.extractFirst()
         given_clause = given_clause.freshVarCopy()
-        print "#", given_clause
+        print("#", given_clause)
         if given_clause.isEmpty():
             # We have found an explicit contradiction
             return given_clause
@@ -110,7 +110,7 @@ class TestSimpleProver(unittest.TestCase):
         Setup function for clause/literal unit tests. Initialize
         variables needed throughout the tests.
         """
-        print
+        print()
         self.spec1 = """
  cnf(axiom, a_is_true, a).
  cnf(negated_conjecture, is_a_true, ~a)."""
@@ -143,15 +143,15 @@ cnf(not_p, axiom, p(b)).
         if provable:
             self.assertNotEqual(res, None)
             if res == None: # pragma: nocover
-                print "# Bug: Should have found a proof!"
+                print("# Bug: Should have found a proof!")
             else:
-                print "# Proof found"
+                print("# Proof found")
         else:
             self.assertEqual(res, None)
             if res != None: # pragma: nocover
-                print "# Bug: Should not have  found a proof!"
+                print("# Bug: Should not have  found a proof!")
             else:
-                print "# No proof found"
+                print("# No proof found")
                 
         
     def testSaturation(self):

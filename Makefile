@@ -34,6 +34,10 @@ TAGS: *.py
 	etags *.py
 
 
+
+distrib: clean
+	cd ..; tar czf PyRes.tgz PyRes
+
 starexec:
 	echo $(STAREXECPATH)
 	rm -rf $(STAREXECPATH)

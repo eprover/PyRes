@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module litselection.py
@@ -143,7 +143,7 @@ class TestLitSelection(unittest.TestCase):
         """
         Setup function for literal selection.
         """
-        print
+        print()
         self.str1 = """
         ~p(a)|~p(f(X,g(a)))|X!=Y|~q(a,g(a))
 """

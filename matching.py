@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module matching.py
@@ -46,7 +46,7 @@ match for a small set of terms (or literals) onto any subset of a
 larger set.
 
 
-Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -188,23 +188,23 @@ class TestMatching(unittest.TestCase):
        Test if s can be matched onto t. If yes, report the
        result. Compare to the expected result.
        """
-       print "Trying to match", term2String(s), "onto", term2String(t)
+       print("Trying to match", term2String(s), "onto", term2String(t))
        sigma = BTSubst()
        res = match(s,t, sigma)
        if success_expected:
           self.assert_(res)
           self.assert_(termEqual(sigma(s), t))
-          print term2String(sigma(s)), term2String(t), sigma
+          print(term2String(sigma(s)), term2String(t), sigma)
        else:
-          print "Failure"
+          print("Failure")
           self.assert_(not res)
-       print
+       print()
 
     def testMatch(self):
         """
         Test Matching.
         """
-        print
+        print()
         self.match_test(match, self.s1, self.t1, True)
         self.match_test(match, self.s2, self.t2, True)
         self.match_test(match, self.s3, self.t3, True)
@@ -229,7 +229,7 @@ class TestMatching(unittest.TestCase):
         """
         Test Matching.
         """
-        print
+        print()
         self.match_test(match_norec, self.s1, self.t1, True)
         self.match_test(match_norec, self.s2, self.t2, True)
         self.match_test(match_norec, self.s3, self.t3, True)

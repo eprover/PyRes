@@ -1,10 +1,10 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module prover.py
 
 """
-prover02.py 0.1
+prover02.py 1.1
 
 Usage: prover02.py [options] <problem_file>
 
@@ -36,7 +36,7 @@ Options:
 --given-clause-heuristic=<heuristic>
   Use the specified heuristic for given-clause selection.
 
-Copyright 2011, 2012 Stephan Schulz, schulz@eprover.org
+Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ def processOptions(opts):
     params = SearchParams()
     for opt, optarg in opts:
         if opt == "-h" or opt == "--help":
-            print __doc__
+            print(__doc__)
             sys.exit()
         elif opt=="-t" or opt == "--delete-tautologies":
             params.delete_tautologies = True
@@ -91,25 +91,30 @@ def processOptions(opts):
             try:
                 params.heuristics = GivenClauseHeuristics[optarg]
             except KeyError:
-                print "Unknown clause evaluation function", optarg
+                print("Unknown clause evaluation function", optarg)
                 sys.exit(1)
         elif opt=="-n" or opt == "--neg-lit-selection":
             try:
                 params.literal_selection = LiteralSelectors[optarg]
             except KeyError:
-                print "Unknown literal selection function", optarg
+                print("Unknown literal selection function", optarg)
                 sys.exit(1)
     return params
 
 if __name__ == '__main__':
-    opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                   "htfbH:n:",
-                                   ["help",
-                                    "delete-tautologies",
-                                    "forward-subsumption",
-                                    "backward-subsumption"
-                                    "given-clause-heuristic=",
-                                    "neg-lit-selection="])
+    try: 
+        opts, args = getopt.gnu_getopt(sys.argv[1:],
+                                       "htfbH:n:",
+                                       ["help",
+                                        "delete-tautologies",
+                                        "forward-subsumption",
+                                        "backward-subsumption"
+                                        "given-clause-heuristic=",
+                                        "neg-lit-selection="])
+    except getopt.GetoptError as err:
+        print(sys.argv[0],":", err)
+        sys.exit(1)
+        
     params = processOptions(opts)
     
     problem = ClauseSet()
@@ -125,13 +130,13 @@ if __name__ == '__main__':
 
 
     
-    print state.statisticsStr()
+    print(state.statisticsStr())
     if res != None:
-        print "# SZS status Unsatisfiable"
+        print("# SZS status Unsatisfiable")
         proof = res.orderedDerivation()
         enableDerivationOutput()
         for s in proof:
-            print s
+            print(s)
         disableDerivationOutput()
     else:
-        print "# SZS status Satisfiable"
+        print("# SZS status Satisfiable")

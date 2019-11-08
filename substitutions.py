@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module substitutions.py
@@ -22,7 +22,7 @@ called tau, and further ones are denoted with primes or subscripts.
 We represent substitutions by a thin wrapper around Python
 dictionaries mapping variables to terms. 
 
-Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -122,7 +122,7 @@ class Substitution(object):
             return self.value(term)
         else:
             res  = [term[0]]
-            args = map(lambda x:self.apply(x), terms.termArgs(term))
+            args = [self.apply(x) for x in terms.termArgs(term)]
             res.extend(args)
             return res                      
 
@@ -272,18 +272,18 @@ class TestSubst(unittest.TestCase):
         Test basic stuff.
         """
         tau = self.sigma1.copy()
-        self.assert_(terms.termEqual(tau("X"), self.sigma1("X")))
-        self.assert_(terms.termEqual(tau("Y"), self.sigma1("Y")))
-        self.assert_(terms.termEqual(tau("Z"), self.sigma1("Z")))
+        self.assertTrue(terms.termEqual(tau("X"), self.sigma1("X")))
+        self.assertTrue(terms.termEqual(tau("Y"), self.sigma1("Y")))
+        self.assertTrue(terms.termEqual(tau("Z"), self.sigma1("Z")))
         
         t = tau.modifyBinding(("X", self.t1))
-        self.assert_(terms.termEqual(t, self.t2))
+        self.assertTrue(terms.termEqual(t, self.t2))
         t = tau.modifyBinding(("U", self.t1))
         self.assertEqual(t, None)
-        self.assert_(tau.isBound("U"))
-        self.assert_(terms.termEqual(tau.value("U"), self.t1))
+        self.assertTrue(tau.isBound("U"))
+        self.assertTrue(terms.termEqual(tau.value("U"), self.t1))
         t = tau.modifyBinding(("U", None))
-        self.assert_(not tau.isBound("U"))
+        self.assertTrue(not tau.isBound("U"))
 
         
     def testSubstApply(self):
@@ -291,8 +291,8 @@ class TestSubst(unittest.TestCase):
         Check application of substitutions
         """
         self.assertEqual(terms.term2String(self.sigma1(self.t1)),"f(a,g(a))")
-        self.assert_(terms.termEqual(self.sigma1(self.t1),  self.t4))
-        self.assert_(terms.termEqual(self.sigma2(self.t1),  self.t5))
+        self.assertTrue(terms.termEqual(self.sigma1(self.t1),  self.t4))
+        self.assertTrue(terms.termEqual(self.sigma2(self.t1),  self.t5))
 
 
     def testFreshVarSubst(self):
@@ -301,13 +301,13 @@ class TestSubst(unittest.TestCase):
         """
         var1 = freshVar()
         var2 = freshVar()
-        self.assert_(var1!=var2)
+        self.assertTrue(var1!=var2)
         
         vars = terms.termCollectVars(self.t1)
         sigma = freshVarSubst(vars)
         vars2 = terms.termCollectVars(sigma(self.t1))
         shared = set(vars).intersection(set(vars2))
-        self.assert_(not shared)
+        self.assertTrue(not shared)
 
     def testBacktrack(self):
         """
@@ -319,7 +319,7 @@ class TestSubst(unittest.TestCase):
         res = sigma.backtrackToState(state)
         self.assertEqual(res, 1)
         res = sigma.backtrack()
-        self.assert_(not res)
+        self.assertTrue(not res)
         
         
 

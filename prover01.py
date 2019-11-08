@@ -1,10 +1,10 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module prover01.py
 
 """
-prover01.py 0.1
+prover01.py 1.1
 
 Usage: prover01.py <problem_file>
 
@@ -20,7 +20,7 @@ Options:
 --help
   Print this help.
 
-Copyright 2011 Stephan Schulz, schulz@eprover.org
+Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -59,13 +59,18 @@ def processOptions(opts):
     """
     for opt, optarg in opts:
         if opt == "-h" or opt == "--help":
-            print __doc__
+            print(__doc__)
             sys.exit()
             
 if __name__ == '__main__':
-    opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                   "h",
-                                   ["help"])
+    try: 
+        opts, args = getopt.gnu_getopt(sys.argv[1:],
+                                       "h",
+                                       ["help"])
+    except getopt.GetoptError as err:
+        print(sys.argv[0],":", err)
+        sys.exit(1)
+        
     processOptions(opts)
     
     problem = ClauseSet()
@@ -80,6 +85,6 @@ if __name__ == '__main__':
     res = state.saturate()
 
     if res != None:
-        print "# SZS status Unsatisfiable"
+        print("# SZS status Unsatisfiable")
     else:
-        print "# SZS status Satisfiable"
+        print("# SZS status Satisfiable")

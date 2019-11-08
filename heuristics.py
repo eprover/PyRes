@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module heuristics.py
@@ -16,7 +16,7 @@ A lower value of h(C) for some clause C implies that C is assumed to
 be better (or more useful) in a given proof search, and should be
 processed before a clause C' with larger value h(C').
 
-Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -212,7 +212,7 @@ class TestHeuristics(unittest.TestCase):
         evaluations on.
         """
 
-        print
+        print()
         self.spec ="""
 cnf(c1,axiom,(f(X1,X2)=f(X2,X1))).
 cnf(c2,axiom,(f(X1,f(X2,X3))=f(f(X1,X2),X3))).
@@ -247,13 +247,13 @@ cnf(c8,axiom,(c=d|h(i(a))!=h(i(e)))).
         e6 = eval(self.c6)
         e7 = eval(self.c7)
         e8 = eval(self.c8)
-        self.assert_(e1<e2)
-        self.assert_(e2<e3)
-        self.assert_(e3<e4)
-        self.assert_(e4<e5)
-        self.assert_(e5<e6)
-        self.assert_(e6<e7)
-        self.assert_(e7<e8)
+        self.assertTrue(e1<e2)
+        self.assertTrue(e2<e3)
+        self.assertTrue(e3<e4)
+        self.assertTrue(e4<e5)
+        self.assertTrue(e5<e6)
+        self.assertTrue(e6<e7)
+        self.assertTrue(e7<e8)
 
     def testSymbolCount(self):
         """

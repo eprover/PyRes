@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module fofspec.py
@@ -190,7 +190,7 @@ class TestFormulas(unittest.TestCase):
         Setup function for clause/literal unit tests. Initialize
         variables needed throughout the tests.
         """
-        print
+        print()
 
         self.seed = """
         cnf(agatha,plain,lives(agatha)).
@@ -229,8 +229,8 @@ class TestFormulas(unittest.TestCase):
         spec = FOFSpec()
 
         spec.parse(lex)
-        print "MIX:\n==="
-        print spec
+        print("MIX:\n===")
+        print(spec)
 
     def testCNF(self):
         """
@@ -241,8 +241,8 @@ class TestFormulas(unittest.TestCase):
         spec = FOFSpec()
         spec.parse(lex)
         spec.clausify()
-        print "CNF:\n==="
-        print spec
+        print("CNF:\n===")
+        print(spec)
 
     def testEqAxioms(self):
         """
@@ -254,8 +254,8 @@ class TestFormulas(unittest.TestCase):
 
         spec.addEqAxioms()
 
-        print "EQ:\n==="
-        print spec
+        print("EQ:\n===")
+        print(spec)
 
 
 if __name__ == '__main__':

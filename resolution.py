@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module resolution.py
@@ -37,7 +37,7 @@ sigma(c|a)
 Again, c is an arbitray disjunction.
 
 
-Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ class TestResolution(unittest.TestCase):
         """
         Setup function for resolution testing
         """
-        print
+        print()
         self.spec = """
 cnf(c1,axiom,p(a, X)|p(X,a)).
 cnf(c2,axiom,~p(a,b)|p(f(Y),a)).
@@ -151,47 +151,47 @@ cnf(taut,axiom,p(X4)|~p(X4)).
         """
         Test resolution
         """
-        print "Resolution:"
+        print("Resolution:")
         res1 = resolution(self.c1, 0, self.c2,0)
-        self.assert_(res1)
-        print res1
+        self.assertTrue(res1)
+        print(res1)
 
         res2 = resolution(self.c1, 0, self.c3,0)
-        self.assert_(res2==None)
-        print res2
+        self.assertTrue(res2==None)
+        print(res2)
 
         res3 = resolution(self.c2, 0, self.c3,0)
-        self.assert_(res3)
-        print res3
+        self.assertTrue(res3)
+        print(res3)
 
         res4 = resolution(self.c1, 0, self.c3,1)
-        self.assert_(res4==None)
-        print res4
+        self.assertTrue(res4==None)
+        print(res4)
 
         res5 = resolution(self.c6, 0, self.c7,0)
-        self.assert_(res5)
-        print res5
+        self.assertTrue(res5)
+        print(res5)
 
     def testFactoring(self):
         """
         Test the factoring inference.
         """        
         f1 = factor(self.c1,0,1)
-        self.assert_(f1)
-        self.assert_(len(f1)==1)
-        print "Factor:", f1
+        self.assertTrue(f1)
+        self.assertTrue(len(f1)==1)
+        print("Factor:", f1)
         
         f2 = factor(self.c2,0,1)
-        self.assert_(f2==None)
-        print f2
+        self.assertTrue(f2==None)
+        print(f2)
 
         f4 = factor(self.c4,0,1)
-        self.assert_(f4==None)
-        print f4
+        self.assertTrue(f4==None)
+        print(f4)
         
         f5 = factor(self.c5,1,3)
-        self.assert_(f5)
-        print f5
+        self.assertTrue(f5)
+        print(f5)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module saturation.py
@@ -138,7 +138,7 @@ class ProofState(object):
         given_clause = self.unprocessed.extractBest()
         given_clause = given_clause.freshVarCopy()
         if not self.silent:
-            print "#"
+            print("#")
         if given_clause.isEmpty():
             # We have found an explicit contradiction
             return given_clause
@@ -172,7 +172,7 @@ class ProofState(object):
         if(self.params.literal_selection):
             given_clause.selectInferenceLits(self.params.literal_selection)
         if not self.silent:
-            print "#", given_clause
+            print("#", given_clause)
         new = []
         factors    = computeAllFactors(given_clause)
         new.extend(factors)
@@ -232,7 +232,7 @@ class TestProver(unittest.TestCase):
         Setup function for clause/literal unit tests. Initialize
         variables needed throughout the tests.
         """
-        print
+        print()
         self.params = SearchParams()
         self.params.delete_tautologies = True
         self.spec1 = """
@@ -347,17 +347,17 @@ cnf(not_p, axiom, ~p(a)).
         if provable:
             self.assertNotEqual(res, None)
             if res == None: # pragma: nocover
-                print "# Bug: Should have found a proof!"
+                print("# Bug: Should have found a proof!")
             else:
-                print "# Proof found"
+                print("# Proof found")
         else:
             self.assertEqual(res, None)
             if res != None: # pragma: nocover
-                print "# Bug: Should not have  found a proof!"
+                print("# Bug: Should not have  found a proof!")
             else:
-                print "# No proof found"
+                print("# No proof found")
 
-        print prover.statisticsStr()
+        print(prover.statisticsStr())
 
     def testSaturation(self):
         """

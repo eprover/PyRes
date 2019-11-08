@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module subsumption.py
@@ -19,7 +19,7 @@ aspect is important for this particular calculus, otherwise
 p(X)|p(Y) would be able to subsume p(X), i.e. a clause would subsume
 its own factors. This would destroy completeness.
 
-Copyright 2011 Stephan Schulz, schulz@eprover.org
+Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ class TestResolution(unittest.TestCase):
         """
         Setup function for resolution testing
         """
-        print
+        print()
         self.spec = """
 cnf(axiom, c1, $false).
 cnf(axiom, c2, p(a)).
@@ -147,47 +147,47 @@ cnf(axiom, c7, Y=Y).
         Test subsumption.
         """
         res = subsumes(self.c1, self.c1)
-        self.assert_(res)
+        self.assertTrue(res)
         
         res = subsumes(self.c2, self.c2)
-        self.assert_(res)
+        self.assertTrue(res)
 
         res = subsumes(self.c3, self.c3)
-        self.assert_(res)
+        self.assertTrue(res)
         
         res = subsumes(self.c4, self.c4)
-        self.assert_(res)
+        self.assertTrue(res)
 
         res = subsumes(self.c1, self.c2)
-        self.assert_(res)
+        self.assertTrue(res)
 
         res = subsumes(self.c2, self.c1)
-        self.assert_(not res)
+        self.assertTrue(not res)
 
         res = subsumes(self.c2, self.c3)
-        self.assert_(not res)
+        self.assertTrue(not res)
 
         res = subsumes(self.c3, self.c2)
-        self.assert_(res)
+        self.assertTrue(res)
 
         res = subsumes(self.c4, self.c5)
-        self.assert_(res)
+        self.assertTrue(res)
         
         res = subsumes(self.c5, self.c4)
-        self.assert_(not res)
+        self.assertTrue(not res)
 
         res = subsumes(self.c6, self.c6)
-        self.assert_(res)
+        self.assertTrue(res)
 
         res = subsumes(self.c6, self.c7)
-        self.assert_(res)
+        self.assertTrue(res)
 
     def testSetSubsumption(self):
         """
         Test set subsumption.
         """
-        self.assert_(not forwardSubsumption(self.cset, self.c1))
-        self.assert_(forwardSubsumption(self.cset, self.c2))
+        self.assertTrue(not forwardSubsumption(self.cset, self.c1))
+        self.assertTrue(forwardSubsumption(self.cset, self.c2))
 
         tmp = backwardSubsumption(self.c1, self.cset)
         self.assertEqual(tmp, 6)

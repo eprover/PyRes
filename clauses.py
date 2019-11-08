@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module clause.py
@@ -170,11 +170,10 @@ class Clause(Derivable):
         candidates = self.getNegativeLits()
         if not candidates:
             return
-        # print "Got: ", candidates
+        # print("Got: ", candidates)
 
         for l in self.literals:
             l.setInferenceLit(False)
-        # print "Resert: ", self.literals
 
         selected = lit_selection_fun(candidates)
         for l in selected:
@@ -221,7 +220,7 @@ class Clause(Derivable):
         Check if a clause is a simple tautology, i.e. if it contains
         two literals with the same atom, but different signs.
         """
-        for i in xrange(len(self.literals)):
+        for i in range(len(self.literals)):
             if oppositeInLitList(self.literals[i],
                                  self.literals[i+1:]):
                 return True
@@ -277,7 +276,7 @@ class TestClauses(unittest.TestCase):
         Setup function for clause/literal unit tests. Initialize
         variables needed throughout the tests.
         """
-        print
+        print()
         self.str1 = """
 cnf(test,axiom,p(a)|p(f(X))).
 cnf(test,axiom,(p(a)|p(f(X)))).
@@ -297,39 +296,39 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         c4 = parseClause(lex)
         c5 = parseClause(lex)
 
-        print c1
-        print c2
+        print(c1)
+        print(c2)
         self.assertEqual(repr(c1), repr(c2))
 
         cf = c1.freshVarCopy()
-        print c1
-        print cf
+        print(c1)
+        print(cf)
 
         self.assertEqual(cf.weight(2,1), c1.weight(2,1))
         self.assertEqual(cf.weight(1,1), c1.weight(1,1))
 
         cnew = Clause(c4.literals)
-        self.assert_(cnew.getLiteral(0).isEqual(c4.getLiteral(0)))
+        self.assertTrue(cnew.getLiteral(0).isEqual(c4.getLiteral(0)))
 
         empty = Clause([])
-        self.assert_(empty.isEmpty())
-        self.assert_(not empty.isUnit())
-        self.assert_(empty.isHorn())
+        self.assertTrue(empty.isEmpty())
+        self.assertTrue(not empty.isUnit())
+        self.assertTrue(empty.isHorn())
 
         unit = Clause([c5.getLiteral(0)])
-        self.assert_(not unit.isEmpty())
-        self.assert_(unit.isUnit())
-        self.assert_(unit.isHorn())
+        self.assertTrue(not unit.isEmpty())
+        self.assertTrue(unit.isUnit())
+        self.assertTrue(unit.isHorn())
 
-        self.assert_(not c1.isHorn())
-        self.assert_(not c3.isHorn())
+        self.assertTrue(not c1.isHorn())
+        self.assertTrue(not c3.isHorn())
 
-        self.assert_(c4.isTautology())
-        self.assert_(not c5.isTautology())
+        self.assertTrue(c4.isTautology())
+        self.assertTrue(not c5.isTautology())
 
         oldlen = len(c5)
         c5.removeDupLits()
-        self.assert_(len(c5)<oldlen)
+        self.assertTrue(len(c5)<oldlen)
 
 
         sig = c1.collectSig()
@@ -337,7 +336,7 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         c3.collectSig(sig)
         c4.collectSig(sig)
         c5.collectSig(sig)
-        print sig
+        print(sig)
 
         negs = c1.getNegativeLits()
         self.assertEqual(len(negs), 0)
@@ -352,7 +351,7 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
 
         c2.selectInferenceLits()
         for l in c2.literals:
-            self.assert_(l.isInferenceLit())
+            self.assertTrue(l.isInferenceLit())
 
         c3.selectInferenceLits()
         for l in c3.literals:
@@ -361,7 +360,7 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
 
         c2.selectInferenceLits(varSizeLit)
         for l in c2.literals:
-            self.assert_(l.isInferenceLit())
+            self.assertTrue(l.isInferenceLit())
 
         c3.selectInferenceLits(varSizeLit)
         for l in c3.literals:

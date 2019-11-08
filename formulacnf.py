@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module formulacnf.py
@@ -730,7 +730,7 @@ class TestCNF(unittest.TestCase):
         Setup function for clause/literal unit tests. Initialize
         variables needed throughout the tests.
         """
-        print
+        print()
         self.formulas = """
         ![X]:(a(X) ~| ~a=b)
         ![X]:(a(X)|b(X)|?[X,Y]:(p(X,f(Y))<~>q(g(a),X)))
@@ -823,24 +823,24 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         Test that operator simplification works.
         """
         f,m = formulaOpSimplify(self.f1)
-        self.assert_(m)
-        self.assert_(f.collectOps() <= self.simple_ops)
+        self.assertTrue(m)
+        self.assertTrue(f.collectOps() <= self.simple_ops)
 
         f,m = formulaOpSimplify(self.f2)
-        self.assert_(m)
-        self.assert_(f.collectOps() <= self.simple_ops)
+        self.assertTrue(m)
+        self.assertTrue(f.collectOps() <= self.simple_ops)
 
         f,m = formulaOpSimplify(self.f3)
-        self.assert_(m)
-        self.assert_(f.collectOps() <= self.simple_ops)
+        self.assertTrue(m)
+        self.assertTrue(f.collectOps() <= self.simple_ops)
 
         f,m = formulaOpSimplify(self.f4)
-        self.assert_(m)
-        self.assert_(f.collectOps() <= self.simple_ops)
+        self.assertTrue(m)
+        self.assertTrue(f.collectOps() <= self.simple_ops)
 
         f,m = formulaOpSimplify(self.f5)
-        self.assert_(not m)
-        self.assert_(f.collectOps() <= self.simple_ops)
+        self.assertTrue(not m)
+        self.assertTrue(f.collectOps() <= self.simple_ops)
 
     def checkSimplificationResult(self, f):
         """
@@ -850,10 +850,10 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
 
         funs = f.collectFuns()
         if f.isPropConst(True) or f.isPropConst(False):
-            self.assert_(funs in [set(["$true"]), set(["$false"])])
+            self.assertTrue(funs in [set(["$true"]), set(["$false"])])
         else:
-            self.assert_(not "$true" in funs )
-            self.assert_(not "$false" in funs )
+            self.assertTrue(not "$true" in funs )
+            self.assertTrue(not "$false" in funs )
 
 
     def testSimplification(self):
@@ -895,13 +895,13 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         literals).
         """
 
-        print "NNF:", f
+        print("NNF:", f)
         if f.isPropConst(True) or f.isPropConst(False):
             funs = f.collectFuns()
-            self.assert_(funs in [set(["$true"]), set(["$false"])])
+            self.assertTrue(funs in [set(["$true"]), set(["$false"])])
         else:
             ops = f.collectOps()
-            self.assert_(ops <= self.nnf_ops)
+            self.assertTrue(ops <= self.nnf_ops)
 
 
     def testNNF(self):
@@ -959,10 +959,10 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
             expected = res.pop(0)
             f = parseFormula(lex)
             f1,m = formulaMiniScope(f)
-            print f, f1, m, expected
+            print(f, f1, m, expected)
             self.assertEqual(expected, m)
             if m:
-                self.assert_(not f1.isQuantified())
+                self.assertTrue(not f1.isQuantified())
 
     def testRenaming(self):
         """
@@ -977,7 +977,7 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         self.assertEqual(v2, set())
 
         f1 = formulaVarRename(f)
-        print f, f1
+        print(f, f1)
 
         v1 = f1.collectVars()
         self.assertEqual(len(v1), 3)
@@ -989,15 +989,15 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         Check if Skolem symbol construction works.
         """
         symbols = []
-        for i in xrange(10):
+        for i in range(10):
             newsymbol = skolemGenerator.newSkolemSymbol()
-            self.assert_(not newsymbol in symbols)
+            self.assertTrue(not newsymbol in symbols)
             symbols.append(newsymbol)
 
         var = ["X", "Y"]
-        for i in xrange(10):
+        for i in range(10):
             t = skolemGenerator(var)
-            self.assert_(termIsCompound(t))
+            self.assertTrue(termIsCompound(t))
             self.assertEqual(termArgs(t), var)
 
 
@@ -1019,18 +1019,18 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         """
         f = self.preprocFormula(self.f2)
         f = formulaSkolemize(f)
-        self.assert_(not "?" in f.collectOps())
-        print f
+        self.assertTrue(not "?" in f.collectOps())
+        print(f)
 
         f = self.preprocFormula(self.f3)
         f = formulaSkolemize(f)
-        self.assert_(not "?" in f.collectOps())
-        print f
+        self.assertTrue(not "?" in f.collectOps())
+        print(f)
 
         f = self.preprocFormula(self.f4)
         f = formulaSkolemize(f)
-        self.assert_(not "?" in f.collectOps())
-        print f
+        self.assertTrue(not "?" in f.collectOps())
+        print(f)
 
     def testShiftQuantors(self):
         """
@@ -1063,22 +1063,22 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         f = formulaSkolemize(f)
         f = formulaShiftQuantorsOut(f)
         f = formulaDistributeDisjunctions(f)
-        print f
-        self.assert_(f.isCNF())
+        print(f)
+        self.assertTrue(f.isCNF())
 
         f = self.preprocFormula(self.f3)
         f = formulaSkolemize(f)
         f = formulaShiftQuantorsOut(f)
         f = formulaDistributeDisjunctions(f)
-        print f
-        self.assert_(f.isCNF())
+        print(f)
+        self.assertTrue(f.isCNF())
 
         f = self.preprocFormula(self.f4)
         f = formulaSkolemize(f)
         f = formulaShiftQuantorsOut(f)
         f = formulaDistributeDisjunctions(f)
-        print f
-        self.assert_(f.isCNF())
+        print(f)
+        self.assertTrue(f.isCNF())
 
     def testCNFization(self):
         """
@@ -1091,11 +1091,11 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
             wf = parseWFormula(lex)
             wf = wFormulaCNF(wf)
             enableDerivationOutput()
-            self.assert_(wf.formula.isCNF())
+            self.assertTrue(wf.formula.isCNF())
             deriv = wf.orderedDerivation()
-            print "=================="
+            print("==================")
             for s in deriv:
-                print s
+                print(s)
             toggleDerivationOutput()
 
     def testClausification(self):
@@ -1108,9 +1108,9 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
             wf = parseWFormula(lex)
             clauses = wFormulaClausify(wf)
             enableDerivationOutput()
-            print "=================="
+            print("==================")
             for c in clauses:
-                print c
+                print(c)
             toggleDerivationOutput()
 
 

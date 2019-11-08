@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module rescontrol.py
@@ -7,7 +7,7 @@
 Functions wrapping basic inference rules for convenience.
 
 
-Copyright 2010-2011 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ def computeAllResolvents(clause, clauseset):
     will be added to the set of unprocessed clauses.
     """
     res = []
-    for lit in xrange(len(clause)):
+    for lit in range(len(clause)):
         if clause.getLiteral(lit).isInferenceLit():
             partners = \
                      clauseset.getResolutionLiterals(clause.getLiteral(lit))
@@ -81,9 +81,9 @@ def computeAllFactors(clause):
     much cheaper than clause/clause-set operations.
     """
     res = []
-    for i in xrange(len(clause)):
+    for i in range(len(clause)):
         if clause.getLiteral(i).isInferenceLit():
-            for j in xrange(i+1, len(clause)):
+            for j in range(i+1, len(clause)):
                 fact = factor(clause, i, j)
                 if fact:
                     res.append(fact)
@@ -99,7 +99,7 @@ class TestSetInferences(unittest.TestCase):
         Setup function for clause/literal unit tests. Initialize
         variables needed throughout the tests.
         """
-        print
+        print()
         spec = """
 cnf(g1, negated_conjecture, ~c).
 cnf(c1, axiom, a|b|c).
@@ -120,18 +120,18 @@ cnf(c3, axiom, c).
         Test that forming resolvents between a clause and a clause set
         works. 
         """
-        print "test set resolution"
+        print("Test set resolution")
         res = computeAllResolvents(self.conj, self.cset)
-        print res
+        print(res)
 
         
     def testFactoring(self):
         """
         Test full factoring of a clause.
         """
-        print "test factoring"
+        print("Test factoring")
         res = computeAllFactors(self.fclause)
-        print res
+        print(res)
 
 
 if __name__ == '__main__':

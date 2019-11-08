@@ -1,10 +1,10 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # ----------------------------------
 #
 # Module prover.py
 
 """
-prover03.py 0.1
+prover03.py 1.1
 
 Usage: prover03.py [options] <problem_file>
 
@@ -95,7 +95,7 @@ def processOptions(opts):
     params = SearchParams()
     for opt, optarg in opts:
         if opt == "-h" or opt == "--help":
-            print __doc__
+            print(__doc__)
             sys.exit()
         elif opt=="-s" or opt == "--silent":
             silent = True
@@ -109,15 +109,15 @@ def processOptions(opts):
             try:
                 params.heuristics = GivenClauseHeuristics[optarg]
             except KeyError:
-                print "Unknown clause evaluation function", optarg
-                print "Supported:", GivenClauseHeuristics.keys()
+                print("Unknown clause evaluation function", optarg)
+                print("Supported:", GivenClauseHeuristics.keys())
                 sys.exit(1)
         elif opt=="-n" or opt == "--neg-lit-selection":
             try:
                 params.literal_selection = LiteralSelectors[optarg]
             except KeyError:
-                print "Unknown literal selection function", optarg
-                print "Supported:", LiteralSelectors.keys()
+                print("Unknown literal selection function", optarg)
+                print("Supported:", LiteralSelectors.keys())
                 sys.exit(1)
         elif opt=="-S" or opt=="--suppress-eq-axioms":
             suppressEqAxioms = True
@@ -125,16 +125,21 @@ def processOptions(opts):
     return params
 
 if __name__ == '__main__':
-    opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                   "hstfbH:n:S",
-                                   ["help",
-                                    "silent",
-                                    "delete-tautologies",
-                                    "forward-subsumption",
-                                    "backward-subsumption"
-                                    "given-clause-heuristic=",
-                                    "neg-lit-selection="
-                                    "supress-eq-axioms"])
+    try: 
+        opts, args = getopt.gnu_getopt(sys.argv[1:],
+                                       "hstfbH:n:S",
+                                       ["help",
+                                        "silent",
+                                        "delete-tautologies",
+                                        "forward-subsumption",
+                                        "backward-subsumption"
+                                        "given-clause-heuristic=",
+                                        "neg-lit-selection="
+                                        "supress-eq-axioms"])
+    except getopt.GetoptError as err:
+        print(sys.argv[0],":", err)
+        sys.exit(1)
+
     params = processOptions(opts)
 
     problem = FOFSpec()
@@ -150,27 +155,27 @@ if __name__ == '__main__':
 
     if res != None:
         if problem.isFof and problem.hasConj:
-            print "# SZS status Theorem"
+            print("# SZS status Theorem")
         else:
-            print "# SZS status Unsatisfiable"
+            print("# SZS status Unsatisfiable")
         proof = res.orderedDerivation()
         enableDerivationOutput()
-        print "# SZS output start CNFRefutation"
+        print("# SZS output start CNFRefutation")
         for s in proof:
-            print s
-        print "# SZS output end CNFRefutation"
+            print(s)
+        print("# SZS output end CNFRefutation")
         disableDerivationOutput()
     else:
         if problem.isFof and problem.hasConj:
-            print "# SZS status CounterSatisfiable"
+            print("# SZS status CounterSatisfiable")
         else:
-            print "# SZS status Satisfiable"
+            print("# SZS status Satisfiable")
         dummy = Derivable("dummy", flatDerivation("pseudoreference", state.processed.clauses))
         sat = dummy.orderedDerivation()
         enableDerivationOutput()
-        print "# SZS output start Saturation"
+        print("# SZS output start Saturation")
         for s in sat[:-1]:
-            print s
-        print "# SZS output end Saturation"
+            print(s)
+        print("# SZS output end Saturation")
         disableDerivationOutput()
-    print state.statisticsStr()
+    print(state.statisticsStr())
