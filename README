@@ -3,8 +3,8 @@ first-order logic. It is released as free software under the GNU GPL
 version 2, and without any warranty. See the file COPYING for
 details and the individual source headers for copyright information.
 
-prover01.py
-===========
+pyres-simple.py
+===============
 
 This is the simplest example of a prover for the clausal fragment of
 first-order logic. It implements the basic given-clause loop with
@@ -12,38 +12,39 @@ first-in-first-out clause selection and without any redundancy
 elimination.
 
 Suggested command line:
-./prover01.py EXAMPLES/PUZ002-1.p
+./pyres-simple.py EXAMPLES/PUZ002-1.p
 
-PUZ001-1.p is quite hard for prover01!
+PUZ001-1.p is quite hard for pyres-simple!
 
 
-prover02.py
+pyres-cnf.py
 ===========
 
-This version of the prover processes the same logic as prover01.py,
-but adds some performance-enhancing features. This include better
-clause selection heuristics, subsumption, and negative literal
-selection.
+This version of the prover processes the same logic as
+pyres-simple.py, but adds some performance-enhancing features. This
+include better clause selection heuristics, subsumption, and negative
+literal selection.
 
 Suggested command line:
-./prover02.py -tfb -HPickGiven5 -nsmallest EXAMPLES/PUZ001-1.p
+./pyres-cnf.py -tfb -HPickGiven5 -nsmallest EXAMPLES/PUZ001-1.p
 
-prover03.py
+pyres-fof.py
 ===========
 
 This prover adds a simple clausifier, so it is able to process full
-first-order logic. Otherwise, it is similar to prover02.
+first-order logic. It also will detect the use of equality, and add
+equality axioms. Otherwise, it is similar to pyres-cnf.py.
 
 
 Suggested command line:
-./prover03.py -tfb -HPickGiven5 -nlargest EXAMPLES/PUZ001+1.p
+./pyres-fof.py -tfb -HPickGiven5 -nlargest EXAMPLES/PUZ001+1.p
 
 
 
 ======== Information for CASC =================
 
 The system comes as a zip file in StarExec compatible format. It
-requires Python 2.7 as python2.7.
+requires (any) Python3 as python3
 
 The runscript is starexec_run_PyRes
 

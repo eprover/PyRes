@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # ----------------------------------
 #
-# Module prover01.py
+# Module pyres-simple.py
 
 """
-prover01.py 1.1
+pyres-simple.py 1.1
 
-Usage: prover01.py <problem_file>
+Usage: pyres-simple.py <problem_file>
 
 This is a straightforward implementation of a simple resolution-based
 prover for first-order clausal logic. Problem files should be in

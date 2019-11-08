@@ -21,10 +21,10 @@ clean:
 
 testcov: *.py
 	-rm -r .coverage COVERAGE
-	for f in *.py ;do coverage run -a $$f; done
-	coverage report > testcov
+	for f in *.py ;do coverage-3.7 run -a $$f; done
+	coverage-3.7 report > testcov
 	mkdir COVERAGE
-	coverage annotate -d COVERAGE
+	coverage-3.7 annotate -d COVERAGE
 	cat testcov
 
 
