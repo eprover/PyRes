@@ -3,16 +3,15 @@
 #
 # Module pyres-simple.py
 
-"""
-pyres-simple.py 1.1
+"""pyres-simple.py 1.1
 
 Usage: pyres-simple.py <problem_file>
 
 This is a straightforward implementation of a simple resolution-based
 prover for first-order clausal logic. Problem files should be in
-(restricted) TPTP-3 CNF syntax. Unsupported features include single-
-and double quoted strings and includes. Equality is parsed, but not
-interpreted so far.
+(restricted) TPTP-3 CNF syntax. Unsupported features include double
+quoted strings and include file. Equality is parsed, but not
+interpreted.
 
 Options:
 
@@ -44,6 +43,7 @@ Auf der Altenburg 7
 70376 Stuttgart
 Germany
 Email: schulz@eprover.org
+
 """
 
 import sys

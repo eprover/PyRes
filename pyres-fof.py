@@ -3,15 +3,16 @@
 #
 # Module pyres-fof.py
 
-"""
-pyres-fof.py 1.1
+"""pyres-fof.py 1.1
 
 Usage: pyres-fof.py [options] <problem_file>
 
 This is a straightforward implementation of a simple resolution-based
-prover for full first-order logic. The problem file should be in TPTP-3
-CNF/FOF syntax. Unsupported features include single- and double quoted
-strings. Equality is parsed, but not interpreted so far.
+prover for full first-order logic. The problem file should be in
+TPTP-3 CNF/FOF syntax. Unsupported features include double quoted
+strings/distinct objects. Equality is parsed, and will by default be
+dealt with by adding equality axioms for all function- and predicate
+symbols.
 
 Options:
 
@@ -69,6 +70,7 @@ Auf der Altenburg 7
 70376 Stuttgart
 Germany
 Email: schulz@eprover.org
+
 """
 
 import sys
