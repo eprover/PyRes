@@ -20,6 +20,14 @@ Options:
 --help
   Print this help.
 
+ -s
+--silent
+  Supress output of processed given clauses.
+
+ -i
+--index
+  Use indexing to speed up some operations.
+
  -t
 --delete-tautologies
   Discard the given clause if it is a tautology.
@@ -45,6 +53,9 @@ Options:
   Do not add equality axioms. This makes the prover incomplete for
   equality problems.
 
+A reasonable command line to run the prover would be:
+
+  ./pyres-fof.py -tifb -HPickGiven5 -nlargest EXAMPLES/PUZ001+1.p
 
 Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 

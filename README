@@ -37,7 +37,7 @@ equality axioms. Otherwise, it is similar to pyres-cnf.py.
 
 
 Suggested command line:
-./pyres-fof.py -tfb -HPickGiven5 -nlargest EXAMPLES/PUZ001+1.p
+./pyres-fof.py -tifb -HPickGiven5 -nlargest EXAMPLES/PUZ001+1.p
 
 
 
