@@ -214,6 +214,7 @@ class TestFormulas(unittest.TestCase):
         fp.close()
 
         self.testeq = """
+        cnf(clause, axiom, a=b).
         fof(eqab, axiom, a=b).
         fof(pa, axiom, p(a)).
         fof(fb, axiom, ![X]:f(X)=b).

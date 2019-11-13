@@ -36,9 +36,10 @@ Email: schulz@eprover.org
 import unittest
 from lexer import Lexer
 from signature import Signature
+from literals import parseLiteral
 from clauses import Clause, parseClause
 from heuristics import PickGiven2
-
+from indexing import ResolutionIndex
 
 class ClauseSet(object):
     """
@@ -172,6 +173,29 @@ class HeuristicClauseSet(ClauseSet):
         evaluation scheme.
         """
         return self.extractBestByEval(self.eval_functions.nextEval())
+
+
+class IndexedClauseSet(ClauseSet):
+    """
+    This is a normal clause set, augmented by an index that speeds up
+    the finding of resolution partners.
+    """
+    def __init__(self, clauses = []):
+        self.res_index = ResolutionIndex()
+        ClauseSet.__init__(self, clauses)
+
+    def addClause(self, clause):
+        self.res_index.insertClause(clause)
+        ClauseSet.addClause(self, clause)
+
+    def extractClause(self, clause):
+        self.res_index.removeClause(clause)
+        return ClauseSet.extractClause(self, clause)
+
+    def getResolutionLiterals(self, lit):
+        return self.res_index.getResolutionLiterals(lit)
+
+
 
 
 class TestClauseSets(unittest.TestCase):
@@ -322,16 +346,59 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         c = clauses.extractFirst()
         self.assertEqual(c, None)
 
+
+    def testIndexedClauseSetChanges(self):
+        """
+        Test that clause set initialization and parsing work.
+        """
+        lexer = Lexer(self.spec)
+        clauses = IndexedClauseSet()
+        clauses.parse(lexer)
+        print(clauses)
+        oldlen = len(clauses)
+        c = clauses.clauses[0]
+        clauses.extractClause(c)
+        self.assertEqual(len(clauses), oldlen-1)
+
+        sig = clauses.collectSig()
+        print(sig)
+
+
     def testResPositions(self):
         """
-        Test the the reolution position function works.
+        Test the the function returning all possible literal positions
+        of possible resolution partner works. The default version
+        should return the clause/position pairs of all literals in the
+        clause set.
         """
         lexer = Lexer(self.spec)
         clauses = ClauseSet()
         clauses.parse(lexer)
 
-        pos = clauses.getResolutionLiterals(["p"])
+        lexer = Lexer("hates(X,agatha)")
+        lit = parseLiteral(lexer)
+        pos = clauses.getResolutionLiterals(lit)
+        self.assertTrue(len(pos), 21)
         print(pos)
+
+    def testResIndexedPositions(self):
+        """
+        Test the the function returning all possible literal positions
+        of possible resolution partner vie indexing works. The indexed
+        version should return the clause/position pairs of all
+        literals with opposite polarity and the same top symbol as the
+        query literal.
+        """
+        lexer = Lexer(self.spec)
+        clauses = IndexedClauseSet()
+        clauses.parse(lexer)
+
+        lexer = Lexer("hates(X,agatha)")
+        lit = parseLiteral(lexer)
+        pos = clauses.getResolutionLiterals(lit)
+        self.assertTrue(len(pos), 6)
+        print(pos)
+
 
 
 

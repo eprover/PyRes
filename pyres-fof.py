@@ -87,12 +87,13 @@ from litselection import LiteralSelectors
 
 suppressEqAxioms = False
 silent           = False
+indexed          = False
 
 def processOptions(opts):
     """
     Process the options given
     """
-    global silent, suppressEqAxioms
+    global silent, indexed, suppressEqAxioms
 
     params = SearchParams()
     for opt, optarg in opts:
@@ -101,6 +102,8 @@ def processOptions(opts):
             sys.exit()
         elif opt=="-s" or opt == "--silent":
             silent = True
+        elif opt=="-i" or opt == "--index":
+            indexed = True
         elif opt=="-t" or opt == "--delete-tautologies":
             params.delete_tautologies = True
         elif opt=="-f" or opt == "--forward-subsumption":
@@ -127,11 +130,12 @@ def processOptions(opts):
     return params
 
 if __name__ == '__main__':
-    try: 
+    try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                       "hstfbH:n:S",
+                                       "hsitfbH:n:S",
                                        ["help",
                                         "silent",
+                                        "index",
                                         "delete-tautologies",
                                         "forward-subsumption",
                                         "backward-subsumption"
@@ -152,7 +156,7 @@ if __name__ == '__main__':
         problem.addEqAxioms()
     cnf = problem.clausify()
 
-    state = ProofState(params, cnf, silent)
+    state = ProofState(params, cnf, silent, indexed)
     res = state.saturate()
 
     if res != None:

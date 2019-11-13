@@ -46,7 +46,7 @@ Email: schulz@eprover.org
 import unittest
 from idents import Ident
 from lexer import Token,Lexer
-from clausesets import ClauseSet, HeuristicClauseSet
+from clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
 import heuristics
 from rescontrol import computeAllResolvents, computeAllFactors
 from subsumption import forwardSubsumption, backwardSubsumption
@@ -111,14 +111,17 @@ class ProofState(object):
     In addition to the clause sets, this data structure also maintains
     a number of counters for statistics on the proof search.
     """
-    def __init__(self, params, clauses, silent=False):
+    def __init__(self, params, clauses, silent=False, indexed=False):
         """
         Initialize the proof state with a set of clauses.
         """
         self.params = params
         self.unprocessed = HeuristicClauseSet(params.heuristics)
 
-        self.processed   = ClauseSet()
+        if indexed:
+            self.processed   = IndexedClauseSet()
+        else:
+            self.processed   = ClauseSet()
         for c in clauses.clauses:
             self.unprocessed.addClause(c)
         self.initial_clause_count = len(self.unprocessed)
