@@ -179,6 +179,12 @@ class Clause(Derivable):
         for l in selected:
             l.setInferenceLit(True)
 
+    def predicateAbstraction(self):
+        res = [l.predicateAbstraction() for l in self.literals]
+        res.sort()
+        return res
+            
+            
     def instantiate(self, subst):
         """
         Return an instantiated copy of self. Name and type are copied
@@ -366,6 +372,10 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         for l in c3.literals:
             self.assertEqual(l.isNegative(), l.isInferenceLit())
 
+        self.assertEqual(c1.predicateAbstraction(), [(True, "p"), (True, "p")])
+        self.assertEqual(c2.predicateAbstraction(), [(True, "p"), (True, "p")])
+        self.assertEqual(c3.predicateAbstraction(), [(False, "p"), (True, "p")])
+            
 
 if __name__ == '__main__':
     unittest.main()

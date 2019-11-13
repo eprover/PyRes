@@ -308,6 +308,9 @@ class Literal(object):
             res =  match(self.atom, other.atom, subst)
             return res
 
+    def predicateAbstraction(self):
+        return (self.isPositive(), termFunc(self.atom))
+
 def parseLiteral(lexer):
     """
     Parse a literal. A literal is an optional negation sign '~',
@@ -413,47 +416,53 @@ class TestLiterals(unittest.TestCase):
 
         vars = set()
         print(self.a1)
-        self.assert_(self.a1.isPositive())
-        self.assert_(not self.a1.isEquational())
+        self.assertTrue(self.a1.isPositive())
+        self.assertTrue(not self.a1.isEquational())
         self.a1.collectVars(vars)
         self.assertEqual(len(vars), 1)
         self.assertEqual(self.a1.collectFuns(), set(["p"]))
-        self.assert_(self.a1.isInferenceLit())
+        self.assertTrue(self.a1.isInferenceLit())
         self.a1.setInferenceLit(False)
-        self.assert_(not self.a1.isInferenceLit())
+        self.assertTrue(not self.a1.isInferenceLit())
         
         print(self.a2)
-        self.assert_(self.a2.isNegative())
-        self.assert_(not self.a2.isEquational())
+        self.assertTrue(self.a2.isNegative())
+        self.assertTrue(not self.a2.isEquational())
         self.a2.collectVars(vars)
         self.assertEqual(len(vars), 1)
         self.assertEqual(self.a2.collectFuns(), set(["q", "f", "a", "b"]))
 
         print(self.a3)
-        self.assert_(self.a3.isNegative())
-        self.assert_(self.a3.isEquational())
-        self.assert_(self.a3.isEqual(self.a4))
+        self.assertTrue(self.a3.isNegative())
+        self.assertTrue(self.a3.isEquational())
+        self.assertTrue(self.a3.isEqual(self.a4))
         self.a3.collectVars(vars)
         self.assertEqual(len(vars), 1)
         
         print(self.a4)
-        self.assert_(self.a4.isNegative())
-        self.assert_(self.a4.isEquational())
-        self.assert_(self.a4.isEqual(self.a3))
+        self.assertTrue(self.a4.isNegative())
+        self.assertTrue(self.a4.isEquational())
+        self.assertTrue(self.a4.isEqual(self.a3))
         self.a4.collectVars(vars)
         self.assertEqual(len(vars), 1)
         
         print(self.a5)
-        self.assert_(not self.a5.isNegative())
-        self.assert_(self.a5.isEquational())
+        self.assertTrue(not self.a5.isNegative())
+        self.assertTrue(self.a5.isEquational())
         self.a5.collectVars(vars)
         self.assertEqual(len(vars), 1)
 
         print(self.a6, self.a7)
-        self.assert_(self.a6.isOpposite(self.a7))
-        self.assert_(self.a7.isOpposite(self.a6))
-        self.assert_(not self.a6.isOpposite(self.a6))
-        self.assert_(not self.a6.isOpposite(self.a1))        
+        self.assertTrue(self.a6.isOpposite(self.a7))
+        self.assertTrue(self.a7.isOpposite(self.a6))
+        self.assertTrue(not self.a6.isOpposite(self.a6))
+        self.assertTrue(not self.a6.isOpposite(self.a1))
+
+        self.assertEqual(self.a1.predicateAbstraction(), (True, "p"))
+        self.assertEqual(self.a2.predicateAbstraction(), (False, "q"))
+        self.assertEqual(self.a3.predicateAbstraction(), (False, "="))
+        
+        
 
     def testPropProps(self):
         """
@@ -467,28 +476,28 @@ class TestLiterals(unittest.TestCase):
         l4 = parseLiteral(lex)
         l5 = parseLiteral(lex)
         
-        self.assert_(l1.isPropTrue())
-        self.assert_(not l1.isPropFalse())
+        self.assertTrue(l1.isPropTrue())
+        self.assertTrue(not l1.isPropFalse())
 
-        self.assert_(not l2.isPropTrue())
-        self.assert_(l2.isPropFalse())
+        self.assertTrue(not l2.isPropTrue())
+        self.assertTrue(l2.isPropFalse())
 
-        self.assert_(l3.isPropTrue())
-        self.assert_(not l3.isPropFalse())
+        self.assertTrue(l3.isPropTrue())
+        self.assertTrue(not l3.isPropFalse())
 
-        self.assert_(not l4.isPropTrue())
-        self.assert_(l4.isPropFalse())
+        self.assertTrue(not l4.isPropTrue())
+        self.assertTrue(l4.isPropFalse())
 
-        self.assert_(not l5.isPropTrue())
-        self.assert_(not l5.isPropFalse())
+        self.assertTrue(not l5.isPropTrue())
+        self.assertTrue(not l5.isPropFalse())
 
         l6 = l1.negate()
-        self.assert_(not l6.isPropTrue())
-        self.assert_(l6.isPropFalse())
+        self.assertTrue(not l6.isPropTrue())
+        self.assertTrue(l6.isPropFalse())
 
         l7 = l2.negate()
-        self.assert_(l7.isPropTrue())
-        self.assert_(not l7.isPropFalse())
+        self.assertTrue(l7.isPropTrue())
+        self.assertTrue(not l7.isPropFalse())
         
 
     def testAtoms(self):
@@ -517,14 +526,14 @@ class TestLiterals(unittest.TestCase):
         """
         Test literal matching.
         """
-        self.assert_(self.a1.match(self.a1, BTSubst()))
-        self.assert_(not self.a1.match(self.a2, BTSubst()))
+        self.assertTrue(self.a1.match(self.a1, BTSubst()))
+        self.assertTrue(not self.a1.match(self.a2, BTSubst()))
 
-        self.assert_(self.a1.match(self.a8, BTSubst()))
-        self.assert_(not self.a8.match(self.a1, BTSubst()))
+        self.assertTrue(self.a1.match(self.a8, BTSubst()))
+        self.assertTrue(not self.a8.match(self.a1, BTSubst()))
 
-        self.assert_(not self.a1.match(self.a2, BTSubst()))
-        self.assert_(not self.a2.match(self.a1, BTSubst()))
+        self.assertTrue(not self.a1.match(self.a2, BTSubst()))
+        self.assertTrue(not self.a2.match(self.a1, BTSubst()))
         
     def testLitList(self):
         """
@@ -550,11 +559,11 @@ class TestLiterals(unittest.TestCase):
         print(literalList2String(l5))
         self.assertEqual(len(l5),2)
 
-        self.assert_(litInLitList(l4[0], l4))
-        self.assert_(not litInLitList(self.a6, l4))
+        self.assertTrue(litInLitList(l4[0], l4))
+        self.assertTrue(not litInLitList(self.a6, l4))
         
-        self.assert_(oppositeInLitList(self.a7, l2))
-        self.assert_(not oppositeInLitList(self.a7, l4))
+        self.assertTrue(oppositeInLitList(self.a7, l2))
+        self.assertTrue(not oppositeInLitList(self.a7, l4))
 
     def testSig(self):
         """
@@ -571,12 +580,12 @@ class TestLiterals(unittest.TestCase):
         sig.addFun("mult", 2)
 
         print(sig)
-        self.assert_(sig.isPred("q"))
-        self.assert_(not sig.isPred("unknown"))
-        self.assert_(not sig.isPred("a"))
-        self.assert_(sig.isFun("a"))
-        self.assert_(not sig.isFun("unknown"))
-        self.assert_(not sig.isFun("q"))
+        self.assertTrue(sig.isPred("q"))
+        self.assertTrue(not sig.isPred("unknown"))
+        self.assertTrue(not sig.isPred("a"))
+        self.assertTrue(sig.isFun("a"))
+        self.assertTrue(not sig.isFun("unknown"))
+        self.assertTrue(not sig.isFun("q"))
 
         self.assertEqual(sig.getArity("b"),0)
         self.assertEqual(sig.getArity("p"),1)

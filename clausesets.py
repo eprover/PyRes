@@ -175,6 +175,7 @@ class HeuristicClauseSet(ClauseSet):
         return self.extractBestByEval(self.eval_functions.nextEval())
 
 
+
 class IndexedClauseSet(ClauseSet):
     """
     This is a normal clause set, augmented by an index that speeds up

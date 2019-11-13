@@ -137,13 +137,13 @@ class TestSignature(unittest.TestCase):
         
 
         print(sig)
-        self.assert_(sig.isPred("weird"))
-        self.assert_(not sig.isPred("unknown"))
-        self.assert_(not sig.isPred("a"))
-        self.assert_(sig.isFun("a"))
-        self.assert_(sig.isConstant("a"))
-        self.assert_(not sig.isFun("unknown"))
-        self.assert_(not sig.isFun("weird"))
+        self.assertTrue(sig.isPred("weird"))
+        self.assertTrue(not sig.isPred("unknown"))
+        self.assertTrue(not sig.isPred("a"))
+        self.assertTrue(sig.isFun("a"))
+        self.assertTrue(sig.isConstant("a"))
+        self.assertTrue(not sig.isFun("unknown"))
+        self.assertTrue(not sig.isFun("weird"))
 
         self.assertEqual(sig.getArity("a"),0)
         self.assertEqual(sig.getArity("weird"),4)

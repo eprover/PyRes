@@ -192,12 +192,12 @@ class TestMatching(unittest.TestCase):
        sigma = BTSubst()
        res = match(s,t, sigma)
        if success_expected:
-          self.assert_(res)
-          self.assert_(termEqual(sigma(s), t))
+          self.assertTrue(res)
+          self.assertTrue(termEqual(sigma(s), t))
           print(term2String(sigma(s)), term2String(t), sigma)
        else:
           print("Failure")
-          self.assert_(not res)
+          self.assertTrue(not res)
        print()
 
     def testMatch(self):
