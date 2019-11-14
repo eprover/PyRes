@@ -38,7 +38,7 @@ TAGS: *.py
 distrib: clean
 	cd ..; tar czf PyRes.tgz PyRes
 
-starexec:
+starexec: clean
 	echo $(STAREXECPATH)
 	rm -rf $(STAREXECPATH)
 	mkdir -p $(STAREXECPATH)/bin
