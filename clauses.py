@@ -180,9 +180,17 @@ class Clause(Derivable):
             l.setInferenceLit(True)
 
     def predicateAbstraction(self):
+        """
+        The predicate abstraction of a clause is an ordered tuple of
+        the predicate abstractions of its literals. As an example, the
+        predicate abstraction of p(x)|~q(Y)|q(a) would be 
+        ((False, q), (True, p), (True, q)) (assuming True > False and
+        q > p). We will use this later to implement a simple
+        subsumption index.
+        """
         res = [l.predicateAbstraction() for l in self.literals]
         res.sort()
-        return res
+        return tuple(res)
             
             
     def instantiate(self, subst):
@@ -372,9 +380,9 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         for l in c3.literals:
             self.assertEqual(l.isNegative(), l.isInferenceLit())
 
-        self.assertEqual(c1.predicateAbstraction(), [(True, "p"), (True, "p")])
-        self.assertEqual(c2.predicateAbstraction(), [(True, "p"), (True, "p")])
-        self.assertEqual(c3.predicateAbstraction(), [(False, "p"), (True, "p")])
+        self.assertEqual(c1.predicateAbstraction(), ((True, "p"), (True, "p")))
+        self.assertEqual(c2.predicateAbstraction(), ((True, "p"), (True, "p")))
+        self.assertEqual(c3.predicateAbstraction(), ((False, "p"), (True, "p")))
             
 
 if __name__ == '__main__':

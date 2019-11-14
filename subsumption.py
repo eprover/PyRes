@@ -53,7 +53,6 @@ from literals import Literal
 from clauses import Clause, parseClause
 from clausesets import ClauseSet
 
-
 def subsumeLitLists(subsumer, subsumed, subst):
     """
     Try to extend subst so that subst(subsumer) is a multi-subset of
@@ -81,12 +80,12 @@ def subsumes(subsumer, subsumed):
     subsumed_list = subsumed.literals
     return subsumeLitLists(subsumer_list, subsumed_list, subst)
 
-
 def forwardSubsumption(set, clause):
     """
     Return True if any clause from set subsumes clause, False otherwise.
     """
-    for c in set.clauses:
+    candidates = set.getSubsumingCandidates(clause)
+    for c in candidates:
         if subsumes(c, clause):
             return True
     return False
@@ -96,8 +95,9 @@ def backwardSubsumption(clause, set):
     """
     Remove all clauses that are subsumed by clause from set. 
     """
+    candidates = set.getSubsumedCandidates(clause)
     subsumed_set = []
-    for c in set.clauses:
+    for c in candidates:
         if subsumes(clause, c):
             subsumed_set.append(c)
     res = len(subsumed_set)

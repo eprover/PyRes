@@ -309,6 +309,14 @@ class Literal(object):
             return res
 
     def predicateAbstraction(self):
+        """
+        The predicate abstraction of a literal is a pair (pol, pred),
+        where pol is an encoding of the polarity (abritrarily True for
+        positive, False for negative), and pred is the predicate
+        symbol of the atom of the literal. Predicate abstractions can
+        be used to quickly reject the possibility that two literals
+        can be unified with or matched to each other.
+        """
         return (self.isPositive(), termFunc(self.atom))
 
 def parseLiteral(lexer):

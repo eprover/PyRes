@@ -131,7 +131,125 @@ class ResolutionIndex(object):
         except KeyError:
             return list()
                     
+def predAbstractionIsSubSequence(candidate, superseq):
+    """
+    Check if candidate is a subsequence of superseq. That is a
+    necessary condition for the clause that produced candidate to
+    subsume the clause that produced superseq.
+    """
+    i = 0
+    end = len(superseq)
+    try:
+        for la in candidate:
+            while superseq[i]!=la:
+                i = i+1
+            i = i+1
+    except IndexError:
+        return False
+    return True
+        
 
+class SubsumptionIndex(object):
+    """
+    This class implements a simple index to speed up subsumption. This
+    is based on the predicate abstraction of a clause. The index
+    organises clauses by there predicate abstraction. Since we know
+    that a clause C can only subsume a clause c if C's predicate
+    abstraction is a subset of c's predicate abstraction, we can
+    exclude whole sets of clauses at once.
+    """
+    def __init__(self):
+        """
+        We store predicate abstractions (with associated clauses) in a
+        dictionary for for fast access by abstraction. We also store
+        them in an array sorted by length, so that we only need to
+        consider stored clauses that are short enough to have a chance
+        to subsume.
+        """
+        self.pred_abstr_set = {}
+        self.pred_abstr_arr = []
+
+    def insertClause(self, clause):
+        """
+        Insert a clause into the index. If the predicate abstraction
+        already is stored, just add the clause to the associated set
+        of clauses. Otherwise, create a new entry for the pa and add
+        the clause.
+        """
+        pa = clause.predicateAbstraction()
+
+        try:
+            entry =  self.pred_abstr_set[pa]
+        except KeyError:
+            entry = set()
+            self.pred_abstr_set[pa] = entry
+            l = len(pa)
+            i = 0
+            for (len_pa, spa, clauses) in self.pred_abstr_arr:
+                if len_pa >= l:
+                    break
+                i = i+1
+            self.pred_abstr_arr.insert(i, (l, pa, entry))
+
+        entry.add(clause)
+            
+    def removeClause(self, clause):
+        """
+        Remove a clause. This is easy, since we never remove the entry
+        for the predicate abstraction, only the clause from its
+        set. In general, successful backward subsumption is rare, so
+        deletion of a processed clause will be rare, too.
+        """
+        pa = clause.predicateAbstraction()
+        entry = self.pred_abstr_set[pa]
+        entry.remove(clause)
+
+    def isIndexed(self, clause):
+        """
+        Return True if a clause is in the index. At the moment, this
+        is only used for unit tests.
+        """
+        pa = clause.predicateAbstraction()
+
+        try:
+            entry =  self.pred_abstr_set[pa]
+            return clause in entry
+        except KeyError:
+            return False
+
+    def getSubsumingCandidates(self, queryclause):
+        """
+        Return a list of all clauses that can potentially subsume the
+        query. This goes through the relevant part of the list of
+        predicate abstractions and collects the clauses stored with
+        predicate abstractions compatible with subsumption.
+        """
+        pa = queryclause.predicateAbstraction()
+        pa_len = len(pa)
+        res = list()
+        for (cpa_len, cpa, clauses) in self.pred_abstr_arr:
+            if cpa_len > pa_len:
+                break
+            if predAbstractionIsSubSequence(cpa, pa):
+                res.extend(clauses)
+        return res               
+
+    def getSubsumedCandidates(self, queryclause):
+        """
+        Return a list of all clauses that can potentially be subsumed
+        by query. See previous function
+        """
+        pa = queryclause.predicateAbstraction()
+        pa_len = len(pa)
+        res = list()
+        for (cpa_len, cpa, clauses) in self.pred_abstr_arr:
+            if cpa_len < pa_len:
+                continue
+            if predAbstractionIsSubSequence(pa, cpa):
+                res.extend(clauses)
+        return res               
+
+    
 class TestIndexing(unittest.TestCase):
     """
     Unit test class for clauses. Test clause and literal
@@ -147,10 +265,11 @@ cnf(c1,axiom,p(a, X)|p(X,a)).
 cnf(c2,axiom,~p(a,b)|p(f(Y),a)).
 cnf(c3,axiom,q(Z,X)|~q(f(Z),X0)).
 cnf(c4,axiom,p(X,X)|p(a,f(Y))).
-cnf(c5,axiom,p(X)|~q(b)|p(a)|~q(a)|p(Y)).
-cnf(c6,axiom,~p(a)).
-cnf(c7,axiom, q(f(a))).
+cnf(c5,axiom,p(X,Y)|~q(b,a)|p(a,b)|~q(a,b)|p(Y,a)).
+cnf(c6,axiom,~p(a,X)).
+cnf(c7,axiom, q(f(a),a)).
 cnf(c8,axiom, r(f(a))).
+cnf(c9,axiom, p(X,Y)).
 """
         lex = Lexer(self.spec)
         self.c1 = clauses.parseClause(lex)
@@ -161,6 +280,7 @@ cnf(c8,axiom, r(f(a))).
         self.c6 = clauses.parseClause(lex)
         self.c7 = clauses.parseClause(lex)
         self.c8 = clauses.parseClause(lex)
+        self.c9 = clauses.parseClause(lex)
        
     def testResolutionInsertRemove(self):
         """
@@ -234,6 +354,96 @@ cnf(c8,axiom, r(f(a))).
         print(cands)
         self.assertEqual(cands, [])
 
-            
+    def testPredAbstraction(self):
+        p1 = []
+        p2 = [(True, "p")]
+        p3 = [(True, "p"), (True, "p"), (True, "q")]
+        p4 = [(False, "p"), (True, "p")]
+
+        self.assertTrue(predAbstractionIsSubSequence(p1, p1))
+        self.assertTrue(predAbstractionIsSubSequence(p2, p2))
+        self.assertTrue(predAbstractionIsSubSequence(p3, p3))
+        self.assertTrue(predAbstractionIsSubSequence(p4, p4))
+
+        self.assertTrue(predAbstractionIsSubSequence(p1, p2))
+        self.assertTrue(predAbstractionIsSubSequence(p1, p3))
+        self.assertTrue(predAbstractionIsSubSequence(p1, p4))
+
+        self.assertTrue(predAbstractionIsSubSequence(p2, p3))
+        self.assertTrue(predAbstractionIsSubSequence(p2, p4))
+
+        self.assertFalse(predAbstractionIsSubSequence(p2, p1))
+        self.assertFalse(predAbstractionIsSubSequence(p3, p1))
+        self.assertFalse(predAbstractionIsSubSequence(p4, p1))
+
+        self.assertFalse(predAbstractionIsSubSequence(p3, p2))
+        self.assertFalse(predAbstractionIsSubSequence(p4, p2)) 
+
+        self.assertFalse(predAbstractionIsSubSequence(p3, p4))
+        self.assertFalse(predAbstractionIsSubSequence(p4, p3))
+               
+    def testSubsumptionIndex(self):
+        index = SubsumptionIndex()
+
+        self.assertFalse(index.isIndexed(self.c1))
+        self.assertFalse(index.isIndexed(self.c6))
+        index.insertClause(self.c1)
+        index.insertClause(self.c2)
+        index.insertClause(self.c3)
+        index.insertClause(self.c4)
+        index.insertClause(self.c5)
+        index.insertClause(self.c6)
+        print(index.pred_abstr_arr)
+        self.assertTrue(index.isIndexed(self.c1))
+        self.assertTrue(index.isIndexed(self.c2))
+        self.assertTrue(index.isIndexed(self.c3))
+        self.assertTrue(index.isIndexed(self.c4))
+        self.assertTrue(index.isIndexed(self.c5))
+        self.assertTrue(index.isIndexed(self.c6))
+       
+        index.removeClause(self.c1)
+        index.removeClause(self.c5)
+        index.removeClause(self.c3)
+        print(index.pred_abstr_arr)
+        self.assertFalse(index.isIndexed(self.c1))
+        self.assertTrue(index.isIndexed(self.c2))
+        self.assertFalse(index.isIndexed(self.c3))
+        self.assertTrue(index.isIndexed(self.c4))
+        self.assertFalse(index.isIndexed(self.c5))
+        self.assertTrue(index.isIndexed(self.c6))
+        
+        index.insertClause(self.c3)
+        index.insertClause(self.c1)
+        index.insertClause(self.c5)
+        index.insertClause(self.c9)
+        print(index.pred_abstr_arr)
+        self.assertTrue(index.isIndexed(self.c1))
+        self.assertTrue(index.isIndexed(self.c2))
+        self.assertTrue(index.isIndexed(self.c3))
+        self.assertTrue(index.isIndexed(self.c4))
+        self.assertTrue(index.isIndexed(self.c5))
+        self.assertTrue(index.isIndexed(self.c6))
+        self.assertTrue(index.isIndexed(self.c9))
+        
+        cands = index.subsumingCandidates(self.c1)
+        print(cands)
+        self.assertEqual(len(cands), 3)
+        cands = index.subsumingCandidates(self.c9)
+        print(cands)
+        self.assertEqual(len(cands), 1)
+
+        cands = index.subsumedCandidates(self.c9)
+        print(cands)
+        self.assertEqual(len(cands), 5)
+
+        cands = index.subsumedCandidates(self.c8)
+        print(cands)
+        self.assertEqual(len(cands), 0)
+
+        cands = index.subsumedCandidates(self.c5)
+        print(cands)
+        self.assertEqual(len(cands), 1)
+
+        
 if __name__ == '__main__':
     unittest.main()

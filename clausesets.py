@@ -39,7 +39,7 @@ from signature import Signature
 from literals import parseLiteral
 from clauses import Clause, parseClause
 from heuristics import PickGiven2
-from indexing import ResolutionIndex
+from indexing import ResolutionIndex, SubsumptionIndex
 
 class ClauseSet(object):
     """
@@ -111,6 +111,23 @@ class ClauseSet(object):
                c.getLiteral(i).isInferenceLit()]
         return res
 
+    def getSubsumingCandidates(self, queryclause):
+        """
+        Return a subset (as a list) of all clauses potentially
+        subsuming queryclause). For plain clause sets, we just return
+        all clauses.
+        """
+        return self.clauses
+
+    def getSubsumedCandidates(self, queryclause):
+        """
+        Return a subset (as a list) of all clauses potentially
+        subsumed by queryclause). For plain clause sets, we just return
+        all clauses.
+        """
+        return self.clauses
+        
+
     def parse(self, lexer):
         """
         Parse a sequence of clauses from lex and add them to the
@@ -178,25 +195,52 @@ class HeuristicClauseSet(ClauseSet):
 
 class IndexedClauseSet(ClauseSet):
     """
-    This is a normal clause set, augmented by an index that speeds up
-    the finding of resolution partners.
+    This is a normal clause set, augmented by indices that speeds up
+    the finding of resolution and subsumption partners.
     """
     def __init__(self, clauses = []):
+        """
+        Create the two indices and call the superclass initializer. 
+        """
         self.res_index = ResolutionIndex()
+        self.sub_index = SubsumptionIndex()
         ClauseSet.__init__(self, clauses)
 
     def addClause(self, clause):
+        """
+        Add the clause to the indices, then use the  superclass
+        function to add it to the actual set.
+        """
         self.res_index.insertClause(clause)
+        self.sub_index.insertClause(clause)
         ClauseSet.addClause(self, clause)
 
     def extractClause(self, clause):
+        """
+        Remove the clause from the indices, then use the  superclass
+        function to remove it to the actual set.
+        """
         self.res_index.removeClause(clause)
+        self.sub_index.removeClause(clause)
         return ClauseSet.extractClause(self, clause)
 
     def getResolutionLiterals(self, lit):
+        """
+        Overwrite the original function with one based on indexing. 
+        """
         return self.res_index.getResolutionLiterals(lit)
 
+    def getSubsumingCandidates(self, queryclause):
+        """
+        Overwrite the original function with one based on indexing. 
+        """
+        return self.sub_index.getSubsumingCandidates(queryclause)
 
+    def getSubsumedCandidates(self, queryclause):
+        """
+        Overwrite the original function with one based on indexing. 
+        """
+        return self.sub_index.getSubsumedCandidates(queryclause)
 
 
 class TestClauseSets(unittest.TestCase):

@@ -8,7 +8,7 @@
 #
 echo -n "% Problem    : " ; head -2 $1 | tail -1 | sed -e "s/.*  : //"
 set ProblemSPC=`grep " SPC " $1 | sed -e "s/.* : //"`
-set flags="-tifbs -nlargest -HPickGiven5 "
+set flags="-tifbsp -nlargest -HPickGiven5 "
 set final=" "$1
 set ecmd="./pyres-fof.py $flags $final"
 
