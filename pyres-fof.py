@@ -24,6 +24,11 @@ Options:
 --silent
   Supress output of processed given clauses.
 
+ -p
+--proof
+  Construct and print an explicit proof object (or the derivation of
+  the saturated clause set if no proof can be found).
+
  -i
 --index
   Use indexing to speed up some operations.
@@ -99,12 +104,13 @@ from litselection import LiteralSelectors
 suppressEqAxioms = False
 silent           = False
 indexed          = False
+proofObject      = False
 
 def processOptions(opts):
     """
     Process the options given
     """
-    global silent, indexed, suppressEqAxioms
+    global silent, indexed, suppressEqAxioms, proofObject
 
     params = SearchParams()
     for opt, optarg in opts:
@@ -113,6 +119,8 @@ def processOptions(opts):
             sys.exit()
         elif opt=="-s" or opt == "--silent":
             silent = True
+        elif opt=="-p" or opt == "--proof":
+            proofObject = True
         elif opt=="-i" or opt == "--index":
             indexed = True
         elif opt=="-t" or opt == "--delete-tautologies":
@@ -143,9 +151,10 @@ def processOptions(opts):
 if __name__ == '__main__':
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                       "hsitfbH:n:S",
+                                       "hspitfbH:n:S",
                                        ["help",
                                         "silent",
+                                        "proof",
                                         "index",
                                         "delete-tautologies",
                                         "forward-subsumption",
@@ -175,24 +184,28 @@ if __name__ == '__main__':
             print("# SZS status Theorem")
         else:
             print("# SZS status Unsatisfiable")
-        proof = res.orderedDerivation()
-        enableDerivationOutput()
-        print("# SZS output start CNFRefutation")
-        for s in proof:
-            print(s)
-        print("# SZS output end CNFRefutation")
-        disableDerivationOutput()
+        if proofObject:
+            proof = res.orderedDerivation()
+            enableDerivationOutput()        
+            print("# SZS output start CNFRefutation")
+            for s in proof:
+                print(s)
+            print("# SZS output end CNFRefutation")
+            disableDerivationOutput()
     else:
         if problem.isFof and problem.hasConj:
             print("# SZS status CounterSatisfiable")
         else:
             print("# SZS status Satisfiable")
-        dummy = Derivable("dummy", flatDerivation("pseudoreference", state.processed.clauses))
-        sat = dummy.orderedDerivation()
-        enableDerivationOutput()
-        print("# SZS output start Saturation")
-        for s in sat[:-1]:
-            print(s)
-        print("# SZS output end Saturation")
-        disableDerivationOutput()
+        if proofObject:
+            dummy = Derivable("dummy",
+                              flatDerivation("pseudoreference",
+                                             state.processed.clauses))
+            sat = dummy.orderedDerivation()
+            enableDerivationOutput()
+            print("# SZS output start Saturation")
+            for s in sat[:-1]:
+                print(s)
+            print("# SZS output end Saturation")
+            disableDerivationOutput()
     print(state.statisticsStr())
