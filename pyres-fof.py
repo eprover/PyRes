@@ -3,7 +3,7 @@
 #
 # Module pyres-fof.py
 
-"""pyres-fof.py 1.1
+"""pyres-fof.py 1.2
 
 Usage: pyres-fof.py [options] <problem_file>
 
@@ -91,6 +91,7 @@ Email: schulz@eprover.org
 
 import sys
 import getopt
+from resource import getrusage, RUSAGE_SELF
 from lexer import Token,Lexer
 from derivations import enableDerivationOutput,disableDerivationOutput,Derivable,flatDerivation
 from clausesets import ClauseSet
@@ -186,7 +187,7 @@ if __name__ == '__main__':
             print("# SZS status Unsatisfiable")
         if proofObject:
             proof = res.orderedDerivation()
-            enableDerivationOutput()        
+            enableDerivationOutput()
             print("# SZS output start CNFRefutation")
             for s in proof:
                 print(s)
@@ -209,3 +210,11 @@ if __name__ == '__main__':
             print("# SZS output end Saturation")
             disableDerivationOutput()
     print(state.statisticsStr())
+
+    # We use the resources interface to get and print the CPU time
+    resources = getrusage(RUSAGE_SELF)
+    print("# -------- CPU Time ---------")
+    print("# User time          : %.3f s"%(resources.ru_utime,))
+    print("# System time        : %.3f s"%(resources.ru_stime,))
+    print("# Total time         : %.3f s"%(resources.ru_utime+
+                                           resources.ru_stime,))

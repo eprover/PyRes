@@ -3,7 +3,7 @@
 #
 # Module pyres-simple.py
 
-"""pyres-simple.py 1.1
+"""pyres-simple.py 1.2
 
 Usage: pyres-simple.py <problem_file>
 
@@ -34,7 +34,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -61,18 +61,18 @@ def processOptions(opts):
         if opt == "-h" or opt == "--help":
             print(__doc__)
             sys.exit()
-            
+
 if __name__ == '__main__':
-    try: 
+    try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
                                        "h",
                                        ["help"])
     except getopt.GetoptError as err:
         print(sys.argv[0],":", err)
         sys.exit(1)
-        
+
     processOptions(opts)
-    
+
     problem = ClauseSet()
     for file in args:
         fp = open(file, "r")
