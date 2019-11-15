@@ -129,7 +129,7 @@ def processOptions(opts):
         elif opt=="-f" or opt == "--forward-subsumption":
             params.forward_subsumption = True
         elif opt=="-b" or opt == "--backward_subsumption":
-            params.backward_subsuption = True
+            params.backward_subsumption = True
         elif opt=="-H" or opt == "--given-clause-heuristic":
             try:
                 params.heuristics = GivenClauseHeuristics[optarg]

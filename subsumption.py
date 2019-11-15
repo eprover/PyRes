@@ -34,7 +34,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -71,7 +71,7 @@ def subsumeLitLists(subsumer, subsumed, subst):
 
 def subsumes(subsumer, subsumed):
     """
-    Return True if subsumer subsumes subsumed, False otherwise. 
+    Return True if subsumer subsumes subsumed, False otherwise.
     """
     if len(subsumer) > len(subsumed):
         return False
@@ -93,7 +93,7 @@ def forwardSubsumption(set, clause):
 
 def backwardSubsumption(clause, set):
     """
-    Remove all clauses that are subsumed by clause from set. 
+    Remove all clauses that are subsumed by clause from set.
     """
     candidates = set.getSubsumedCandidates(clause)
     subsumed_set = []
@@ -141,20 +141,20 @@ cnf(axiom, c7, Y=Y).
         self.cset.addClause(self.c5)
         self.cset.addClause(self.c6)
         self.cset.addClause(self.c7)
-        
+
     def testSubsumption(self):
         """
         Test subsumption.
         """
         res = subsumes(self.c1, self.c1)
         self.assertTrue(res)
-        
+
         res = subsumes(self.c2, self.c2)
         self.assertTrue(res)
 
         res = subsumes(self.c3, self.c3)
         self.assertTrue(res)
-        
+
         res = subsumes(self.c4, self.c4)
         self.assertTrue(res)
 
@@ -172,7 +172,7 @@ cnf(axiom, c7, Y=Y).
 
         res = subsumes(self.c4, self.c5)
         self.assertTrue(res)
-        
+
         res = subsumes(self.c5, self.c4)
         self.assertTrue(not res)
 
@@ -191,7 +191,7 @@ cnf(axiom, c7, Y=Y).
 
         tmp = backwardSubsumption(self.c1, self.cset)
         self.assertEqual(tmp, 6)
-        
-        
+
+
 if __name__ == '__main__':
     unittest.main()
