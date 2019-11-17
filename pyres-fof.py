@@ -91,6 +91,7 @@ Email: schulz@eprover.org
 
 import sys
 import getopt
+from signal import  signal, SIGXCPU
 from resource import getrusage, RUSAGE_SELF
 from lexer import Token,Lexer
 from derivations import enableDerivationOutput,disableDerivationOutput,Derivable,flatDerivation
@@ -152,7 +153,17 @@ def processOptions(opts):
 
     return params
 
+def timeoutHandler(sign, frame):
+    """
+    """
+    print("# Failure: Resource limit exceeded (time)")
+    print("# SZS status ResourceOut")
+    sys.exit(0)
+
+
 if __name__ == '__main__':
+    signal(SIGXCPU, timeoutHandler)
+
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
                                        "hsVpitfbH:n:S",
