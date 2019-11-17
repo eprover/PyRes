@@ -155,6 +155,10 @@ def processOptions(opts):
 
 def timeoutHandler(sign, frame):
     """
+    This will be called if the process receives a SIGXCPU error. In
+    that case, we print an informative message before terminating. We
+    expect this signal from the benchmark environment (typically
+    StarExec).
     """
     print("# Failure: Resource limit exceeded (time)")
     print("# SZS status ResourceOut")
