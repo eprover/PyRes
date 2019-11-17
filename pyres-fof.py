@@ -102,6 +102,7 @@ from saturation import SearchParams,ProofState
 from litselection import LiteralSelectors
 
 
+version          = "1.2"
 suppressEqAxioms = False
 silent           = False
 indexed          = False
@@ -120,6 +121,8 @@ def processOptions(opts):
             sys.exit()
         elif opt=="-s" or opt == "--silent":
             silent = True
+        elif opt=="-V" or opt == "--version":
+            print("# Version: ", version)
         elif opt=="-p" or opt == "--proof":
             proofObject = True
         elif opt=="-i" or opt == "--index":
@@ -152,9 +155,10 @@ def processOptions(opts):
 if __name__ == '__main__':
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                       "hspitfbH:n:S",
+                                       "hsVpitfbH:n:S",
                                        ["help",
                                         "silent",
+                                        "version",
                                         "proof",
                                         "index",
                                         "delete-tautologies",
