@@ -46,7 +46,7 @@ Suggested command line:
 The system comes as a zip file in StarExec compatible format. It
 requires (any) Python3 as python3
 
-The runscript is starexec_run_PyRes
+The runscript is starexec_run_PyRes_default
 
 Problem is CNF and unsatisfiable:
 
