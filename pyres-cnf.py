@@ -3,7 +3,7 @@
 #
 # Module pyres-cnf.py
 
-"""pyres-cnf.py 1.2
+"""pyres-cnf.py 1.3
 
 Usage: pyres-cnf.py [options] <problem_file>
 

@@ -20,7 +20,7 @@ structure contains additional information that is useful, but not
 strictly necessary from a clogic/alculus point of view.
 
 
-Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2020 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ class Clause(Derivable):
         """
         Initialize the clause.
         """
-        self.literals   = literals
+        self.literals   = [l for l in literals if not l.isPropFalse()]
         self.type       = type
         self.evaluation = None
         Derivable.__init__(self, name)
@@ -183,7 +183,7 @@ class Clause(Derivable):
         """
         The predicate abstraction of a clause is an ordered tuple of
         the predicate abstractions of its literals. As an example, the
-        predicate abstraction of p(x)|~q(Y)|q(a) would be 
+        predicate abstraction of p(x)|~q(Y)|q(a) would be
         ((False, q), (True, p), (True, q)) (assuming True > False and
         q > p). We will use this later to implement a simple
         subsumption index.
@@ -191,8 +191,8 @@ class Clause(Derivable):
         res = [l.predicateAbstraction() for l in self.literals]
         res.sort()
         return tuple(res)
-            
-            
+
+
     def instantiate(self, subst):
         """
         Return an instantiated copy of self. Name and type are copied
@@ -383,7 +383,7 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         self.assertEqual(c1.predicateAbstraction(), ((True, "p"), (True, "p")))
         self.assertEqual(c2.predicateAbstraction(), ((True, "p"), (True, "p")))
         self.assertEqual(c3.predicateAbstraction(), ((False, "p"), (True, "p")))
-            
+
 
 if __name__ == '__main__':
     unittest.main()

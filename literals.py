@@ -43,7 +43,7 @@ forms internally. In other words, the symbol != only occurs during
 parsing and printing.
 
 
-Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2020 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -87,7 +87,7 @@ def parseAtom(lexer):
 
     In either case, we represent the atom as a first-order
     term. Equational literals are represented at terms with faux
-    function symbols "=" and "!=". 
+    function symbols "=" and "!=".
     """
     atom = parseTerm(lexer)
     if lexer.TestTok([Token.EqualSign, Token.NotEqualSign]):
@@ -97,10 +97,10 @@ def parseAtom(lexer):
         op  = lexer.Next().literal
         lhs = atom
         rhs = parseTerm(lexer)
-        atom = list([op, lhs, rhs])        
+        atom = list([op, lhs, rhs])
 
     return atom
-    
+
 def atom2String(atom):
     if termFunc(atom) in ["=", "!="]:
         arg1 = termArgs(atom)[0]
@@ -144,7 +144,7 @@ class Literal(object):
             self.negative = negative
             self.atom = atom
         self.setInferenceLit(True)
-        
+
     def __repr__(self):
         """
         Return a string representation of the literal.
@@ -153,7 +153,7 @@ class Literal(object):
             op = "="
             if self.isNegative():
                 op = "!="
-                
+
             result = term2String(termArgs(self.atom)[0])+\
                      op+\
                      term2String(termArgs(self.atom)[1])
@@ -186,7 +186,7 @@ class Literal(object):
         Return true if the literal is negative.
         """
         return self.negative
-    
+
     def isPositive(self):
         """
         Return true if the literal is positive.
@@ -206,7 +206,7 @@ class Literal(object):
     def isInferenceLit(self):
         """
         Return the status of a literal as inference literal (see
-        above). 
+        above).
         """
         return self.inference_lit
 
@@ -216,21 +216,21 @@ class Literal(object):
         """
         return ((self.isNegative() and
                  atomIsConstFalse(self.atom))
-                or 
+                or
                 (self.isPositive() and
                  atomIsConstTrue(self.atom)))
-        
+
     def isPropFalse(self):
         """
         Return True if the literal is of the form $false or ~$true.
         """
         return ((self.isNegative() and
                  atomIsConstTrue(self.atom))
-                or 
+                or
                 (self.isPositive() and
                  atomIsConstFalse(self.atom)))
 
-                
+
     def isEqual(self, other):
         """
         Return true if the literal is structurally identical to
@@ -270,11 +270,11 @@ class Literal(object):
         """
         if not sig:
             sig = Signature()
-            
+
         sig.addPred(termFunc(self.atom), len(self.atom)-1)
         for s in termArgs(self.atom):
-            termCollectSig(s, sig)            
-        return sig    
+            termCollectSig(s, sig)
+        return sig
 
 
     def instantiate(self, subst):
@@ -288,11 +288,16 @@ class Literal(object):
         """
         Return a copy of self with oposite polarity.
         """
-        return Literal(termCopy(self.atom), not self.negative)
+        if self.isPropTrue():
+            return Literal(["$false"])
+        elif self.isPropFalse():
+            return Literal(["$true"])
+        else:
+            return Literal(termCopy(self.atom), not self.negative)
 
     def weight(self, fweight, vweight):
         """
-        Return the symbol count weight of the literal.        
+        Return the symbol count weight of the literal.
         """
         return termWeight(self.atom, fweight, vweight)
 
@@ -300,7 +305,7 @@ class Literal(object):
         """
         Try to extend subst a match from self to other. Return True on
         success, False otherwise. In the False case, subst is
-        unchanged. 
+        unchanged.
         """
         if self.isNegative()!=other.isNegative():
             return False
@@ -331,7 +336,7 @@ def parseLiteral(lexer):
     atom = parseAtom(lexer)
 
     return Literal(atom, negative)
-    
+
 
 def parseLiteralList(lexer):
     """
@@ -345,10 +350,10 @@ def parseLiteralList(lexer):
     else:
         lit = parseLiteral(lexer)
         res.append(lit)
-    
+
     while lexer.TestTok(Token.Or):
         lexer.Next()
-        
+
         if lexer.LookLit()=="$false":
             lexer.Next()
         else:
@@ -366,7 +371,7 @@ def literalList2String(list):
     if not list:
         return "$false"
     return "|".join(map(repr, list))
-    
+
 
 def litInLitList(lit, litlist):
     """
@@ -405,7 +410,7 @@ class TestLiterals(unittest.TestCase):
         self.input3="$false"
         self.input4="$false|~q(f(X,a), b)|$false"
         self.input5="p(a)|p(f(X))"
-        
+
         lexer = Lexer(self.input1)
         self.a1 = parseLiteral(lexer)
         self.a2 = parseLiteral(lexer)
@@ -432,7 +437,7 @@ class TestLiterals(unittest.TestCase):
         self.assertTrue(self.a1.isInferenceLit())
         self.a1.setInferenceLit(False)
         self.assertTrue(not self.a1.isInferenceLit())
-        
+
         print(self.a2)
         self.assertTrue(self.a2.isNegative())
         self.assertTrue(not self.a2.isEquational())
@@ -446,14 +451,14 @@ class TestLiterals(unittest.TestCase):
         self.assertTrue(self.a3.isEqual(self.a4))
         self.a3.collectVars(vars)
         self.assertEqual(len(vars), 1)
-        
+
         print(self.a4)
         self.assertTrue(self.a4.isNegative())
         self.assertTrue(self.a4.isEquational())
         self.assertTrue(self.a4.isEqual(self.a3))
         self.a4.collectVars(vars)
         self.assertEqual(len(vars), 1)
-        
+
         print(self.a5)
         self.assertTrue(not self.a5.isNegative())
         self.assertTrue(self.a5.isEquational())
@@ -469,13 +474,13 @@ class TestLiterals(unittest.TestCase):
         self.assertEqual(self.a1.predicateAbstraction(), (True, "p"))
         self.assertEqual(self.a2.predicateAbstraction(), (False, "q"))
         self.assertEqual(self.a3.predicateAbstraction(), (False, "="))
-        
-        
+
+
 
     def testPropProps(self):
         """
         Test if literals are correctly handled as propositional
-        constants. 
+        constants.
         """
         lex = Lexer("$true $false ~$false ~$true p(a)")
         l1 = parseLiteral(lex)
@@ -483,7 +488,7 @@ class TestLiterals(unittest.TestCase):
         l3 = parseLiteral(lex)
         l4 = parseLiteral(lex)
         l5 = parseLiteral(lex)
-        
+
         self.assertTrue(l1.isPropTrue())
         self.assertTrue(not l1.isPropFalse())
 
@@ -506,7 +511,7 @@ class TestLiterals(unittest.TestCase):
         l7 = l2.negate()
         self.assertTrue(l7.isPropTrue())
         self.assertTrue(not l7.isPropFalse())
-        
+
 
     def testAtoms(self):
         """
@@ -542,7 +547,7 @@ class TestLiterals(unittest.TestCase):
 
         self.assertTrue(not self.a1.match(self.a2, BTSubst()))
         self.assertTrue(not self.a2.match(self.a1, BTSubst()))
-        
+
     def testLitList(self):
         """
         Test literal list parsing and printing.
@@ -550,18 +555,18 @@ class TestLiterals(unittest.TestCase):
         lexer = Lexer(self.input2)
         l2 = parseLiteralList(lexer)
         print(literalList2String(l2))
-        self.assertEqual(len(l2),5) 
+        self.assertEqual(len(l2),5)
 
         lexer = Lexer(self.input3)
         l3 = parseLiteralList(lexer)
         print(literalList2String(l3))
-        self.assertEqual(len(l3),0) 
+        self.assertEqual(len(l3),0)
 
         lexer = Lexer(self.input4)
         l4 = parseLiteralList(lexer)
         print(literalList2String(l4))
         self.assertEqual(len(l4),1)
-        
+
         lexer = Lexer(self.input5)
         l5 = parseLiteralList(lexer)
         print(literalList2String(l5))
@@ -569,7 +574,7 @@ class TestLiterals(unittest.TestCase):
 
         self.assertTrue(litInLitList(l4[0], l4))
         self.assertTrue(not litInLitList(self.a6, l4))
-        
+
         self.assertTrue(oppositeInLitList(self.a7, l2))
         self.assertTrue(not oppositeInLitList(self.a7, l4))
 

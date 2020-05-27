@@ -3,7 +3,7 @@
 #
 # Module pyres-fof.py
 
-"""pyres-fof.py 1.2
+"""pyres-fof.py 1.3
 
 Usage: pyres-fof.py [options] <problem_file>
 
