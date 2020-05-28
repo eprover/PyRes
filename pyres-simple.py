@@ -3,8 +3,7 @@
 #
 # Module pyres-simple.py
 
-"""pyres-simple.py 1.2
-
+"""
 Usage: pyres-simple.py <problem_file>
 
 This is a straightforward implementation of a simple resolution-based
@@ -19,7 +18,7 @@ Options:
 --help
   Print this help.
 
-Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2011-2020 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,6 +47,7 @@ Email: schulz@eprover.org
 
 import sys
 import getopt
+from version import version
 from lexer import Token,Lexer
 from clausesets import ClauseSet
 from simplesat import SimpleProofState
@@ -59,6 +59,7 @@ def processOptions(opts):
     """
     for opt, optarg in opts:
         if opt == "-h" or opt == "--help":
+            print("pyres-simple.py "+version)
             print(__doc__)
             sys.exit()
 

@@ -3,8 +3,7 @@
 #
 # Module pyres-cnf.py
 
-"""pyres-cnf.py 1.3
-
+"""
 Usage: pyres-cnf.py [options] <problem_file>
 
 This is a straightforward implementation of a simple resolution-based
@@ -64,6 +63,7 @@ Email: schulz@eprover.org
 
 import sys
 import getopt
+from version import version
 from lexer import Token,Lexer
 from derivations import enableDerivationOutput,disableDerivationOutput
 from clausesets import ClauseSet
@@ -79,6 +79,7 @@ def processOptions(opts):
     params = SearchParams()
     for opt, optarg in opts:
         if opt == "-h" or opt == "--help":
+            print("pyres-cnf.py "+version)
             print(__doc__)
             sys.exit()
         elif opt=="-t" or opt == "--delete-tautologies":
