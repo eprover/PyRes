@@ -167,6 +167,7 @@ def timeoutHandler(sign, frame):
 
 if __name__ == '__main__':
     signal(SIGXCPU, timeoutHandler)
+    sys.setrecursionlimit(10000)
 
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],

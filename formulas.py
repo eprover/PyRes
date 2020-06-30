@@ -70,6 +70,7 @@ Email: schulz@eprover.org
 """
 
 import unittest
+from collections import deque
 from lexer import Token,Lexer
 from derivations import Derivable,Derivation,flatDerivation,toggleDerivationOutput
 from signature import Signature
@@ -292,16 +293,20 @@ class Formula(object):
         if not sig:
             sig = Signature()
 
-        if self.isLiteral():
-            self.child1.collectSig(sig)
-        elif self.isUnary():
-            self.child1.collectSig(sig)
-        elif self.isBinary():
-            self.child1.collectSig(sig)
-            self.child2.collectSig(sig)
-        else:
-            assert self.isQuantified()
-            self.child2.collectSig(sig)
+        todo = deque()
+        todo.append(self)
+        while todo:
+            f = todo.popleft()
+            if f.isLiteral():
+                f.child1.collectSig(sig)
+            elif f.isUnary():
+                todo.append(f.child1)
+            elif f.isBinary():
+                todo.append(f.child1)
+                todo.append(f.child2)
+            else:
+                assert f.isQuantified()
+                todo.append(f.child2)
         return sig
 
     def collectVars(self):
@@ -459,7 +464,7 @@ def parseWFormula(lexer):
     lexer.AcceptLit("fof");
     lexer.AcceptTok(Token.OpenPar)
     name = lexer.LookLit()
-    lexer.AcceptTok(Token.IdentLower)
+    lexer.AcceptTok([Token.IdentLower,Token.SQString])
     lexer.AcceptTok(Token.Comma)
     type = lexer.LookLit()
     if not type in ["axiom", "conjecture", "negated_conjecture"]:
