@@ -89,6 +89,7 @@ Email: schulz@eprover.org
 """
 
 import sys
+from resource import RLIMIT_STACK, setrlimit, getrlimit
 import getopt
 from signal import  signal, SIGXCPU
 from resource import getrusage, RUSAGE_SELF
@@ -166,6 +167,20 @@ def timeoutHandler(sign, frame):
 
 
 if __name__ == '__main__':
+    # We try to increase stack space, since we use a lot of
+    # recursion. This works differentially well on different OSes, so
+    # it is a bit more complex than I would hope for.
+    try:
+        soft, hard = getrlimit(RLIMIT_STACK)
+        soft = 10*soft
+        if hard > 0 and soft > hard:
+            soft = hard
+        setrlimit(RLIMIT_STACK, (soft, hard))
+    except ValueError:
+        # For reasons nobody understands, this seems to fail on
+        # OS-X. In that case, we just do our best...
+        pass
+
     signal(SIGXCPU, timeoutHandler)
     sys.setrecursionlimit(10000)
 
