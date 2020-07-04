@@ -21,7 +21,7 @@ clean:
 
 testcov: *.py
 	-rm -r .coverage COVERAGE
-	for f in *.py ;do coverage-3.7 run -a $$f; done
+	for f in *.py ;do coverage-3.8 run -a $$f; done
 	coverage-3.8 report > testcov
 	mkdir COVERAGE
 	coverage-3.8 annotate -d COVERAGE
