@@ -241,11 +241,12 @@ def freshVar():
 
 def freshVarSubst(vars):
     """
-    Create a substitution that maps all variables in var to fresh
-    variables. Note that there is no guarantee that the fresh
+    Create a substitution that maps all variables in the list vars to
+    fresh variables. Note that there is no guarantee that the fresh
     variables have never been used. However, there is a a guarantee
     that the fresh variables have never been produced by a uniqSubst
     substitution.
+
     """
     l = [(var, freshVar()) for var in vars]
     return Substitution(l)
