@@ -17,10 +17,10 @@ Substitutions are customarily represented by the Greek letter simga.
 
 Footnote:
 If more than one substitution is needed, the second one is usually
-called tau, and further ones are denoted with primes or subscripts. 
+called tau, and further ones are denoted with primes or subscripts.
 
 We represent substitutions by a thin wrapper around Python
-dictionaries mapping variables to terms. 
+dictionaries mapping variables to terms.
 
 Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
@@ -37,7 +37,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -56,14 +56,14 @@ class Substitution(object):
     """
     Substitutions map variables to terms. Substitutions as used here
     are always fully expanded, i.e. each variable is bound directly to
-    the term it maps too.
+    the term it maps to.
     """
 
     varCounter = 1
     """
     A counter to generate fresh variables.
     """
-    
+
     def __init__(self, init = []):
         """
         Initialize. The optional argument is a list of variable/term
@@ -86,7 +86,7 @@ class Substitution(object):
     def __call__(self, term):
         """
         Pretty synonym for apply() allowing us to use substitutions as
-        functions. 
+        functions.
         """
         return self.apply(term)
 
@@ -113,7 +113,7 @@ class Substitution(object):
         Return True if var is bound in self, false otherwise.
         """
         return var in self.subst
-    
+
     def apply(self, term):
         """
         Apply the substitution to a term. Return the result.
@@ -124,7 +124,7 @@ class Substitution(object):
             res  = [term[0]]
             args = [self.apply(x) for x in terms.termArgs(term)]
             res.extend(args)
-            return res                      
+            return res
 
     def modifyBinding(self, binding):
         """
@@ -146,10 +146,10 @@ class Substitution(object):
             self.subst[var] = term
 
         return res
-        
+
     def composeBinding(self, binding):
         """
-        Compose a new binding to an existing substitution. 
+        Compose a new binding to an existing substitution.
         """
         tmpsubst = Substitution([binding])
         var, term = binding
@@ -190,7 +190,7 @@ class BTSubst(Substitution):
    def backtrack(self):
       """
       Backtrack a single binding (if there is one). Return success or
-      failure. 
+      failure.
       """
       if self.bindings:
          tmp = self.bindings.pop()
@@ -207,7 +207,7 @@ class BTSubst(Substitution):
       subst, state = bt_state
       assert subst == self
       res = 0
-      
+
       while len(self.bindings)>state:
          self.backtrack()
          res = res+1
@@ -227,7 +227,7 @@ class BTSubst(Substitution):
       """
       assert False and \
              "You cannot compose backtrackable substitutions."
-   
+
 
 def freshVar():
     """
@@ -237,7 +237,7 @@ def freshVar():
     """
     Substitution.varCounter += 1
     return "X%d"%(Substitution.varCounter,)
-    
+
 
 def freshVarSubst(vars):
     """
@@ -249,7 +249,7 @@ def freshVarSubst(vars):
     """
     l = [(var, freshVar()) for var in vars]
     return Substitution(l)
-    
+
 
 
 
@@ -266,7 +266,7 @@ class TestSubst(unittest.TestCase):
 
         self.sigma1 = Substitution([("X", self.t2), ("Y", self.t2)])
         self.sigma2 = Substitution([("X", self.t2), ("Y", self.t3)])
-        
+
     def testSubstBasic(self):
         """
         Test basic stuff.
@@ -275,7 +275,7 @@ class TestSubst(unittest.TestCase):
         self.assertTrue(terms.termEqual(tau("X"), self.sigma1("X")))
         self.assertTrue(terms.termEqual(tau("Y"), self.sigma1("Y")))
         self.assertTrue(terms.termEqual(tau("Z"), self.sigma1("Z")))
-        
+
         t = tau.modifyBinding(("X", self.t1))
         self.assertTrue(terms.termEqual(t, self.t2))
         t = tau.modifyBinding(("U", self.t1))
@@ -285,7 +285,7 @@ class TestSubst(unittest.TestCase):
         t = tau.modifyBinding(("U", None))
         self.assertTrue(not tau.isBound("U"))
 
-        
+
     def testSubstApply(self):
         """
         Check application of substitutions
@@ -297,12 +297,12 @@ class TestSubst(unittest.TestCase):
 
     def testFreshVarSubst(self):
         """
-        Test that 
+        Test that
         """
         var1 = freshVar()
         var2 = freshVar()
         self.assertTrue(var1!=var2)
-        
+
         vars = terms.termCollectVars(self.t1)
         sigma = freshVarSubst(vars)
         vars2 = terms.termCollectVars(sigma(self.t1))
@@ -320,8 +320,8 @@ class TestSubst(unittest.TestCase):
         self.assertEqual(res, 1)
         res = sigma.backtrack()
         self.assertTrue(not res)
-        
-        
+
+
 
 if __name__ == '__main__':
     unittest.main()

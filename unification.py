@@ -151,7 +151,10 @@ def occursCheck(x, t):
 def mguTermList(l1, l2, subst):
     """
     Unify all terms in l1 with the corresponding terms in l2 with a
-    common substitution variable "subst".
+    common substitution variable "subst". We don't use explicit
+    equations or pairs of terms here - if l1 is [s1, s2, s3] and l2 is
+    [t1, t2, t3], this represents the set of equations {s1=t1, s2=t2,
+    s3=t3}. This makes several operations easier to implement.
     """
     assert len(l1)==len(l2)
     while(len(l1)!=0):
