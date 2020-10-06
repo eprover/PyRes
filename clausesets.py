@@ -113,17 +113,17 @@ class ClauseSet(object):
 
     def getSubsumingCandidates(self, queryclause):
         """
-        Return a subset (as a list) of all clauses potentially
-        subsuming queryclause). For plain clause sets, we just return
-        all clauses.
+        Return a subset (as a list) of the set containing at least all
+        clauses potentially subsuming queryclause. For a plain
+        ClauseSet, we just return all clauses in the set. 
         """
         return self.clauses
 
     def getSubsumedCandidates(self, queryclause):
         """
-        Return a subset (as a list) of all clauses potentially
-        subsumed by queryclause). For plain clause sets, we just return
-        all clauses.
+        Return a subset (as a list) of the set containing at least the
+        clauses  potentially subsumed by queryclause). For a plain
+        ClauseSet, we just return all clauses in the set.
         """
         return self.clauses
         
