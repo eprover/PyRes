@@ -89,10 +89,10 @@ Email: schulz@eprover.org
 """
 
 import sys
-from resource import RLIMIT_STACK, setrlimit, getrlimit
+#from resource import RLIMIT_STACK, setrlimit, getrlimit
 import getopt
-from signal import  signal, SIGXCPU
-from resource import getrusage, RUSAGE_SELF
+#from signal import  signal, SIGXCPU
+#from resource import getrusage, RUSAGE_SELF
 from version import version
 from lexer import Token,Lexer
 from derivations import enableDerivationOutput,disableDerivationOutput,Derivable,flatDerivation
@@ -170,7 +170,7 @@ if __name__ == '__main__':
     # We try to increase stack space, since we use a lot of
     # recursion. This works differentially well on different OSes, so
     # it is a bit more complex than I would hope for.
-    try:
+    '''try:
         soft, hard = getrlimit(RLIMIT_STACK)
         soft = 10*soft
         if hard > 0 and soft > hard:
@@ -180,8 +180,8 @@ if __name__ == '__main__':
         # For reasons nobody understands, this seems to fail on
         # OS-X. In that case, we just do our best...
         pass
-
-    signal(SIGXCPU, timeoutHandler)
+'''
+    #signal(SIGXCPU, timeoutHandler)
     sys.setrecursionlimit(10000)
 
     try:
@@ -247,9 +247,9 @@ if __name__ == '__main__':
     print(state.statisticsStr())
 
     # We use the resources interface to get and print the CPU time
-    resources = getrusage(RUSAGE_SELF)
-    print("# -------- CPU Time ---------")
-    print("# User time          : %.3f s"%(resources.ru_utime,))
-    print("# System time        : %.3f s"%(resources.ru_stime,))
-    print("# Total time         : %.3f s"%(resources.ru_utime+
-                                           resources.ru_stime,))
+    #resources = getrusage(RUSAGE_SELF)
+    #print("# -------- CPU Time ---------")
+    #print("# User time          : %.3f s"%(resources.ru_utime,))
+    #print("# System time        : %.3f s"%(resources.ru_stime,))
+    #print("# Total time         : %.3f s"%(resources.ru_utime+
+    #                                       resources.ru_stime,))
