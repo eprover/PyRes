@@ -191,6 +191,51 @@ class HeuristicClauseSet(ClauseSet):
         """
         return self.extractBestByEval(self.eval_functions.nextEval())
 
+class BTreeClauseSet(ClauseSet):
+    """
+    BTree Interface, right now just does the same as HeuristicClauseSet
+    TODO: Implement BTree
+    """
+    def __init__(self, eval_functions):
+        """
+        Initialize the clause.
+        """
+        self.clauses  = []
+        self.eval_functions = eval_functions
+
+
+    def addClause(self, clause):
+        """
+        Add a clause to the clause set. If the clause set supports
+        heuristic evaluations, add the relevant evaluations to the
+        clause.
+        """
+        evals = self.eval_functions.evaluate(clause)
+        clause.addEval(evals)
+        ClauseSet.addClause(self, clause)
+
+    def extractBestByEval(self, heuristic_index):
+        """
+        Extract and return the clause with the lowest weight according
+        to the selected heuristic. If the set is empty, return None.
+        """
+        if self.clauses:
+            best = 0
+            besteval = self.clauses[0].evaluation[heuristic_index]
+            for i in range(1, len(self.clauses)):
+                if self.clauses[i].evaluation[heuristic_index] < besteval:
+                    besteval = self.clauses[i].evaluation[heuristic_index]
+                    best     = i
+            return self.clauses.pop(best)
+        else:
+            return None
+
+    def extractBest(self):
+        """
+        Extract and return the next "best" clause according to the
+        evaluation scheme.
+        """
+        return self.extractBestByEval(self.eval_functions.nextEval())
 
 
 class IndexedClauseSet(ClauseSet):

@@ -57,6 +57,9 @@ Options:
   Do not add equality axioms. This makes the prover incomplete for
   equality problems.
 
+ -B
+--btree
+
 A reasonable command line to run the prover would be:
 
   ./pyres-fof.py -tifb -HPickGiven5 -nlargest EXAMPLES/PUZ001+1.p
@@ -151,6 +154,9 @@ def processOptions(opts):
                 sys.exit(1)
         elif opt=="-S" or opt=="--suppress-eq-axioms":
             suppressEqAxioms = True
+        elif opt=="-B" or opt=="--btree":
+            params.btree = True
+
 
     return params
 
@@ -197,13 +203,13 @@ if __name__ == '__main__':
                                         "backward-subsumption"
                                         "given-clause-heuristic=",
                                         "neg-lit-selection="
-                                        "supress-eq-axioms"])
+                                        "supress-eq-axioms",
+                                        "btree"])
     except getopt.GetoptError as err:
         print(sys.argv[0],":", err)
         sys.exit(1)
 
     params = processOptions(opts)
-
     problem = FOFSpec()
     for file in args:
         problem.parse(file)
