@@ -46,7 +46,7 @@ Email: schulz@eprover.org
 import unittest
 from idents import Ident
 from lexer import Token,Lexer
-from clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
+from clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet, BTreeClauseSet
 import heuristics
 from rescontrol import computeAllResolvents, computeAllFactors
 from subsumption import forwardSubsumption, backwardSubsumption
@@ -58,11 +58,12 @@ class SearchParams(object):
     search.
     """
     def __init__(self,
-                 heuristics = heuristics.PickGiven5,
+                 heuristics           = heuristics.PickGiven5,
                  delete_tautologies   = False,
                  forward_subsumption  = False,
                  backward_subsumption = False,
-                 literal_selection    = None):
+                 literal_selection    = None,
+                 btree                = False):
         """
         Initialize heuristic parameters.
         """
@@ -94,7 +95,10 @@ class SearchParams(object):
         literals from a set of negative literals (both represented as
         lists, not Python sets) as the inference literal.
         """
-
+        self.btree             = btree
+        """
+        TODO
+        """
 
 
 class ProofState(object):
@@ -116,7 +120,10 @@ class ProofState(object):
         Initialize the proof state with a set of clauses.
         """
         self.params = params
-        self.unprocessed = HeuristicClauseSet(params.heuristics)
+        if params.btree == True:
+            self.unprocessed = BTreeClauseSet(params.heuristics)
+        else:
+            self.unprocessed = HeuristicClauseSet(params.heuristics)
 
         if indexed:
             self.processed   = IndexedClauseSet()
@@ -124,6 +131,7 @@ class ProofState(object):
             self.processed   = ClauseSet()
         for c in clauses.clauses:
             self.unprocessed.addClause(c)
+
         self.initial_clause_count = len(self.unprocessed)
         self.proc_clause_count    = 0
         self.factor_count         = 0
