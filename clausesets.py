@@ -40,13 +40,16 @@ from literals import parseLiteral
 from clauses import Clause, parseClause
 from heuristics import PickGiven2
 from indexing import ResolutionIndex, SubsumptionIndex
+from btree import BTree
+
 
 class ClauseSet(object):
     """
     A class representing a clause set (or, more precisely,
     a multi-set of clauses).
     """
-    def __init__(self, clauses = []):
+
+    def __init__(self, clauses=[]):
         """
         Initialize the clause.
         """
@@ -126,7 +129,6 @@ class ClauseSet(object):
         ClauseSet, we just return all clauses in the set.
         """
         return self.clauses
-        
 
     def parse(self, lexer):
         """
@@ -137,7 +139,7 @@ class ClauseSet(object):
         while lexer.LookLit() == "cnf":
             clause = parseClause(lexer)
             self.addClause(clause)
-            count = count+1
+            count = count + 1
         return count
 
 
@@ -150,13 +152,13 @@ class HeuristicClauseSet(ClauseSet):
     according to all criteria. The clause set support extraction of
     the "best" clause according to any of the configured heuristics.
     """
+
     def __init__(self, eval_functions):
         """
         Initialize the clause.
         """
-        self.clauses  = []
+        self.clauses = []
         self.eval_functions = eval_functions
-
 
     def addClause(self, clause):
         """
@@ -179,7 +181,7 @@ class HeuristicClauseSet(ClauseSet):
             for i in range(1, len(self.clauses)):
                 if self.clauses[i].evaluation[heuristic_index] < besteval:
                     besteval = self.clauses[i].evaluation[heuristic_index]
-                    best     = i
+                    best = i
             return self.clauses.pop(best)
         else:
             return None
@@ -191,18 +193,25 @@ class HeuristicClauseSet(ClauseSet):
         """
         return self.extractBestByEval(self.eval_functions.nextEval())
 
+
 class BTreeClauseSet(ClauseSet):
     """
-    BTree Interface, right now just does the same as HeuristicClauseSet
+    BTree Interface, to use a BTree as the clause set
     TODO: Implement BTree
     """
+
     def __init__(self, eval_functions):
         """
-        Initialize the clause.
+        Initialize the Btree and the evaluation functions.
+        TODO: make the degree of the BTree to a parameter
         """
-        self.clauses  = []
+        self.trees = []
+        self.clauses = []
+        self.clauseDeleted = []
         self.eval_functions = eval_functions
-
+        self.counter = 0
+        for i in range(0, len(eval_functions.eval_descriptor)):
+            self.trees.append(BTree(2))
 
     def addClause(self, clause):
         """
@@ -212,6 +221,10 @@ class BTreeClauseSet(ClauseSet):
         """
         evals = self.eval_functions.evaluate(clause)
         clause.addEval(evals)
+        for index, tree in enumerate(self.trees):
+            tree.insert(clause, self.counter, evals[index])
+        self.counter += 1
+        self.clauseDeleted.append(False)
         ClauseSet.addClause(self, clause)
 
     def extractBestByEval(self, heuristic_index):
@@ -219,13 +232,21 @@ class BTreeClauseSet(ClauseSet):
         Extract and return the clause with the lowest weight according
         to the selected heuristic. If the set is empty, return None.
         """
-        if self.clauses:
+        if self.trees:
+            """
+            while True:
+                clause, clause_id = self.trees[heuristic_index].getBest()
+                self.trees[heuristic_index].remove(clause_id)
+                if not self.clauseDeleted[clause_id]:
+                    self.clauseDeleted[clause_id] = True
+                    break
+            """
             best = 0
             besteval = self.clauses[0].evaluation[heuristic_index]
             for i in range(1, len(self.clauses)):
                 if self.clauses[i].evaluation[heuristic_index] < besteval:
                     besteval = self.clauses[i].evaluation[heuristic_index]
-                    best     = i
+                    best = i
             return self.clauses.pop(best)
         else:
             return None
@@ -243,7 +264,8 @@ class IndexedClauseSet(ClauseSet):
     This is a normal clause set, augmented by indices that speeds up
     the finding of resolution and subsumption partners.
     """
-    def __init__(self, clauses = []):
+
+    def __init__(self, clauses=[]):
         """
         Create the two indices and call the superclass initializer. 
         """
@@ -292,13 +314,14 @@ class TestClauseSets(unittest.TestCase):
     """
     Unit test class for clause sets.
     """
+
     def setUp(self):
         """
         Setup function for clause/literal unit tests. Initialize
         variables needed throughout the tests.
         """
         print()
-        self.spec ="""
+        self.spec = """
 %------------------------------------------------------------------------------
 % File     : PUZ001-1 : TPTP v4.1.0. Released v1.0.0.
 % Domain   : Puzzles
@@ -395,12 +418,11 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         oldlen = len(clauses)
         c = clauses.clauses[0]
         clauses.extractClause(c)
-        self.assertEqual(len(clauses), oldlen-1)
+        self.assertEqual(len(clauses), oldlen - 1)
 
         sig = Signature()
         clauses.collectSig(sig)
         print(sig)
-
 
     def testClauseSetHeuristics(self):
         """
@@ -436,7 +458,6 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         c = clauses.extractFirst()
         self.assertEqual(c, None)
 
-
     def testIndexedClauseSetChanges(self):
         """
         Test that clause set initialization and parsing work.
@@ -448,11 +469,10 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         oldlen = len(clauses)
         c = clauses.clauses[0]
         clauses.extractClause(c)
-        self.assertEqual(len(clauses), oldlen-1)
+        self.assertEqual(len(clauses), oldlen - 1)
 
         sig = clauses.collectSig()
         print(sig)
-
 
     def testResPositions(self):
         """
@@ -488,8 +508,6 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         pos = clauses.getResolutionLiterals(lit)
         self.assertTrue(len(pos), 6)
         print(pos)
-
-
 
 
 if __name__ == '__main__':

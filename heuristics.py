@@ -135,6 +135,7 @@ class EvalStructure(object):
         count.         
         """
         assert len(eval_descriptor)
+        self.eval_descriptor = eval_descriptor
         self.eval_funs = [pair[0] for pair in eval_descriptor]
         self.eval_vec  = [pair[1] for pair in eval_descriptor]
         self.current = 0
