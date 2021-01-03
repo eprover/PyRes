@@ -20,7 +20,7 @@ structure contains additional information that is useful, but not
 strictly necessary from a clogic/alculus point of view.
 
 
-Copyright 2010-2020 Stephan Schulz, schulz@eprover.org
+Copyright 2010-2021 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -111,7 +111,7 @@ class Clause(Derivable):
         Return true if the clause is a Horn clause.
         """
         tmp = [l for l in self.literals if l.isPositive()]
-        return len(self.literals) <= 1
+        return len(tmp) <= 1
 
     def getLiteral(self, position):
         """
@@ -335,7 +335,8 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         self.assertTrue(unit.isHorn())
 
         self.assertTrue(not c1.isHorn())
-        self.assertTrue(not c3.isHorn())
+        self.assertTrue(c3.isHorn())
+
 
         self.assertTrue(c4.isTautology())
         self.assertTrue(not c5.isTautology())

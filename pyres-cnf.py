@@ -86,7 +86,7 @@ def processOptions(opts):
             params.delete_tautologies = True
         elif opt=="-f" or opt == "--forward-subsumption":
             params.forward_subsumption = True
-        elif opt=="-b" or opt == "--backward_subsumption":
+        elif opt=="-b" or opt == "--backward-subsumption":
             params.backward_subsumption = True
         elif opt=="-H" or opt == "--given-clause-heuristic":
             try:
