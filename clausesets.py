@@ -211,7 +211,7 @@ class BTreeClauseSet(ClauseSet):
         self.eval_functions = eval_functions
         self.counter = 0
         for i in range(0, len(eval_functions.eval_descriptor)):
-            self.trees.append(BTree(2))
+            self.trees.append(BTree(4))
 
     def addClause(self, clause):
         """
@@ -232,24 +232,25 @@ class BTreeClauseSet(ClauseSet):
         Extract and return the clause with the lowest weight according
         to the selected heuristic. If the set is empty, return None.
         """
-        if self.trees:
-            """
-            while True:
-                clause, clause_id = self.trees[heuristic_index].getBest()
-                self.trees[heuristic_index].remove(clause_id)
-                if not self.clauseDeleted[clause_id]:
-                    self.clauseDeleted[clause_id] = True
-                    break
-            """
+
+        while True:
+            clause, clause_id, empty = self.trees[heuristic_index].getBest()
+            if empty:
+                return None
+            if not self.clauseDeleted[clause_id]:
+                self.clauseDeleted[clause_id] = True
+                break
+        print(clause, clause_id)
+        '''
             best = 0
             besteval = self.clauses[0].evaluation[heuristic_index]
             for i in range(1, len(self.clauses)):
                 if self.clauses[i].evaluation[heuristic_index] < besteval:
                     besteval = self.clauses[i].evaluation[heuristic_index]
                     best = i
-            return self.clauses.pop(best)
-        else:
-            return None
+            #print(self.clauses.copy().pop(best))
+        '''
+        return clause
 
     def extractBest(self):
         """
