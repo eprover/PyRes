@@ -21,7 +21,7 @@ identity, match (for a query term t, find all terms s for which a
 substitution sigma exists such that sigma(s)=t), instance (for a query
 term t, find all terms s for which a substitution sigma exists such
 that s=sigma(t), and unifiability (find all terms with a sigma such
-that sigma(s)=sigma(t). 
+that sigma(s)=sigma(t).
 
 Clause indexed directly index clauses, typically by abstracting a
 clause into some kind of sequential vector. Typical retrieval
@@ -59,7 +59,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -96,14 +96,30 @@ class ResolutionIndex(object):
 
 
     def insertData(self, idx, topsymbol, payload):
+        """
+        Insert the payload into the provided index, associating it
+        with the given top symbol (i.e. the predicate symbol of the
+        indexed literal). The payload here is a tuple (clause, pos),
+        where pos is the position of the indexed literal in the clause
+        (counting from 0).
+        """
         if not topsymbol in idx:
             idx[topsymbol] = set()
         idx[topsymbol].add(payload)
 
-    def removeData(self, idx, topsymbol, payload):        
+    def removeData(self, idx, topsymbol, payload):
+        """
+        Remove a payload indexed at topsymbol from the provided
+        index.
+        """
         idx[topsymbol].remove(payload)
-        
+
     def insertClause(self, clause):
+        """
+        Insert all inference literals of clause into the appropriate
+        index (positive or negative, depending on the sign of the
+        literal).
+        """
         for i in range(len(clause)):
             lit = clause.getLiteral(i)
             if lit.isInferenceLit():
@@ -113,6 +129,9 @@ class ResolutionIndex(object):
                     self.insertData(self.neg_idx, termFunc(lit.atom), (clause, i))
 
     def removeClause(self, clause):
+        """
+        Remove all inference literals of the clause from the index.
+        """
         for i in range(len(clause)):
             lit = clause.getLiteral(i)
             if lit.isInferenceLit():
@@ -122,6 +141,12 @@ class ResolutionIndex(object):
                     self.removeData(self.neg_idx, termFunc(lit.atom), (clause, i))
 
     def getResolutionLiterals(self, lit):
+        """
+        Return a list of resolution candidates for lit. Every
+        candidate is a pair (clause, pos), where pos is the position
+        of the literal that potentially unifies with lit (and has the
+        opposite sign).
+        """
         if lit.isPositive():
             idx = self.neg_idx
         else:
@@ -130,7 +155,7 @@ class ResolutionIndex(object):
             return list(idx[termFunc(lit.atom)])
         except KeyError:
             return list()
-                    
+
 def predAbstractionIsSubSequence(candidate, superseq):
     """
     Check if candidate is a subsequence of superseq. That is a
@@ -147,7 +172,7 @@ def predAbstractionIsSubSequence(candidate, superseq):
     except IndexError:
         return False
     return True
-        
+
 
 class SubsumptionIndex(object):
     """
@@ -192,7 +217,7 @@ class SubsumptionIndex(object):
             self.pred_abstr_arr.insert(i, (l, pa, entry))
 
         entry.add(clause)
-            
+
     def removeClause(self, clause):
         """
         Remove a clause. This is easy, since we never remove the entry
@@ -232,7 +257,7 @@ class SubsumptionIndex(object):
                 break
             if predAbstractionIsSubSequence(cpa, pa):
                 res.extend(clauses)
-        return res               
+        return res
 
     def getSubsumedCandidates(self, queryclause):
         """
@@ -247,9 +272,9 @@ class SubsumptionIndex(object):
                 continue
             if predAbstractionIsSubSequence(pa, cpa):
                 res.extend(clauses)
-        return res               
+        return res
 
-    
+
 class TestIndexing(unittest.TestCase):
     """
     Unit test class for clauses. Test clause and literal
@@ -281,11 +306,11 @@ cnf(c9,axiom, p(X,Y)).
         self.c7 = clauses.parseClause(lex)
         self.c8 = clauses.parseClause(lex)
         self.c9 = clauses.parseClause(lex)
-       
+
     def testResolutionInsertRemove(self):
         """
         Test inserting and removal of clauses into the resolution
-        index. 
+        index.
         """
         index = ResolutionIndex()
         index.insertClause(self.c1)
@@ -293,16 +318,16 @@ cnf(c9,axiom, p(X,Y)).
 
         self.assertEqual(len(index.pos_idx), 1)
         self.assertEqual(len(index.pos_idx["p"]), 3)
-        print(index.pos_idx)       
+        print(index.pos_idx)
         self.assertEqual(len(index.neg_idx), 1)
         self.assertEqual(len(index.neg_idx["p"]), 1)
         print(index.neg_idx)
 
         index.insertClause(self.c3)
-        print("Insert ", self.c3)       
+        print("Insert ", self.c3)
         self.assertEqual(len(index.pos_idx), 2)
         self.assertEqual(len(index.pos_idx["p"]), 3)
-        print(index.pos_idx)    
+        print(index.pos_idx)
         self.assertEqual(len(index.neg_idx), 2)
         self.assertEqual(len(index.neg_idx["p"]), 1)
         self.assertEqual(len(index.neg_idx["q"]), 1)
@@ -313,7 +338,7 @@ cnf(c9,axiom, p(X,Y)).
         print("Removed ", self.c3)
         self.assertEqual(len(index.pos_idx), 2)
         self.assertEqual(len(index.pos_idx["p"]), 3)
-        print(index.pos_idx)    
+        print(index.pos_idx)
         self.assertEqual(len(index.neg_idx), 2)
         self.assertEqual(len(index.neg_idx["p"]), 1)
         self.assertEqual(len(index.neg_idx["q"]), 0)
@@ -330,7 +355,7 @@ cnf(c9,axiom, p(X,Y)).
         index.insertClause(self.c3)
         index.insertClause(self.c4)
         index.insertClause(self.c5)
-        
+
         lit = self.c6.getLiteral(0)
         cands = index.getResolutionLiterals(lit)
         print(cands)
@@ -339,7 +364,7 @@ cnf(c9,axiom, p(X,Y)).
             l = c.getLiteral(i)
             self.assertEqual(l.isNegative(), not lit.isNegative())
             self.assertEqual(termFunc(l.atom), termFunc(lit.atom))
-            
+
         lit = self.c7.getLiteral(0)
         cands = index.getResolutionLiterals(lit)
         print(cands)
@@ -377,11 +402,11 @@ cnf(c9,axiom, p(X,Y)).
         self.assertFalse(predAbstractionIsSubSequence(p4, p1))
 
         self.assertFalse(predAbstractionIsSubSequence(p3, p2))
-        self.assertFalse(predAbstractionIsSubSequence(p4, p2)) 
+        self.assertFalse(predAbstractionIsSubSequence(p4, p2))
 
         self.assertFalse(predAbstractionIsSubSequence(p3, p4))
         self.assertFalse(predAbstractionIsSubSequence(p4, p3))
-               
+
     def testSubsumptionIndex(self):
         index = SubsumptionIndex()
 
@@ -400,7 +425,7 @@ cnf(c9,axiom, p(X,Y)).
         self.assertTrue(index.isIndexed(self.c4))
         self.assertTrue(index.isIndexed(self.c5))
         self.assertTrue(index.isIndexed(self.c6))
-       
+
         index.removeClause(self.c1)
         index.removeClause(self.c5)
         index.removeClause(self.c3)
@@ -411,7 +436,7 @@ cnf(c9,axiom, p(X,Y)).
         self.assertTrue(index.isIndexed(self.c4))
         self.assertFalse(index.isIndexed(self.c5))
         self.assertTrue(index.isIndexed(self.c6))
-        
+
         index.insertClause(self.c3)
         index.insertClause(self.c1)
         index.insertClause(self.c5)
@@ -424,7 +449,7 @@ cnf(c9,axiom, p(X,Y)).
         self.assertTrue(index.isIndexed(self.c5))
         self.assertTrue(index.isIndexed(self.c6))
         self.assertTrue(index.isIndexed(self.c9))
-        
+
         cands = index.subsumingCandidates(self.c1)
         print(cands)
         self.assertEqual(len(cands), 3)
@@ -444,6 +469,6 @@ cnf(c9,axiom, p(X,Y)).
         print(cands)
         self.assertEqual(len(cands), 1)
 
-        
+
 if __name__ == '__main__':
     unittest.main()
