@@ -176,7 +176,8 @@ def formulaTopSimplify(f):
     """
     Try to apply the following simplification rules to f at the top
     level. Return (f',m), where f' is the result of simplification,
-    and m indicates if f'!=f.
+    and m indicates if f'!=f, i.e. if any of the simplification rules
+    has been applied.
     """
     if f.op == "~":
         if f.child1.isLiteral():
@@ -270,10 +271,11 @@ def formulaTopSimplify(f):
 
 def formulaSimplify(f):
     """
-    Exhaustively apply simplification to f. See formulaTopSimplify()
-    above for the
+    Exhaustively apply simplification to f, creating the simplified
+    version f'. See formulaTopSimplify()
+    above for the individual rules.
 
-    Returns (f', True) if f!=f, (f', False) otherwise.
+    Returns (f', True) if f'!=', (f', False) otherwise.
     """
     if f.isLiteral():
         return f, False
