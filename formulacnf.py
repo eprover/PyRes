@@ -849,9 +849,9 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
     def checkSimplificationResult(self, f):
         """
         Simplification results in a formula that does not contain
-        the constant predicats $true or $false. The only exception is
+        the constant predicates $true or $false. The only exception is
         when the whole formula has been has been reduced to a single
-        literal (in which case it can be either $true, or $false, or a
+        literal (in which case it can be either $true, or $false, or
         any other literal).
         """
 
