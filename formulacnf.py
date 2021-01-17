@@ -275,7 +275,9 @@ def formulaSimplify(f):
     version f'. See formulaTopSimplify()
     above for the individual rules.
 
-    Returns (f', True) if f'!=', (f', False) otherwise.
+    Returns (f', True) if f'!=f, (f', False) otherwise (i.e. if no
+    simplification happened because the formula already was completely
+    simplified.
     """
     if f.isLiteral():
         return f, False
