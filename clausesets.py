@@ -211,13 +211,11 @@ class BTreeClauseSet(ClauseSet):
         self.eval_functions = eval_functions
         self.counter = 0
         for i in range(0, len(eval_functions.eval_descriptor)):
-            self.trees.append(BTree(5))
+            self.trees.append(BTree(3))
 
     def addClause(self, clause):
         """
-        Add a clause to the clause set. If the clause set supports
-        heuristic evaluations, add the relevant evaluations to the
-        clause.
+        Add a clause to the btrees.
         """
         evals = self.eval_functions.evaluate(clause)
         clause.addEval(evals)
@@ -240,16 +238,6 @@ class BTreeClauseSet(ClauseSet):
             if not self.clauseDeleted[clause_id]:
                 self.clauseDeleted[clause_id] = True
                 break
-        #print(clause, clause_id)
-        '''
-            best = 0
-            besteval = self.clauses[0].evaluation[heuristic_index]
-            for i in range(1, len(self.clauses)):
-                if self.clauses[i].evaluation[heuristic_index] < besteval:
-                    besteval = self.clauses[i].evaluation[heuristic_index]
-                    best = i
-            #print(self.clauses.copy().pop(best))
-        '''
         return clause
 
     def extractBest(self):

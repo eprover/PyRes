@@ -191,8 +191,10 @@ class BTree:
                 self.root.parent = None
             return False
         elif len(node.parent.child[1].clauses) > self.min_keys:
-            #TODO: Borrow
-            pass
+            node.clauses.append(node.parent.clauses[0])
+            node.child.append(node.parent.child[1].child.pop(0))
+            node.parent.clauses.append(node.parent.child[1].clauses.pop(0))
+            return False
         else:
             return self.merge(node.parent)
 
