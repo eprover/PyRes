@@ -83,12 +83,24 @@ from literals import Literal, parseLiteral, parseLiteralList,\
 class Formula(object):
     """
     A class representing a naked first-order formula
-    formula. Operators are represented as strings, an empty operator
-    indicates an atomic formula. child1 and child2 are the subformulas
-    (child2 may be empty). In the case of atomic formula, child1 is an
-    atom (representing a term). In the case of quantified formulae,
+    formula. First-order operators are represented as strings, an
+    empty operator (i.e. "") indicates an atomic formula.
+    child1 and child2 are the subformulas (child2 may be empty).
+
+    In the case of an atomic formula (with operator ""), child1 is
+    a Literal object (this unifies parsing and simplifies
+    clausification), and child2 is empty (i.e. None).
+
+    In the case of quantified formulae (operator is "!" or "?"),
     child1 is a plain string (i.e. the term representing the variable)
     and child2 is the formula quantified over.
+
+    In the case of a negated formula, the operator is "~", child1 is
+    the single subformula, and child2 is empty.
+
+    In the last case (a binary composite formula), the operator is one
+    of "&", "|", "=>", "<=", "<=>", "<~>", "~|", "~&", and child1 and
+    child2 are the two subformulas.
     """
 
     def __init__(self, op, child1, child2=None):
