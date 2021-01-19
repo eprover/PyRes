@@ -197,7 +197,6 @@ class HeuristicClauseSet(ClauseSet):
 class BTreeClauseSet(ClauseSet):
     """
     BTree Interface, to use a BTree as the clause set
-    TODO: Implement BTree
     """
 
     def __init__(self, eval_functions):
