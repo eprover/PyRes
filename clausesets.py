@@ -199,7 +199,7 @@ class BTreeClauseSet(ClauseSet):
     BTree Interface, to use a BTree as the clause set
     """
 
-    def __init__(self, eval_functions):
+    def __init__(self, eval_functions, degree):
         """
         Initialize the Btree and the evaluation functions.
         TODO: make the degree of the BTree to a parameter
@@ -210,7 +210,7 @@ class BTreeClauseSet(ClauseSet):
         self.eval_functions = eval_functions
         self.counter = 0
         for i in range(0, len(eval_functions.eval_descriptor)):
-            self.trees.append(BTree(3))
+            self.trees.append(BTree(degree))
 
     def addClause(self, clause):
         """
