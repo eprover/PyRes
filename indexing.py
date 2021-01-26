@@ -369,7 +369,7 @@ cnf(c9,axiom, p(X,Y)).
         lit = self.c7.getLiteral(0)
         cands = index.getResolutionLiterals(lit)
         print(cands)
-        self.assertTrue(len(cands), 3)
+        self.assertEqual(len(cands), 3)
         for (c,i) in cands:
             l = c.getLiteral(i)
             self.assertEqual(l.isNegative(), not lit.isNegative())
