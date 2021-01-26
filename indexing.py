@@ -356,10 +356,11 @@ cnf(c9,axiom, p(X,Y)).
         index.insertClause(self.c4)
         index.insertClause(self.c5)
 
+        print("testResolutionRetrieval()")
         lit = self.c6.getLiteral(0)
         cands = index.getResolutionLiterals(lit)
         print(cands)
-        self.assertTrue(len(cands), 7)
+        self.assertEqual(len(cands), 8)
         for (c,i) in cands:
             l = c.getLiteral(i)
             self.assertEqual(l.isNegative(), not lit.isNegative())
@@ -450,22 +451,22 @@ cnf(c9,axiom, p(X,Y)).
         self.assertTrue(index.isIndexed(self.c6))
         self.assertTrue(index.isIndexed(self.c9))
 
-        cands = index.subsumingCandidates(self.c1)
+        cands = index.getSubsumingCandidates(self.c1)
         print(cands)
         self.assertEqual(len(cands), 3)
-        cands = index.subsumingCandidates(self.c9)
+        cands = index.getSubsumingCandidates(self.c9)
         print(cands)
         self.assertEqual(len(cands), 1)
 
-        cands = index.subsumedCandidates(self.c9)
+        cands = index.getSubsumedCandidates(self.c9)
         print(cands)
         self.assertEqual(len(cands), 5)
 
-        cands = index.subsumedCandidates(self.c8)
+        cands = index.getSubsumedCandidates(self.c8)
         print(cands)
         self.assertEqual(len(cands), 0)
 
-        cands = index.subsumedCandidates(self.c5)
+        cands = index.getSubsumedCandidates(self.c5)
         print(cands)
         self.assertEqual(len(cands), 1)
 
