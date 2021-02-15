@@ -71,7 +71,8 @@ def tptpLexer(source, refdir):
             lex = Lexer(fp.read())
             fp.close()
             refdir = os.path.dirname(name)
-        raise IOError(errno.ENOENT, "File not found", name)
+        else:
+            raise IOError(errno.ENOENT, "File not found", name)
     return lex, refdir
 
 
