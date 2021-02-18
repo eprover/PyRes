@@ -162,8 +162,8 @@ class Literal(object):
                 result = "~"+term2String(self.atom)
             else:
                 result = term2String(self.atom)
-        if(self.isInferenceLit()):
-            result = result
+        # if(self.isInferenceLit()):
+        #    result = result
         return result
 
     def isEquational(self):

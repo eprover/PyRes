@@ -22,7 +22,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -53,7 +53,7 @@ def computeAllResolvents(clause, clauseset):
     and added to the proof state. The algorithm moves one clause at a
     time from unprocessed, and adds it to processed (unless the clause
     is redundant).
-    
+
     This function  is used when integrating a new clause into the
     processed part of the proof state. It computes all the resolvents
     between a single clause (the new "given clause") and a clause set
@@ -82,13 +82,14 @@ def computeAllFactors(clause):
     """
     res = []
     for i in range(len(clause)):
-        if clause.getLiteral(i).isInferenceLit():
-            for j in range(i+1, len(clause)):
+        for j in range(i+1, len(clause)):
+            if clause.getLiteral(i).isInferenceLit() or \
+               clause.getLiteral(j).isInferenceLit():
                 fact = factor(clause, i, j)
                 if fact:
                     res.append(fact)
     return res
-    
+
 
 class TestSetInferences(unittest.TestCase):
     """
@@ -114,17 +115,17 @@ cnf(c3, axiom, c).
         cstr = "cnf(ftest, axiom, p(X)|~q|p(a)|~q|p(Y))."
         lex = Lexer(cstr)
         self.fclause = parseClause(lex)
-       
+
     def testSetResolution(self):
         """
         Test that forming resolvents between a clause and a clause set
-        works. 
+        works.
         """
         print("Test set resolution")
         res = computeAllResolvents(self.conj, self.cset)
         print(res)
 
-        
+
     def testFactoring(self):
         """
         Test full factoring of a clause.
