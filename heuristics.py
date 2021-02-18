@@ -132,7 +132,23 @@ class EvalStructure(object):
         """
         Initialize ths structure. The argument is a list of pairs,
         where each pair consists of a function and its relative weight
-        count.         
+        count. 
+
+        This is internally converted to two arrays:
+        eval_funs[] is an array of the different evaluation
+                    functions. Each clause receives a a list of
+                    evaluations, one from each of the functions in
+                    this list.
+        eval_vec[]  is the corresponding vector of
+                    frequencies. eval_vec[i] indicates, how many
+                    clauses should be picked according to eval_fun[i]
+                    before switching to the next one, which would be
+                    eval_funs[(i+1) % len(eval_funs)].
+        The two other members are used to implement this scheme:
+        current       is the current evaluation to use.
+        current_count indicates, how many more clause will be
+                      picked according to current, before current
+                      switches to the next value. 
         """
         assert len(eval_descriptor)
         self.eval_funs = [pair[0] for pair in eval_descriptor]
@@ -149,7 +165,12 @@ class EvalStructure(object):
 
     def nextEval(self):
         """
-        Return the index of the next evaluation function of the scheme.
+        Return the index of the next evaluation function of the
+        evaluation scheme. 
+
+        Note that we use a while-loop instead of a simple "if" to
+        accomodate evaluation functions with a count of 0 (which in
+        this way will simply be skipped). 
         """
         while not self.current_count:
             self.current = (self.current+1) % len(self.eval_vec)
