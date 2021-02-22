@@ -52,7 +52,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -76,7 +76,7 @@ def resolution(clause1, lit1, clause2, lit2):
     """
     Implementation of the Resolution rule. lit1 and lit2 are indices
     of literals in clause1 and clause2, respectively, so clause1|lit1
-    and clause2|lit2 are literals.    
+    and clause2|lit2 are literals.
 
     Try to resolve clause1|lit1 against clause2|lit2. If this is
     possible, return the resolvent. Otherwise, return None.
@@ -113,10 +113,11 @@ def factor(clause, lit1, lit2):
     res = clauses.Clause(lits)
     res.removeDupLits()
     res.setDerivation(flatDerivation("factor", [clause]))
+    print(clause, " => ", res);
     return res
 
 
-    
+
 
 
 class TestResolution(unittest.TestCase):
@@ -146,7 +147,7 @@ cnf(taut,axiom,p(X4)|~p(X4)).
         self.c5 = clauses.parseClause(lex)
         self.c6 = clauses.parseClause(lex)
         self.c7 = clauses.parseClause(lex)
-       
+
     def testResolution(self):
         """
         Test resolution
@@ -175,12 +176,12 @@ cnf(taut,axiom,p(X4)|~p(X4)).
     def testFactoring(self):
         """
         Test the factoring inference.
-        """        
+        """
         f1 = factor(self.c1,0,1)
         self.assertTrue(f1)
         self.assertTrue(len(f1)==1)
         print("Factor:", f1)
-        
+
         f2 = factor(self.c2,0,1)
         self.assertTrue(f2==None)
         print(f2)
@@ -188,7 +189,7 @@ cnf(taut,axiom,p(X4)|~p(X4)).
         f4 = factor(self.c4,0,1)
         self.assertTrue(f4==None)
         print(f4)
-        
+
         f5 = factor(self.c5,1,3)
         self.assertTrue(f5)
         print(f5)
