@@ -113,9 +113,7 @@ def factor(clause, lit1, lit2):
     res = clauses.Clause(lits)
     res.removeDupLits()
     res.setDerivation(flatDerivation("factor", [clause]))
-    print(clause, " => ", res);
     return res
-
 
 
 
