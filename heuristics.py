@@ -4,7 +4,7 @@
 # Module heuristics.py
 
 """
-This module implements heuristic evaluation functions for clauses. 
+This module implements heuristic evaluation functions for clauses.
 The purpose of heuristic evaluation is selection of clauses during the
 resolution process.
 
@@ -31,7 +31,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -55,31 +55,32 @@ class ClauseEvaluationFunction(object):
     to be able to store information, either from initialization, or
     from previous calls.
     """
-        
+
     def __init__(self): # pragma: nocover
         """
         Initialize the evaluaton function.
         """
         self.name = "Virtual Base"
-        
+
     def __repr__(self): # pragma: nocover
         """
-        Return a string representation of the clause.
+        Return a string representation of the clause evaluation
+        function.
         """
         return "ClauseEvalFun(%s)"%(self.name,)
 
-    def __call__(self, clause): 
+    def __call__(self, clause):
         """
         Provide this as a callable function.
         """
         return self.hEval(clause)
-   
+
     def hEval(self, clause): # pragma: nocover
         """
         This needs to be overloaded...
         """
         assert False and "Virtual base class is not callable"
-        
+
 
 class FIFOEvaluation(ClauseEvaluationFunction):
     """
@@ -103,7 +104,7 @@ class FIFOEvaluation(ClauseEvaluationFunction):
 
 class SymbolCountEvaluation(ClauseEvaluationFunction):
     """
-    Implement a standard symbol counting heuristic. 
+    Implement a standard symbol counting heuristic.
     """
     def __init__(self, fweight=2, vweight=1):
         """
@@ -132,7 +133,7 @@ class EvalStructure(object):
         """
         Initialize ths structure. The argument is a list of pairs,
         where each pair consists of a function and its relative weight
-        count. 
+        count.
 
         This is internally converted to two arrays:
         eval_funs[] is an array of the different evaluation
@@ -148,7 +149,7 @@ class EvalStructure(object):
         current       is the current evaluation to use.
         current_count indicates, how many more clause will be
                       picked according to current, before current
-                      switches to the next value. 
+                      switches to the next value.
         """
         assert len(eval_descriptor)
         self.eval_funs = [pair[0] for pair in eval_descriptor]
@@ -158,7 +159,7 @@ class EvalStructure(object):
 
     def evaluate(self, clause):
         """
-        Return a composite evaluation of the clause.
+        Return a composite evaluation of a clause.
         """
         evals = [f(clause) for f in self.eval_funs]
         return evals
@@ -166,31 +167,31 @@ class EvalStructure(object):
     def nextEval(self):
         """
         Return the index of the next evaluation function of the
-        evaluation scheme. 
+        evaluation scheme.
 
         Note that we use a while-loop instead of a simple "if" to
         accomodate evaluation functions with a count of 0 (which in
-        this way will simply be skipped). 
+        this way will simply be skipped).
         """
         while not self.current_count:
             self.current = (self.current+1) % len(self.eval_vec)
             self.current_count = self.eval_vec[self.current]
         self.current_count = self.current_count - 1
         return self.current
-            
+
 
 FIFOEval        = EvalStructure([(FIFOEvaluation(),1)])
 """
 Strict first-in/first out evaluation. This is obviously fair
 (i.e. every clause will be picked eventuall), but not a good search
-strategy. 
+strategy.
 """
 
 SymbolCountEval = EvalStructure([(SymbolCountEvaluation(2,1),1)])
 """
 Strict symbol counting (a smaller clause is always better than a
 larger clause). This is only fair if subsumption or a similar
-mechanism is employed, otherwise there can e.g. be an infinite set of 
+mechanism is employed, otherwise there can e.g. be an infinite set of
 clauses p(X1), p(X2), p(X3),.... that are all smaller than q(f(X)), so
 that the latter is never selected.
 """
@@ -253,7 +254,7 @@ cnf(c8,axiom,(c=d|h(i(a))!=h(i(e)))).
         self.c6 = clauses.parseClause(lexer)
         self.c7 = clauses.parseClause(lexer)
         self.c8 = clauses.parseClause(lexer)
-        
+
 
     def testFIFO(self):
         """
@@ -304,7 +305,7 @@ cnf(c8,axiom,(c=d|h(i(a))!=h(i(e)))).
         """
         eval_funs = EvalStructure([(SymbolCountEvaluation(2,1),2),
                                    (FIFOEvaluation(),1)])
-        
+
         evals = eval_funs.evaluate(self.c1)
         self.assertEqual(len(evals), 2)
         self.assertEqual(eval_funs.nextEval(),0)

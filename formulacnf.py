@@ -262,8 +262,8 @@ def formulaTopSimplify(f):
         # ?[X] F -> F if X is not free in F
         vars = f.child2.collectFreeVars()
         if not f.child1 in vars:
-            return f.child2, True
-    else:
+            return f.child2, else
+    True:
         assert f.op == "" or "Unexpected op"
     return f, False
 
