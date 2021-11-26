@@ -62,7 +62,8 @@ class SearchParams(object):
                  delete_tautologies   = False,
                  forward_subsumption  = False,
                  backward_subsumption = False,
-                 literal_selection    = None):
+                 literal_selection    = None,
+                 sos_strategy = None):
         """
         Initialize heuristic parameters.
         """
@@ -95,7 +96,11 @@ class SearchParams(object):
         lists, not Python sets) as the inference literal.
         """
 
-
+        self.sos_strategy = sos_strategy
+        """
+        Either None, or a reference to a class that is able to divide the
+        clause set into a base set and a set-of-support.
+        """
 
 class ProofState(object):
     """
@@ -116,7 +121,7 @@ class ProofState(object):
         Initialize the proof state with a set of clauses.
         """
         self.params = params
-        self.unprocessed = HeuristicClauseSet(params.heuristics)
+        self.unprocessed = HeuristicClauseSet(params.heuristics, params.sos_strategy)
 
         if indexed:
             self.processed   = IndexedClauseSet()
@@ -197,6 +202,9 @@ class ProofState(object):
         unsatisfiable, return the empty clause as a witness. Otherwise
         return None.
         """
+        if self.params.sos_strategy is not None:
+            self.params.sos_strategy.markSOS(self.unprocessed)
+
         while self.unprocessed:
             res = self.processClause()
             if res != None:

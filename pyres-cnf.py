@@ -34,6 +34,10 @@ Options:
 --given-clause-heuristic=<heuristic>
   Use the specified heuristic for given-clause selection.
 
+ -O <strategy>
+--set-of-support=<strategy>
+  Apply the selected Set-Of-Support strategy.
+
 Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
@@ -63,6 +67,8 @@ Email: schulz@eprover.org
 
 import sys
 import getopt
+
+from setofsupport import GivenSOSStrategies
 from version import version
 from lexer import Token,Lexer
 from derivations import enableDerivationOutput,disableDerivationOutput
@@ -100,18 +106,26 @@ def processOptions(opts):
             except KeyError:
                 print("Unknown literal selection function", optarg)
                 sys.exit(1)
+        elif opt=="-O" or opt == "--set-of-support":
+            try:
+                params.sos_strategy = GivenSOSStrategies[optarg]
+            except KeyError:
+                print("Unknown set-of-support strategy", optarg)
+                sys.exit(1)
+
     return params
 
 if __name__ == '__main__':
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                       "htfbH:n:",
+                                       "htfbH:n:O:",
                                        ["help",
                                         "delete-tautologies",
                                         "forward-subsumption",
-                                        "backward-subsumption"
+                                        "backward-subsumption",
                                         "given-clause-heuristic=",
-                                        "neg-lit-selection="])
+                                        "neg-lit-selection=",
+                                        "set-of-support="])
     except getopt.GetoptError as err:
         print(sys.argv[0],":", err)
         sys.exit(1)

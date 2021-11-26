@@ -150,12 +150,13 @@ class HeuristicClauseSet(ClauseSet):
     according to all criteria. The clause set support extraction of
     the "best" clause according to any of the configured heuristics.
     """
-    def __init__(self, eval_functions):
+    def __init__(self, eval_functions, sos_strategy):
         """
         Initialize the clause.
         """
         self.clauses  = []
         self.eval_functions = eval_functions
+        self.sos_strategy = sos_strategy
 
 
     def addClause(self, clause):
@@ -174,12 +175,21 @@ class HeuristicClauseSet(ClauseSet):
         to the selected heuristic. If the set is empty, return None.
         """
         if self.clauses:
-            best = 0
-            besteval = self.clauses[0].evaluation[heuristic_index]
-            for i in range(1, len(self.clauses)):
-                if self.clauses[i].evaluation[heuristic_index] < besteval:
-                    besteval = self.clauses[i].evaluation[heuristic_index]
-                    best     = i
+            best = -1
+            besteval = float('inf')
+            if self.sos_strategy is not None:
+                # If set-of-support strategy is used, only allow clauses that are part of sos
+                for i in range(0, len(self.clauses)):
+                    if self.clauses[i].evaluation[heuristic_index] < besteval and self.clauses[i].part_of_sos:
+                        besteval = self.clauses[i].evaluation[heuristic_index]
+                        best     = i
+            if best == -1:
+                # Either set-of-support strategy is not used or none of the clauses is part of the sos.
+                # Return the best clause no matter if it is part of sos or not
+                for i in range(0, len(self.clauses)):
+                    if self.clauses[i].evaluation[heuristic_index] < besteval:
+                        besteval = self.clauses[i].evaluation[heuristic_index]
+                        best     = i
             return self.clauses.pop(best)
         else:
             return None

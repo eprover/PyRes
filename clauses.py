@@ -65,6 +65,10 @@ class Clause(Derivable):
     - The literal list.
     - The type ("plain" if none given)
     - The name (generated automatically if not given)
+
+    Optionally a clause can compromise following elements:
+    - A list of evaulation of the clause
+    - A flag that inidicated if the clause is part of the Set-Of-Support (SOS)
     """
     def __init__(self, literals, type="plain", name=None):
         """
@@ -73,6 +77,7 @@ class Clause(Derivable):
         self.literals   = [l for l in literals if not l.isPropFalse()]
         self.type       = type
         self.evaluation = None
+        self.part_of_sos = None
         Derivable.__init__(self, name)
 
 
@@ -238,7 +243,6 @@ class Clause(Derivable):
                                  self.literals[i+1:]):
                 return True
         return False
-
 
 
 def parseClause(lexer):

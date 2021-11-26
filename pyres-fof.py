@@ -52,6 +52,10 @@ Options:
 --neg-lit-selection
   Use the specified negative literal selection function.
 
+ -O <strategy>
+--set-of-support=<strategy>
+  Apply the selected Set-Of-Support strategy.
+
  -S
 --suppress-eq-axioms
   Do not add equality axioms. This makes the prover incomplete for
@@ -93,6 +97,8 @@ from resource import RLIMIT_STACK, setrlimit, getrlimit
 import getopt
 from signal import  signal, SIGXCPU
 from resource import getrusage, RUSAGE_SELF
+
+from setofsupport import GivenSOSStrategies
 from version import version
 from lexer import Token,Lexer
 from derivations import enableDerivationOutput,disableDerivationOutput,Derivable,flatDerivation
@@ -149,6 +155,12 @@ def processOptions(opts):
                 print("Unknown literal selection function", optarg)
                 print("Supported:", LiteralSelectors.keys())
                 sys.exit(1)
+        elif opt=="-O" or opt == "--set-of-support":
+            try:
+                params.sos_strategy = GivenSOSStrategies[optarg]
+            except KeyError:
+                print("Unknown set-of-support strategy", optarg)
+                sys.exit(1)
         elif opt=="-S" or opt=="--suppress-eq-axioms":
             suppressEqAxioms = True
 
@@ -186,7 +198,7 @@ if __name__ == '__main__':
 
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                       "hsVpitfbH:n:S",
+                                       "hsVpitfbH:n:O:S",
                                        ["help",
                                         "silent",
                                         "version",
@@ -196,7 +208,8 @@ if __name__ == '__main__':
                                         "forward-subsumption",
                                         "backward-subsumption"
                                         "given-clause-heuristic=",
-                                        "neg-lit-selection="
+                                        "neg-lit-selection=",
+                                        "set-of-support=",
                                         "supress-eq-axioms"])
     except getopt.GetoptError as err:
         print(sys.argv[0],":", err)
