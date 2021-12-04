@@ -62,7 +62,8 @@ class SearchParams(object):
                  delete_tautologies   = False,
                  forward_subsumption  = False,
                  backward_subsumption = False,
-                 literal_selection    = None):
+                 literal_selection    = None,
+                 ordered_resolution = False):
         """
         Initialize heuristic parameters.
         """
@@ -94,7 +95,10 @@ class SearchParams(object):
         literals from a set of negative literals (both represented as
         lists, not Python sets) as the inference literal.
         """
-
+        self.ordered_resolution = ordered_resolution
+        """
+        Use KBO ordered Resolution or not
+        """
 
 
 class ProofState(object):
@@ -174,6 +178,8 @@ class ProofState(object):
 
         if(self.params.literal_selection):
             given_clause.selectInferenceLits(self.params.literal_selection)
+        if self.params.ordered_resolution:
+            print("TEST")
         if not self.silent:
             print("#", given_clause)
         new = []

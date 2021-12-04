@@ -57,6 +57,10 @@ Options:
   Do not add equality axioms. This makes the prover incomplete for
   equality problems.
 
+ -o
+--ordered-resolution
+  Use ordered Resolution KBO
+
 A reasonable command line to run the prover would be:
 
   ./pyres-fof.py -tifb -HPickGiven5 -nlargest EXAMPLES/PUZ001+1.p
@@ -151,7 +155,15 @@ def processOptions(opts):
                 sys.exit(1)
         elif opt=="-S" or opt=="--suppress-eq-axioms":
             suppressEqAxioms = True
+        elif opt == "-o" or opt == "--ordered-resolution":
+            try:
 
+                print("Ordered Resolution KBO")
+                params.ordered_resolution = True
+                #sys.exit(0)
+            except KeyError:
+                print("KeyError or in KBO")
+                sys.exit(1)
     return params
 
 def timeoutHandler(sign, frame):
@@ -186,7 +198,7 @@ if __name__ == '__main__':
 
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                       "hsVpitfbH:n:S",
+                                       "hsVpitfbH:n:S:o",
                                        ["help",
                                         "silent",
                                         "version",
@@ -197,7 +209,8 @@ if __name__ == '__main__':
                                         "backward-subsumption"
                                         "given-clause-heuristic=",
                                         "neg-lit-selection="
-                                        "supress-eq-axioms"])
+                                        "supress-eq-axioms",
+                                        "ordered-resolution"])
     except getopt.GetoptError as err:
         print(sys.argv[0],":", err)
         sys.exit(1)
