@@ -8,7 +8,7 @@
 """
 import enum
 
-from terms import termIsVar, termWeight, termCollectSig, subterm
+from terms import *
 
 
 class CompareResult(enum.Enum):
@@ -124,11 +124,38 @@ def kbocompare(term_s, term_t):
         assert False
 
 
-def kbovarcompare(term_s, term_t):
-    return 0#WIP
+def getvaroccurences(term):
+    occurences = 0
 
+    while 1:
+        if termIsVar(term):
+            occurences += 1
+        elif termIsGround(term):
+            break
+        else:
+            arity = termCollectSig(term).getArity()
+            for pos in range(arity):
+                occurences += getvaroccurences(subterm(term, pos))
+    return occurences
 
+def kbovarcompare(term_s, term_t):  # simplify ?!
+    sgreater = False
+    tgreater = False
 
+    diff = getvaroccurences(term_s) - getvaroccurences(term_t)
+    if diff > 0:
+        sgreater = True
+    if diff < 0:
+        tgreater = True
+
+    if sgreater and tgreater:
+        return CompareResult.to_uncomparable
+    elif sgreater:
+        return CompareResult.to_greater
+    elif tgreater:
+        return CompareResult.to_lesser
+    else:
+        return CompareResult.to_equal
 
     """
     #candidates = self.literals
