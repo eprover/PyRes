@@ -292,6 +292,29 @@ def subterm(t, pos):
     return subterm(t[index],pos)
 
 
+def termIsSubterm(term, test):
+    if term == test:
+        return True
+    if not termIsCompound(term):
+        return False
+    for i in range(len(termArgs(term))):
+        if termIsSubterm(subterm(term, [i]), test):
+            return True
+
+    return False
+
+
+def getvaroccurences(term):
+    occurences = 0
+
+    if termIsVar(term):
+        occurences += 1
+    else:
+        for pos in range(len(termArgs(term))):
+            occurences += getvaroccurences(subterm(term, [pos]))
+    return occurences
+
+
 class TestTerms(unittest.TestCase):
     """
     Test basic term functions.
@@ -468,6 +491,24 @@ class TestTerms(unittest.TestCase):
         self.assertTrue(subterm(self.t5,[1]) == 'X')
         self.assertTrue(subterm(self.t5,[2,0]) == 'f')
         self.assertTrue(subterm(self.t5,[5,0]) == None)
+
+    def testTermIsSubterm(self):
+        """
+        Test if termIsSubterm() works as expected.
+        """
+        self.assertTrue((termIsSubterm(self.t5, subterm(self.t5, [0]))) == True)
+        self.assertTrue((termIsSubterm(self.t5, self.t5)) == True)
+        self.assertTrue((termIsSubterm(subterm(self.t5, [0]), self.t5)) == False)
+        self.assertTrue((termIsSubterm(self.t5, self.t2)) == False)
+
+    def testGetVarOccurences(self):
+        """
+        Test if getvaroccurences() works as expected.
+        """
+        self.assertTrue(getvaroccurences(self.t1) == 1)
+        self.assertTrue(getvaroccurences(self.t2) == 0)
+        self.assertTrue(getvaroccurences(self.t4) == 2)
+
 
 if __name__ == '__main__':
     unittest.main()

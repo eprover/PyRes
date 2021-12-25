@@ -36,6 +36,7 @@ def kbocomparevars(term_s, term_t):
             return CompareResult.to_lesser
         return CompareResult.to_uncomparable
 
+
 def kbocompare(term_s, term_t):
     if termIsVar(term_s) or termIsVar(term_t):
         return kbocomparevars(term_s, term_t)
@@ -124,19 +125,7 @@ def kbocompare(term_s, term_t):
         assert False
 
 
-def getvaroccurences(term):
-    occurences = 0
 
-    while 1:
-        if termIsVar(term):
-            occurences += 1
-        elif termIsGround(term):
-            break
-        else:
-            arity = termCollectSig(term).getArity()
-            for pos in range(arity):
-                occurences += getvaroccurences(subterm(term, pos))
-    return occurences
 
 def kbovarcompare(term_s, term_t):  # simplify ?!
     sgreater = False
@@ -157,30 +146,5 @@ def kbovarcompare(term_s, term_t):  # simplify ?!
     else:
         return CompareResult.to_equal
 
-    """
-    #candidates = self.literals
-    #if not candidates:
-     #   return
-    # print("Got: ", candidates)
-    maxLit = [[]]
-    for idx, l in enumerate(literals):
-        l.setInferenceLit(False)
-        if idx == 0:
-            maxLit = [[0, l]]
-            print("init", maxLit)
-        else:
-            print(l.collectVars())
-            if l.collectVars() < maxLit[0][1].collectVars():
-                if l.weight(1,1) < maxLit[0][1].weight(1,1):
-                    maxLit = [[idx, l]]
-                elif l.weight(1, 1) == maxLit[0][1].weight(1, 1):
-                    print("equal")
-                    maxLit.append([idx,l])
-        print(maxLit)
-        for l in maxLit:
-            print("result",l)
-            l[1].setInferenceLit(True)
-        # maxLit[1].setInferenceLit(True)
 
-    """
 
