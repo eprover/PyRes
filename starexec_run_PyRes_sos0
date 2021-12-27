@@ -1,0 +1,31 @@
+#!/bin/tcsh
+#
+# This is a StarExec runscript for PyRes. See https://www.starexec.org.
+#
+# To use this, build a StarExec package with "make starexec" and
+# upload it to a StarExec cluster - then follow local instructions
+# ;-).
+#
+
+module add python/python33
+echo -n "% Problem    : " ; head -2 $1 | tail -1 | sed -e "s/.*  : //"
+set ProblemSPC=`grep " SPC " $1 | sed -e "s/.* : //"`
+set flags="-tfbsVp -nlargest -HPickGiven5 "
+set final=" "$1
+set ecmd="./pyres-fof.py $flags $final"
+
+if ( `expr "$ProblemSPC" : "FOF.*"` || `expr "$ProblemSPC" : "CNF.*"` ) then
+	echo "% Command    : " $ecmd
+	/home/starexec/bin/GetComputerInfo -p THIS Model CPUModel RAMPerCPU OS | \
+        sed -e "s/Computer     /% Computer   /" \
+            -e "s/Model        /% Model      /" \
+            -e "s/CPUModel     /% CPU        /" \
+            -e "s/RAMPerCPU    /% Memory     /" \
+            -e "s/OS           /% OS         /"
+	echo -n "% CPULimit   : " ; echo "$STAREXEC_CPU_LIMIT"
+	echo -n "% DateTime   : " ; date
+	echo "% CPUTime    : "
+	$ecmd
+else
+    echo "% SZS status Inappropriate"
+endif
