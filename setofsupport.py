@@ -127,3 +127,21 @@ GivenSOSStrategies = {
     "ContainsNegLit": SOSWhereNegLit(),
     "ContainsPosLit": SOSWherePosLit(),
 }
+
+
+class SOSRatio(object):
+    """ If set-of-support-strategy is combined with other strategies the proof algorithm may not be complete anymore.
+     To solve this problem a ratio is introduced that allows clauses to be processed even if they are not part
+     of the set-of-support
+     """
+    def __init__(self, ratio=10):
+        self.current = 0
+        self.ratio = ratio
+
+    def nextEval(self):
+        self.current += 1
+        if self.current >= self.ratio:
+            self.current = 0
+            return False
+        else:
+            return True

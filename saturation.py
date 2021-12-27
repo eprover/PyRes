@@ -205,6 +205,12 @@ class ProofState(object):
         if self.params.sos_strategy is not None:
             self.params.sos_strategy.markSOS(self.unprocessed)
 
+        # add all clauses not in sos to processed
+        for c in self.unprocessed.clauses:
+            if c.part_of_sos is False:
+                self.unprocessed.extractClause(c)
+                self.processed.addClause(c)
+
         while self.unprocessed:
             res = self.processClause()
             if res != None:

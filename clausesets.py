@@ -35,6 +35,7 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Lexer
+from setofsupport import SOSRatio
 from signature import Signature
 from literals import parseLiteral
 from clauses import Clause, parseClause
@@ -156,6 +157,7 @@ class HeuristicClauseSet(ClauseSet):
         """
         self.clauses  = []
         self.eval_functions = eval_functions
+        self.sos_ratio = SOSRatio(10)
         self.sos_strategy = sos_strategy
 
 
@@ -169,38 +171,46 @@ class HeuristicClauseSet(ClauseSet):
         clause.addEval(evals)
         ClauseSet.addClause(self, clause)
 
-    def extractBestByEval(self, heuristic_index):
+    def extractBestByEval(self, heuristic_index, clause_of_sos=True):
         """
-        Extract and return the clause with the lowest weight according
+        Find and return the clause with the lowest weight according
         to the selected heuristic. If the set is empty, return None.
+        Also consider the parameter clause_of_sos. If the parameter is True/False
+        the method will only return clauses that are/aren't part of set of support.
         """
         if self.clauses:
             best = -1
             besteval = float('inf')
-            if self.sos_strategy is not None:
-                # If set-of-support strategy is used, only allow clauses that are part of sos
-                for i in range(0, len(self.clauses)):
-                    if self.clauses[i].evaluation[heuristic_index] < besteval and self.clauses[i].part_of_sos:
-                        besteval = self.clauses[i].evaluation[heuristic_index]
-                        best     = i
+            # If set-of-support strategy is used, only allow clauses that are part of sos
+            for i in range(0, len(self.clauses)):
+                if self.clauses[i].evaluation[heuristic_index] < besteval\
+                        and (self.clauses[i].part_of_sos is None
+                        or self.clauses[i].part_of_sos is clause_of_sos):
+                    besteval = self.clauses[i].evaluation[heuristic_index]
+                    best     = i
             if best == -1:
-                # Either set-of-support strategy is not used or none of the clauses is part of the sos.
-                # Return the best clause no matter if it is part of sos or not
-                for i in range(0, len(self.clauses)):
-                    if self.clauses[i].evaluation[heuristic_index] < besteval:
-                        besteval = self.clauses[i].evaluation[heuristic_index]
-                        best     = i
-            return self.clauses.pop(best)
-        else:
-            return None
+                return None
+            else:
+                return self.clauses.pop(best)
 
     def extractBest(self):
         """
         Extract and return the next "best" clause according to the
         evaluation scheme.
         """
-        return self.extractBestByEval(self.eval_functions.nextEval())
+        # determines which of the evaluation metrics should be applied (lowest index or least literals)
+        heuristic_index = self.eval_functions.nextEval()
 
+        # determines whether the clause should or should not be part of the set of support
+        next_clause_sos = self.sos_ratio.nextEval()
+
+        clause = self.extractBestByEval(heuristic_index, next_clause_sos)
+        if clause is not None:
+            return clause
+        else:
+            # if there is no clause that matches the sos requirement, search for a clause with the opposite
+            # sos property
+            return self.extractBestByEval(heuristic_index, not next_clause_sos)
 
 
 class IndexedClauseSet(ClauseSet):
