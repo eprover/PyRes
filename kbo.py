@@ -8,6 +8,7 @@
 """
 import enum
 
+from ocb import OCBCell
 from terms import *
 
 
@@ -33,17 +34,15 @@ def kbocomparevars(term_s, term_t):
 
 
 def kbocompare(ocb, term_s, term_t):
+
     #if term_s.isPureVarLit() or term_t.isPureVarLit():
     if termIsVar(term_s) or termIsVar(term_t):
         return kbocomparevars(term_s, term_t)
  #   input(...)
     sweight = termWeight(term_s,1,1) #change numbers gettermweight(ocb, s)
     tweight = termWeight(term_t,1,1) #change numbers gettermweight(ocb, t)
-    print(sweight)
-    print(tweight)
     if sweight > tweight:
         case = kbovarcompare(term_s, term_t)
-        print(case)
         if case == CompareResult.to_greater or case == CompareResult.to_equal:
             return CompareResult.to_greater
         elif case == CompareResult.to_lesser or case == CompareResult.to_uncomparable:
@@ -60,15 +59,12 @@ def kbocompare(ocb, term_s, term_t):
             assert False
 
     assert (sweight == tweight)
-    print(termCollectSig(term_s))
-    print(termCollectFuns(term_s))
-    input("WIP")
     topsymbolcompare = ocbfuncompare(ocb, termCollectFuns(term_s), termCollectFuns(term_t))
     if topsymbolcompare == CompareResult.to_uncomparable:
         return CompareResult.to_uncomparable
     elif topsymbolcompare == CompareResult.to_greater:
         case = kbovarcompare(term_s, term_t)
-        if case == (CompareResult.to_greater or CompareResult.to_equal):
+        if case == CompareResult.to_greater or case == CompareResult.to_equal:
             return CompareResult.to_greater
         elif case == CompareResult.to_lesser or case == CompareResult.to_uncomparable:
             return CompareResult.to_uncomparable
@@ -83,12 +79,23 @@ def kbocompare(ocb, term_s, term_t):
         else:
             assert False
     elif topsymbolcompare == CompareResult.to_equal:
-        sarity = termCollectSig(term_s).getArity()
-        tarity = termCollectSig(term_t).getArity()
-        for i in max(sarity,tarity):
+        #sarity = termCollectSig(term_s).getArity()
+        sarity = 0
+        tarity = 0
+
+        for fun in termCollectFuns(term_s):
+            arity = termCollectSig(term_s).getArity(fun)
+            if arity > sarity:
+                sarity = arity
+        for fun in termCollectFuns(term_t):
+            arity = termCollectSig(term_t).getArity(fun)
+            if arity > tarity:
+                tarity = arity
+        #tarity = termCollectSig(term_t).getArity()
+        for i in range(max(sarity,tarity)):
             if tarity <= i:
                 case = kbovarcompare(term_s, term_t)
-                if case == (CompareResult.to_greater or CompareResult.to_equal):
+                if case == CompareResult.to_greater or case == CompareResult.to_equal:
                     return CompareResult.to_greater
                 elif case == CompareResult.to_lesser or case == CompareResult.to_uncomparable:
                     return CompareResult.to_uncomparable
@@ -102,10 +109,10 @@ def kbocompare(ocb, term_s, term_t):
                     return CompareResult.to_uncomparable
                 else:
                     assert False
-            res = kbocompare(subterm(term_s, i), subterm(term_t, i))      # args from t and s
+            res = kbocompare(ocb, subterm(term_s, [i+1]), subterm(term_t, [i+1]))      # args from t and s
             if res == CompareResult.to_greater:
                 case = kbovarcompare(term_s, term_t)
-                if case == (CompareResult.to_greater or CompareResult.to_equal):
+                if case == CompareResult.to_greater or case == CompareResult.to_equal:
                     return CompareResult.to_greater
                 elif case == CompareResult.to_lesser or case == CompareResult.to_uncomparable:
                     return CompareResult.to_uncomparable
@@ -132,7 +139,6 @@ def kbovarcompare(term_s, term_t):
     sgreater = False
     tgreater = False
     allvars = termCollectVars(term_s).union(termCollectVars(term_t))
-    print(allvars)
     for var in allvars:
         diff = getvaroccurences(term_s, var) - getvaroccurences(term_t, var)
         if diff > 0:
@@ -151,8 +157,25 @@ def kbovarcompare(term_s, term_t):
 
 
 def ocbfuncomparepos(ocb, f1, f2):
-    #Compare position of both func to ocb sig_size
-    pass
+    max_idx1 = -1
+    max_idx2 = -1
+    for fun in f1:
+        idx = list(ocb.ocb_funs.keys()).index(fun)
+        if idx > max_idx1:
+            max_idx1 = idx
+    for fun in f2:
+        idx = list(ocb.ocb_funs.keys()).index(fun)
+        if idx > max_idx2:
+            max_idx2 = idx
+    res = max_idx1 - max_idx2
+    if res > 0:
+        return CompareResult.to_greater
+    elif res < 0:
+        return CompareResult.to_lesser
+    elif res == 0:
+        return CompareResult.to_equal
+    else:
+        assert False
 
 
 def ocbfuncompare(ocb, f1, f2):
@@ -162,15 +185,15 @@ def ocbfuncompare(ocb, f1, f2):
         return CompareResult.to_lesser
     if "$True" in f2:
         return CompareResult.to_greater
-    if f1 <= ocb.sig_size:
-        if f2 <= ocb.sig_size:
+    if len(f1) <= ocb.sig_size:
+        if len(f2) <= ocb.sig_size:
             return ocbfuncomparepos(ocb, f1, f2)
         return CompareResult.to_greater
-    if f2 <= ocb.sig_size:
+    if len(f2) <= ocb.sig_size:
         return CompareResult.to_lesser
 
-    assert ((f1 > ocb.sig_size) and (f1 > ocb.sig_size))
-    res = f1 - f2
+    assert ((len(f1) > ocb.sig_size) and (len(f1) > ocb.sig_size))
+    res = len(f1) - len(f2)
     if res < 0:
         return CompareResult.to_lesser
     elif res > 0:
@@ -191,7 +214,8 @@ class TestKBO(unittest.TestCase):
         self.example5 = "g(X, h(a, b))"
         self.example6 = "g(X, h(X, a))"
         self.example7 = "g(Y, h(Y, Y))"
-        self.example8 = "g(X, h(b))"
+        self.example8 = "g(X, h(a))"
+        self.example9 = "g(X, h(b))"
 
         self.t1 = string2Term(self.example1)
         self.t2 = string2Term(self.example2)
@@ -201,6 +225,8 @@ class TestKBO(unittest.TestCase):
         self.t6 = string2Term(self.example6)
         self.t7 = string2Term(self.example7)
         self.t8 = string2Term(self.example8)
+        self.t9 = string2Term(self.example9)
+
         print(self.t4)
 
     def testkbocomparevars(self):
@@ -217,7 +243,10 @@ class TestKBO(unittest.TestCase):
         """
 
         """
-        ocb = None
+        ocb = OCBCell(self.t3,None,None)
+        ocb.insert2dic(self.t8,None,None)
+        print("Ordering:")
+        print(ocb.ocb_funs.keys())
         self.assertTrue(kbocompare(ocb,self.t1, self.t1) == CompareResult.to_equal)
         self.assertTrue(kbocompare(ocb,self.t1, self.t3) == CompareResult.to_lesser)
         self.assertTrue(kbocompare(ocb,self.t3, self.t1) == CompareResult.to_greater)
@@ -226,10 +255,17 @@ class TestKBO(unittest.TestCase):
         self.assertTrue(kbocompare(ocb,self.t6, self.t3) == CompareResult.to_greater)
         self.assertTrue(kbocompare(ocb,self.t3, self.t6) == CompareResult.to_lesser)
         self.assertTrue(kbocompare(ocb,self.t5, self.t3) == CompareResult.to_greater)
+
         self.assertTrue(kbocompare(ocb,self.t7, self.t3) == CompareResult.to_uncomparable)
         self.assertTrue(kbocompare(ocb,self.t4, self.t3) == CompareResult.to_lesser)
         self.assertTrue(kbocompare(ocb,self.t3, self.t4) == CompareResult.to_greater)
 
+        self.assertTrue(kbocompare(ocb, self.t3, self.t8) == CompareResult.to_lesser)
+        self.assertTrue(kbocompare(ocb, self.t8, self.t3) == CompareResult.to_greater)
+
+        self.assertTrue(kbocompare(ocb, self.t3, self.t3) == CompareResult.to_equal)
+        self.assertTrue(kbocompare(ocb, self.t8, self.t9) == CompareResult.to_greater)
+        self.assertTrue(kbocompare(ocb, self.t9, self.t8) == CompareResult.to_lesser)
 
 
 if __name__ == '__main__':
