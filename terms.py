@@ -304,14 +304,13 @@ def termIsSubterm(term, test):
     return False
 
 
-def getvaroccurences(term):
+def getvaroccurences(term, var):
     occurences = 0
-
-    if termIsVar(term):
+    if termIsVar(term) and term == var:
         occurences += 1
-    else:
+    elif not termIsVar(term):
         for pos in range(len(termArgs(term))):
-            occurences += getvaroccurences(subterm(term, [pos]))
+            occurences += getvaroccurences(subterm(term, [pos+1]), var)
     return occurences
 
 
@@ -327,6 +326,7 @@ class TestTerms(unittest.TestCase):
         self.example5 = "g(X, f(Y))"
         self.example6 = "g(b,b)"
         self.example7 = "'g'(b,b)"
+        self.example8 = "g(X, f(X))"
         self.t1 = string2Term(self.example1)
         self.t2 = string2Term(self.example2)
         self.t3 = string2Term(self.example3)
@@ -334,7 +334,7 @@ class TestTerms(unittest.TestCase):
         self.t5 = string2Term(self.example5)
         self.t6 = string2Term(self.example6)
         self.t7 = string2Term(self.example7)
-
+        self.t8 = string2Term(self.example8)
 
     def testToString(self):
         """
@@ -505,9 +505,11 @@ class TestTerms(unittest.TestCase):
         """
         Test if getvaroccurences() works as expected.
         """
-        self.assertTrue(getvaroccurences(self.t1) == 1)
-        self.assertTrue(getvaroccurences(self.t2) == 0)
-        self.assertTrue(getvaroccurences(self.t4) == 2)
+        self.assertTrue(getvaroccurences(self.t1, self.t1) == 1)
+        self.assertTrue(getvaroccurences(self.t2, self.t1) == 0)
+        self.assertTrue(getvaroccurences(self.t4, self.t1) == 1)
+        self.assertTrue(getvaroccurences(self.t8, self.t1) == 2)
+
 
 
 if __name__ == '__main__':

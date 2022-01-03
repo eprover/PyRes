@@ -23,6 +23,15 @@ class LinkedList:
     def __init__(self, initocbcell=None):
         self.initOCBCell = initocbcell
 
+    def append(self, cell):
+        if not self.initOCBCell:
+            self.initOCBCell = cell
+        else:
+            last_cell = self.initOCBCell
+            while last_cell.nextcell:
+                last_cell = last_cell.nextcell
+            last_cell.nextcell = cell
+
 
 class TestOCB(unittest.TestCase):
     """

@@ -45,6 +45,7 @@ Email: schulz@eprover.org
 
 import unittest
 from idents import Ident
+from orderedResolution import selectInferenceLitsOrderedResolution
 from lexer import Token,Lexer
 from clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
 import heuristics
@@ -179,7 +180,8 @@ class ProofState(object):
         if(self.params.literal_selection):
             given_clause.selectInferenceLits(self.params.literal_selection)
         if self.params.ordered_resolution:
-            print("TEST")
+            # given_clause.selectInferenceLitsKBO()
+            selectInferenceLitsOrderedResolution(given_clause   )
         if not self.silent:
             print("#", given_clause)
         new = []
