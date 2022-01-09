@@ -12,14 +12,18 @@ from terms import *
 
 
 class OCBCell:
-    def __init__(self, term, weights=None, var_weight=None):
 
-        self.ocb_funs = {}
-        self.ocb_vars = {}
+    def __init__(self, ocb_funs=None, ocb_vars=None):
+        if ocb_vars is None:
+            ocb_vars = {}
+        if ocb_funs is None:
+            ocb_funs = {}
+        self.ocb_funs = ocb_funs
+        self.ocb_vars = ocb_vars
 
-        self.insert2dic(term, weights, var_weight)
-        self.sig_size = len(self.ocb_funs)
-        #self.nextcell = None
+    """
+    For Tests only:
+    """
 
     def insert2dic(self, term, weights=None, var_weights=None):
         if var_weights is None:
@@ -37,23 +41,6 @@ class OCBCell:
         for idx,var in enumerate(termCollectVars(term)):
             self.ocb_vars.update({var: var_weights[idx]})
 
-
-"""
-class LinkedList:
-    def __init__(self, initocbcell=None):
-        self.initOCBCell = initocbcell
-
-
-    def append(self, cell):
-        if not self.initOCBCell:
-            self.initOCBCell = cell
-        else:
-            last_cell = self.initOCBCell
-            while last_cell.nextcell:
-                last_cell = last_cell.nextcell
-            last_cell.nextcell = cell
-
-"""
 
 class TestOCB(unittest.TestCase):
     """

@@ -12,61 +12,72 @@ from literals import *
 from ocb import *
 
 
-def selectInferenceLitsOrderedResolution(given_clause):
-    print(given_clause.literals)
+def countsymbols(clauses):
+    symbol_count = {}
+    varis = {}
+    for clause in clauses.clauses:
+        for lit in clause.literals:
+            funs = termCollectFuns(lit.atom)
+            varis = termCollectVars(lit.atom)
+            for fun in funs:
+                old = symbol_count.get(fun)
+                if old is None:
+                    symbol_count.update({fun: 0})
+                    old = symbol_count.get(fun)
+                symbol_count.update({fun: old + 1})
+    return symbol_count, varis
+
+
+def initocb(symbolcount, varis, option=0):
+    fun_dict = {}
+    var_dict = {}
+    sorted_list = sorted(symbolcount.items(), key=lambda x: x[1], reverse=True)
+    print(sorted_list)
+    print(sorted_list[0][0])
+    if option == 0:
+        for fun in sorted_list:
+            fun_dict.update({fun[0]: 1})
+        for var in varis:
+            var_dict.update({var: 1})
+    return OCBCell(fun_dict, var_dict)
+
+
+def selectInferenceLitsOrderedResolution(ocb, given_clause):
+    print(given_clause)
     for lit in given_clause.literals:
         if len(given_clause.literals) == 1:
             lit.setInferenceLit(True)
             return
-        else:
-            lit.setInferenceLit(False)
-            print("atom")
-            print(lit.atom)
-
-            """
-            print("Litlist")
-            print(literalList2String(given_clause.literals))
-            print("strlit")
-            print(term2String(lit))
-            print("lit")
-            print(lit)
-            print("Var?")
-            print(termIsVar(lit))
-            print("atom")
-            print(lit.atom)
-            print("weight")
-            print(lit.weight(1,2))
-            print("funs")
-            print(lit.collectFuns())
-            print("vars")
-            print(lit.collectVars())
-            print("Sig")
-            print(lit.collectSig())
-
-            input(...)
-"""
-    ocb = LinkedList(OCBCell("$True", [1]))
-    ocb.append(OCBCell("$False", [1]))
-    ocb.append(OCBCell("=", [1]))
-    for lit in given_clause.literals:
-        ocb.append(OCBCell)
 
     for a in given_clause.literals:
-        #if a.isNegative():
-            #set1 = a.atom + ["$False"]
-        #else:
-            #set1 = a.atom + ["$True"]
-        for b in given_clause.literals:
-            #if b.isNegative():
-            #    set2 = b.atom + ["$False"]
-            #else:
-            #    set2 = b.atom + ["$True"]
-            #print(set1)
-            #print(set2)
-            #input(...)
-            result = kbocompare(ocb, a.atom, b.atom)
-            if result == CompareResult.to_greater or CompareResult.to_uncomparable:
-                a.setInferenceLit(True)
-            else:
-                print("else")
-                a.setInferenceLit(False)
+        if a.inference_lit is True:
+            for b in given_clause.literals:
+                if b.inference_lit is True:
+                    result = kbocompare(ocb, a.atom, b.atom)
+                    if result == CompareResult.to_greater:
+                        b.setInferenceLit(False)
+                    elif result == CompareResult.to_equal or result == CompareResult.to_uncomparable:
+                        pass
+                    elif result == CompareResult.to_lesser:
+                        a.setInferenceLit(False)
+                        break
+                    else:
+                        assert False
+
+
+class TestOrderedResolution(unittest.TestCase):
+    """
+    Test basic  functions.
+    """
+    def setUp(self):
+        self.ocb = None
+        self.input1 = "cnf(symmetry,axiom,X15!=X16|X16=X15)."
+        lex = Lexer(self.input1)
+        self.given_clause = parseClause(lex)
+    def testselectInferenceLitsOrderedResolution(self):
+        selectInferenceLitsOrderedResolution(self.ocb, self.given_clause)
+
+
+
+if __name__ == '__main__':
+    unittest.main()

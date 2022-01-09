@@ -45,7 +45,7 @@ Email: schulz@eprover.org
 
 import unittest
 from idents import Ident
-from orderedResolution import selectInferenceLitsOrderedResolution
+from orderedResolution import selectInferenceLitsOrderedResolution, countsymbols, initocb
 from lexer import Token,Lexer
 from clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
 import heuristics
@@ -138,6 +138,11 @@ class ProofState(object):
         self.backward_subsumed    = 0
         self.silent               = silent
 
+        if self.params.ordered_resolution:
+            option = 0
+            self.symbol_count, self.vars = countsymbols(clauses)
+            self.ocb = initocb(self.symbol_count, self.vars, option)
+
     def processClause(self):
         """
         Pick a clause from unprocessed and process it. If the empty
@@ -180,8 +185,7 @@ class ProofState(object):
         if(self.params.literal_selection):
             given_clause.selectInferenceLits(self.params.literal_selection)
         if self.params.ordered_resolution:
-            # given_clause.selectInferenceLitsKBO()
-            selectInferenceLitsOrderedResolution(given_clause   )
+            selectInferenceLitsOrderedResolution(self.ocb, given_clause)
         if not self.silent:
             print("#", given_clause)
         new = []

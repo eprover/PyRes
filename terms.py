@@ -272,6 +272,17 @@ def termWeight(t, fweight, vweight):
         return res
 
 
+def termocbweight(t, ocb):
+    """
+
+    """
+    if termIsVar(t):
+        return ocb.ocb_vars.get(t)
+    else:
+        res = ocb.ocb_funs.get(termFunc(t))
+        for s in termArgs(t):
+            res = res + termocbweight(s, ocb)
+        return res
 
 def subterm(t, pos):
     """
@@ -304,13 +315,18 @@ def termIsSubterm(term, test):
     return False
 
 
-def getvaroccurences(term, var):
-    occurences = 0
-    if termIsVar(term) and term == var:
-        occurences += 1
+def countvaroccurences(term, increment, occurences=None):
+    if occurences is None:
+        occurences = {}
+    if termIsVar(term):
+        old = occurences.get(term)
+        if old is None:
+            occurences.update({term: 0})
+            old = occurences.get(term)
+        occurences.update({term: old + increment})
     elif not termIsVar(term):
         for pos in range(len(termArgs(term))):
-            occurences += getvaroccurences(subterm(term, [pos+1]), var)
+            occurences = countvaroccurences(subterm(term, [pos + 1]), increment, occurences)
     return occurences
 
 
@@ -501,16 +517,17 @@ class TestTerms(unittest.TestCase):
         self.assertTrue((termIsSubterm(subterm(self.t5, [0]), self.t5)) == False)
         self.assertTrue((termIsSubterm(self.t5, self.t2)) == False)
 
-    def testGetVarOccurences(self):
+    def testCountVarOccurences(self):
         """
         Test if getvaroccurences() works as expected.
         """
-        self.assertTrue(getvaroccurences(self.t1, self.t1) == 1)
-        self.assertTrue(getvaroccurences(self.t2, self.t1) == 0)
-        self.assertTrue(getvaroccurences(self.t4, self.t1) == 1)
-        self.assertTrue(getvaroccurences(self.t8, self.t1) == 2)
-
-
+        self.assertTrue(countvaroccurences(self.t1, 1).keys() == {"X"})
+        self.assertTrue(countvaroccurences(self.t1, 1).get("X") == 1)
+        self.assertTrue(countvaroccurences(self.t1, -1).get("X") == -1)
+        self.assertTrue(countvaroccurences(self.t4, 1).keys() == {"X", "Y"})
+        self.assertTrue(countvaroccurences(self.t4, 1).get("X") == 1)
+        self.assertTrue(countvaroccurences(self.t4, 1).get("Y") == 1)
+        self.assertTrue(countvaroccurences(self.t8, 1).get("X") == 2)
 
 if __name__ == '__main__':
     unittest.main()
