@@ -39,7 +39,7 @@ class OCBCell:
         for idx,fun in enumerate(termCollectFuns(term)):
             self.ocb_funs.update({fun: weights[idx]})
         for idx,var in enumerate(termCollectVars(term)):
-            self.ocb_vars.update({var: var_weights[idx]})
+            self.ocb_vars.update({var[:1]: var_weights[idx]})
 
 
 class TestOCB(unittest.TestCase):

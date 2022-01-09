@@ -277,9 +277,9 @@ def termocbweight(t, ocb):
 
     """
     if termIsVar(t):
-        return ocb.ocb_vars.get(t)
+        return ocb.ocb_vars.get(t[:1], 1)           # Failsafe id not found, weight=1
     else:
-        res = ocb.ocb_funs.get(termFunc(t))
+        res = ocb.ocb_funs.get(termFunc(t), 1)
         for s in termArgs(t):
             res = res + termocbweight(s, ocb)
         return res
