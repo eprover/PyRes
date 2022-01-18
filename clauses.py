@@ -48,6 +48,8 @@ Email: schulz@eprover.org
 import unittest
 from lexer import Token,Lexer
 from derivations import Derivable,Derivation
+from ocb import OCBCell
+from orderedResolution import selectInferenceLitsOrderedResolution
 from signature import Signature
 
 from terms import *
@@ -160,7 +162,7 @@ class Clause(Derivable):
             res = res + l.weight(fweight, vweight)
         return res
 
-    def selectInferenceLits(self, lit_selection_fun=firstLit, option=0):
+    def selectInferenceLits(self, lit_selection_fun=firstLit, ocb=None):
         """
         Perform negative literal selection. lit_selection_function is
         a function that takes a list of literals and returns a sublist
@@ -168,15 +170,18 @@ class Clause(Derivable):
         """
         candidates = self.getNegativeLits()
         if not candidates:
+            if ocb is not None:
+                selectInferenceLitsOrderedResolution(ocb, self)
             return
         # print("Got: ", candidates)
-        if option != 1:
-            for l in self.literals:
-                l.setInferenceLit(False)
+        for l in self.literals:
+            l.setInferenceLit(False)
 
         selected = lit_selection_fun(candidates)
         for l in selected:
             l.setInferenceLit(True)
+
+
 
     def predicateAbstraction(self):
         """
@@ -384,6 +389,18 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         self.assertEqual(c2.predicateAbstraction(), ((True, "p"), (True, "p")))
         self.assertEqual(c3.predicateAbstraction(), ((False, "p"), (True, "p")))
 
+        # check ordered resolution + neglitselection
+        ocb = OCBCell()
+        for lit in c1.literals:
+            ocb.insert2dic(lit.atom)
+        c1.selectInferenceLits(firstLit, ocb)
+        self.assertTrue(not c1.literals[0].isInferenceLit())
+        self.assertTrue(c1.literals[1].isInferenceLit())
+        for lit in c4.literals:
+            ocb.insert2dic(lit.atom)
+        c5.selectInferenceLits(firstLit, ocb)
+        self.assertTrue(not c5.literals[0].isInferenceLit())
+        self.assertTrue(c5.literals[1].isInferenceLit())
 
 if __name__ == '__main__':
     unittest.main()

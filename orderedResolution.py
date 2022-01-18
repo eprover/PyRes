@@ -14,37 +14,28 @@ from ocb import *
 
 def countsymbols(clauses):
     symbol_count = {}
-    varis = set()
     for clause in clauses.clauses:
         for lit in clause.literals:
             funs = termCollectFuns(lit.atom)
-            varis = termCollectVars(lit.atom, varis)
             for fun in funs:
                 old = symbol_count.get(fun)
                 if old is None:
                     symbol_count.update({fun: 0})
                     old = symbol_count.get(fun)
                 symbol_count.update({fun: old + 1})
-    varis2 = set()
-    for v in varis:
-        varis2.update(v[:1])
-    return symbol_count, varis
+    return symbol_count
 
 
-def initocb(symbolcount, varis, option=0):
+def initocb(symbolcount, option=0):
     fun_dict = {}
-    var_dict = {}
+    var_weight = 1
     sorted_list = sorted(symbolcount.items(), key=lambda x: x[1], reverse=True)
     if option == 0:
         for fun in sorted_list:
             fun_dict.update({fun[0]: 1})
-        for var in varis:
-            var_dict.update({var: 1})
-    print("-----------------------")
-    print("INIT_____________OCB")
-    print("-----------------------")
+        # var_weight = 1 default
 
-    return OCBCell(fun_dict, var_dict)
+    return OCBCell(fun_dict, var_weight)
 
 
 def selectInferenceLitsOrderedResolution(ocb, given_clause):
@@ -78,12 +69,14 @@ def selectInferenceLitsOrderedResolution(ocb, given_clause):
                 b.setInferenceLit(False)
             elif result == CompareResult.to_lesser:
                 a.setInferenceLit(False)
+                #break
             elif result == CompareResult.to_uncomparable or result == CompareResult.to_equal:
                 if a.isNegative():
                     if not b.isNegative():
                         b.setInferenceLit(False)    # a greater b
                 elif b.isNegative():
                     a.setInferenceLit(False)        # b greater a
+                    #break
             else:
                 assert False
 
