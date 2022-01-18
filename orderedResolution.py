@@ -54,7 +54,7 @@ def selectInferenceLitsOrderedResolution(ocb, given_clause):
             return
         else:
             lit.setInferenceLit(False)
-
+    """
     for a in given_clause.literals:
         for b in given_clause.literals:
             if a != b:
@@ -70,7 +70,7 @@ def selectInferenceLitsOrderedResolution(ocb, given_clause):
                 else:
                     assert False
     """
-    
+
     candidates = given_clause.literals.copy()
     for a in given_clause.literals:
         if a in candidates:
@@ -93,7 +93,7 @@ def selectInferenceLitsOrderedResolution(ocb, given_clause):
     #for lit in candidates:
        # lit.setInferenceLit(True)
 
-    """
+
 
 
 class TestOrderedResolution(unittest.TestCase):

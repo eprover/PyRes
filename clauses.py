@@ -160,7 +160,7 @@ class Clause(Derivable):
             res = res + l.weight(fweight, vweight)
         return res
 
-    def selectInferenceLits(self, lit_selection_fun=firstLit):
+    def selectInferenceLits(self, lit_selection_fun=firstLit, option=0):
         """
         Perform negative literal selection. lit_selection_function is
         a function that takes a list of literals and returns a sublist
@@ -170,9 +170,9 @@ class Clause(Derivable):
         if not candidates:
             return
         # print("Got: ", candidates)
-
-        for l in self.literals:
-            l.setInferenceLit(False)
+        if option != 1:
+            for l in self.literals:
+                l.setInferenceLit(False)
 
         selected = lit_selection_fun(candidates)
         for l in selected:

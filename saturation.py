@@ -181,11 +181,13 @@ class ProofState(object):
             # general than the new given clause).
             tmp = backwardSubsumption(given_clause, self.processed)
             self.backward_subsumed = self.backward_subsumed+tmp
-
-        if(self.params.literal_selection):
-            given_clause.selectInferenceLits(self.params.literal_selection)
         if self.params.ordered_resolution:
             selectInferenceLitsOrderedResolution(self.ocb, given_clause)
+        if self.params.ordered_resolution and self.params.literal_selection:
+            given_clause.selectInferenceLits(self.params.literal_selection, 1)
+        elif(self.params.literal_selection):
+            given_clause.selectInferenceLits(self.params.literal_selection, 0)
+
         if not self.silent:
             print("#", given_clause)
         new = []
