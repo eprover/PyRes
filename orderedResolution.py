@@ -49,11 +49,9 @@ def initocb(symbolcount, varis, option=0):
 
 def selectInferenceLitsOrderedResolution(ocb, given_clause):
     for lit in given_clause.literals:
+        lit.setInferenceLit(True)
         if len(given_clause.literals) == 1:
-            lit.setInferenceLit(True)
             return
-        else:
-            lit.setInferenceLit(False)
     """
     for a in given_clause.literals:
         for b in given_clause.literals:
@@ -71,6 +69,26 @@ def selectInferenceLitsOrderedResolution(ocb, given_clause):
                     assert False
     """
 
+    for iter_lit in range(len(given_clause.literals) - 1, 0, -1):
+        a = given_clause.literals[iter_lit]
+        for iter_lit_2 in range(iter_lit):
+            b = given_clause.literals[iter_lit_2]
+            result = kbocompare(ocb, a.atom, b.atom)
+            if result == CompareResult.to_greater:
+                b.setInferenceLit(False)
+            elif result == CompareResult.to_lesser:
+                a.setInferenceLit(False)
+            elif result == CompareResult.to_uncomparable or result == CompareResult.to_equal:
+                if a.isNegative():
+                    if not b.isNegative():
+                        b.setInferenceLit(False)    # a greater b
+                elif b.isNegative():
+                    a.setInferenceLit(False)        # b greater a
+            else:
+                assert False
+
+
+"""
     candidates = given_clause.literals.copy()
     for a in given_clause.literals:
         if a in candidates:
@@ -92,8 +110,7 @@ def selectInferenceLitsOrderedResolution(ocb, given_clause):
                         pass
     #for lit in candidates:
        # lit.setInferenceLit(True)
-
-
+"""
 
 
 class TestOrderedResolution(unittest.TestCase):
@@ -113,7 +130,7 @@ class TestOrderedResolution(unittest.TestCase):
         selectInferenceLitsOrderedResolution(self.ocb, self.given_clause)
         self.assertEqual(self.given_clause.literals[0].inference_lit, False)
         self.assertEqual(self.given_clause.literals[1].inference_lit, True)
-        self.assertEqual(self.given_clause.literals[2].inference_lit, True)
+        self.assertEqual(self.given_clause.literals[2].inference_lit, False)
         self.assertEqual(self.given_clause.literals[3].inference_lit, True)
 
 
