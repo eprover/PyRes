@@ -566,8 +566,8 @@ def separateQuantors(f, varlist=None):
     Remove all quantors from f, returning the quantor-free core of the
     formula and a list of quanified variables. This will only be
     applied to Skolemized formulas, thus finding an existential
-    quantor is an error. To be useful, the inpt formula also has to be
-    variable-normalized.
+    quantor is an error. To be useful, the input formula also has to
+    be variable-normalized.
     """
     if varlist == None:
         varlist = list()
