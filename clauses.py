@@ -205,6 +205,7 @@ class Clause(Derivable):
         lits = [l.instantiate(subst) for l in self.literals]
         res = Clause(lits, self.type, self.name)
         res.setDerivation(self.derivation)
+        res.part_of_sos = self.part_of_sos
         return res
 
     def freshVarCopy(self):
