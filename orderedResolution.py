@@ -26,11 +26,15 @@ def countsymbols(clauses):
     return symbol_count
 
 
-def initocb(symbolcount, option=0):
+def initocb(symbolcount, option=1):
     fun_dict = {}
     var_weight = 1
     sorted_list = sorted(symbolcount.items(), key=lambda x: x[1], reverse=True)
-    if option == 0:
+    if option == 2:
+        for fun in sorted_list:
+            fun_dict.update({fun[0]: 2})
+        # var_weight = 1 default
+    else:   #default case option = 1
         for fun in sorted_list:
             fun_dict.update({fun[0]: 1})
         # var_weight = 1 default

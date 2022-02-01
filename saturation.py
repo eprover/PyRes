@@ -44,6 +44,8 @@ Email: schulz@eprover.org
 """
 
 import unittest
+from builtins import int
+
 from idents import Ident
 from orderedResolution import selectInferenceLitsOrderedResolution, countsymbols, initocb
 from lexer import Token,Lexer
@@ -139,7 +141,7 @@ class ProofState(object):
         self.silent               = silent
 
         if self.params.ordered_resolution:
-            option = 0
+            option = self.params.ordered_resolution
             self.symbol_count = countsymbols(clauses)
             self.ocb = initocb(self.symbol_count, option)
 
