@@ -94,8 +94,12 @@ def resolution(clause1, lit1, clause2, lit2):
     res = clauses.Clause(lits1)
     res.removeDupLits()
     res.setDerivation(flatDerivation("resolution", [clause1, clause2]))
-    if clause1.part_of_sos or clause2.part_of_sos:
+    if (clause1.part_of_sos is True) or (clause2.part_of_sos is True):
         res.part_of_sos = True
+    elif (clause1.part_of_sos is False) and (clause2.part_of_sos is False):
+        res.part_of_sos = False
+    else:
+        res.part_of_sos = None
     return res
 
 
@@ -115,11 +119,13 @@ def factor(clause, lit1, lit2):
     res = clauses.Clause(lits)
     res.removeDupLits()
     res.setDerivation(flatDerivation("factor", [clause]))
-    if clause.part_of_sos:
+    if clause.part_of_sos is True:
         res.part_of_sos = True
+    elif clause.part_of_sos is False:
+        res.part_of_sos = False
+    else:
+        res.part_of_sos = None
     return res
-
-
 
 
 class TestResolution(unittest.TestCase):

@@ -56,6 +56,11 @@ Options:
 --set-of-support=<strategy>
   Apply the selected Set-Of-Support strategy.
 
+ -R <ratio>
+--ratio-sos=<ratio>
+  Number of clauses that are processed with SOS before one clause is processed without
+  sos
+
  -S
 --suppress-eq-axioms
   Do not add equality axioms. This makes the prover incomplete for
@@ -157,9 +162,22 @@ def processOptions(opts):
                 sys.exit(1)
         elif opt=="-O" or opt == "--set-of-support":
             try:
-                params.sos_strategy = GivenSOSStrategies[optarg]
+                # extract the selected sos class from the dictionary 'GivenSOSStrategies'
+                # and call its constructor with ()
+                sos_strategy = GivenSOSStrategies[optarg]()
+                params.sos_strategy = sos_strategy
             except KeyError:
                 print("Unknown set-of-support strategy", optarg)
+                sys.exit(1)
+        elif opt == "-R" or opt == "--ratio-sos":
+            if isinstance(optarg, int) or optarg < 0:
+                try:
+                    params.sos_strategy.ratio = optarg
+                except AttributeError:
+                    print("SOS Strategy must be defined before assigning sos-ratio")
+                    sys.exit(1)
+            else:
+                print("Illegal value for ratio-sos (only integers >= 0 are allowed)")
                 sys.exit(1)
         elif opt=="-S" or opt=="--suppress-eq-axioms":
             suppressEqAxioms = True

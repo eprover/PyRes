@@ -35,19 +35,20 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Lexer
-from setofsupport import SOSRatio
 from signature import Signature
 from literals import parseLiteral
-from clauses import Clause, parseClause
+from clauses import parseClause
 from heuristics import PickGiven2
 from indexing import ResolutionIndex, SubsumptionIndex
+
 
 class ClauseSet(object):
     """
     A class representing a clause set (or, more precisely,
     a multi-set of clauses).
     """
-    def __init__(self, clauses = []):
+
+    def __init__(self, clauses=[]):
         """
         Initialize the clause.
         """
@@ -127,7 +128,6 @@ class ClauseSet(object):
         ClauseSet, we just return all clauses in the set.
         """
         return self.clauses
-        
 
     def parse(self, lexer):
         """
@@ -138,7 +138,7 @@ class ClauseSet(object):
         while lexer.LookLit() == "cnf":
             clause = parseClause(lexer)
             self.addClause(clause)
-            count = count+1
+            count = count + 1
         return count
 
 
@@ -151,15 +151,15 @@ class HeuristicClauseSet(ClauseSet):
     according to all criteria. The clause set support extraction of
     the "best" clause according to any of the configured heuristics.
     """
-    def __init__(self, eval_functions, sos_strategy):
+
+    def __init__(self, eval_functions, sos_strategy=None):
         """
         Initialize the clause.
         """
-        self.clauses  = []
+        super().__init__()
+        self.clauses = []
         self.eval_functions = eval_functions
-        self.sos_ratio = SOSRatio(10)
         self.sos_strategy = sos_strategy
-
 
     def addClause(self, clause):
         """
@@ -171,23 +171,23 @@ class HeuristicClauseSet(ClauseSet):
         clause.addEval(evals)
         ClauseSet.addClause(self, clause)
 
-    def extractBestByEval(self, heuristic_index, clause_of_sos=True):
+    def extractBestByEval(self, heuristic_index, force_sos=False):
         """
         Find and return the clause with the lowest weight according
         to the selected heuristic. If the set is empty, return None.
-        Also consider the parameter clause_of_sos. If the parameter is True/False
-        the method will only return clauses that are/aren't part of set of support.
+        Also consider the parameter clause_of_sos. If the parameter is True
+        the method will only return clauses that are part of set of support.
         """
         if self.clauses:
             best = -1
             besteval = float('inf')
             # If set-of-support strategy is used, only allow clauses that are part of sos
             for i in range(0, len(self.clauses)):
-                if self.clauses[i].evaluation[heuristic_index] < besteval\
-                        and (self.clauses[i].part_of_sos is None
-                        or self.clauses[i].part_of_sos is clause_of_sos):
+                if self.clauses[i].evaluation[heuristic_index] < besteval \
+                        and (self.sos_strategy is None or
+                             self.clauses[i].part_of_sos >= force_sos):
                     besteval = self.clauses[i].evaluation[heuristic_index]
-                    best     = i
+                    best = i
             if best == -1:
                 return None
             else:
@@ -202,15 +202,17 @@ class HeuristicClauseSet(ClauseSet):
         heuristic_index = self.eval_functions.nextEval()
 
         # determines whether the clause should or should not be part of the set of support
-        next_clause_sos = self.sos_ratio.nextEval()
+        force_sos_next = False
+        if self.sos_strategy is not None:
+            force_sos_next = self.sos_strategy.should_apply()
 
-        clause = self.extractBestByEval(heuristic_index, next_clause_sos)
+        clause = self.extractBestByEval(heuristic_index, force_sos_next)
         if clause is not None:
             return clause
         else:
             # if there is no clause that matches the sos requirement, search for a clause with the opposite
             # sos property
-            return self.extractBestByEval(heuristic_index, not next_clause_sos)
+            return self.extractBestByEval(heuristic_index, not force_sos_next)
 
 
 class IndexedClauseSet(ClauseSet):
@@ -218,7 +220,8 @@ class IndexedClauseSet(ClauseSet):
     This is a normal clause set, augmented by indices that speeds up
     the finding of resolution and subsumption partners.
     """
-    def __init__(self, clauses = []):
+
+    def __init__(self, clauses=[]):
         """
         Create the two indices and call the superclass initializer. 
         """
@@ -267,13 +270,14 @@ class TestClauseSets(unittest.TestCase):
     """
     Unit test class for clause sets.
     """
+
     def setUp(self):
         """
         Setup function for clause/literal unit tests. Initialize
         variables needed throughout the tests.
         """
         print()
-        self.spec ="""
+        self.spec = """
 %------------------------------------------------------------------------------
 % File     : PUZ001-1 : TPTP v4.1.0. Released v1.0.0.
 % Domain   : Puzzles
@@ -370,12 +374,11 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         oldlen = len(clauses)
         c = clauses.clauses[0]
         clauses.extractClause(c)
-        self.assertEqual(len(clauses), oldlen-1)
+        self.assertEqual(len(clauses), oldlen - 1)
 
         sig = Signature()
         clauses.collectSig(sig)
         print(sig)
-
 
     def testClauseSetHeuristics(self):
         """
@@ -397,7 +400,7 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         c3 = clauses.extractFirst()
         self.assertEqual(c3.name, "charles")
         c = clauses.extractBestByEval(0)
-        while c != None:
+        while c is not None:
             c = clauses.extractBestByEval(0)
 
         print("==========================================")
@@ -405,12 +408,11 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         lexer = Lexer(self.spec)
         parsed = clauses.parse(lexer)
         c = clauses.extractBest()
-        while c != None:
+        while c is not None:
             print(c)
             c = clauses.extractBest()
         c = clauses.extractFirst()
         self.assertEqual(c, None)
-
 
     def testIndexedClauseSetChanges(self):
         """
@@ -423,11 +425,10 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         oldlen = len(clauses)
         c = clauses.clauses[0]
         clauses.extractClause(c)
-        self.assertEqual(len(clauses), oldlen-1)
+        self.assertEqual(len(clauses), oldlen - 1)
 
         sig = clauses.collectSig()
         print(sig)
-
 
     def testResPositions(self):
         """
@@ -463,8 +464,6 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         pos = clauses.getResolutionLiterals(lit)
         self.assertTrue(len(pos), 6)
         print(pos)
-
-
 
 
 if __name__ == '__main__':

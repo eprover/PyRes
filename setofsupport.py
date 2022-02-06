@@ -67,81 +67,98 @@ Auf der Altenburg 7
 Germany
 Email: schulz@eprover.org
 """
+import sys
+from typing import Dict
 
 
-
-class SOSGenerator(object):
+class SosStrategy(object):
     """ pure virtual class that represents a divison strategy
     of a clauseset into satisfiable set and set-of-support."""
-    def markSOS(self, clauseset):
-        return
-
-
-class SOSConjecture(SOSGenerator):
-    """ division strategy that adds the negated conjecture into
-    the set-of-support and all axioms into the base set.
-    This can be done by assuming that the set of all axioms is
-    satisfiable and only the negated conjecture makes the set
-    unsatisfiable.
-    """
-    def markSOS(self, clauseset):
-        for c in clauseset.clauses:
-            if c.type == "negated_conjecture":
-                c.part_of_sos = True
-            else:
-                c.part_of_sos = False
-
-class SOSWhereNegLit(SOSGenerator):
-    """ division strategy that adds all clauses with at least one
-    negative literal into the set-of-support. This can be done
-    because the base set consists of clauses with only positive
-    literals which makes the clause set satisfiable by
-    interpeting all atoms as true.
-    """
-    def markSOS(self, clauseset):
-        for c in clauseset.clauses:
-            c.part_of_sos = False
-            for l in c.literals:
-                if l.isNegative():
-                    c.part_of_sos = True
-                    break
-
-
-class SOSWherePosLit(SOSGenerator):
-    """ division strategy that adds all clauses with at least one
-    positive literal into the set-of-support. This can be done
-    because the base set consists of clauses with only negative
-    literals which makes the clause set satisfiable by
-    interpreting all atoms as false."""
-    def markSOS(self, clauseset):
-        for c in clauseset.clauses:
-            c.part_of_sos = False
-            for l in c.literals:
-                if l.isPositive():
-                    c.part_of_sos = True
-                    break
-
-
-GivenSOSStrategies = {
-    "Conjecture": SOSConjecture(),
-    "ContainsNegLit": SOSWhereNegLit(),
-    "ContainsPosLit": SOSWherePosLit(),
-}
-
-
-class SOSRatio(object):
-    """ If set-of-support-strategy is combined with other strategies the proof algorithm may not be complete anymore.
-     To solve this problem a ratio is introduced that allows clauses to be processed even if they are not part
-     of the set-of-support
-     """
-    def __init__(self, ratio=10):
+    def __init__(self, ratio=0):
         self.current = 0
-        self.ratio = ratio
+        """ current count of processed clauses modulo ratio.
+        If current >= ratio then the SOS won't be applied in the next step
+        """
 
-    def nextEval(self):
+        self.ratio = ratio
+        """ number of clauses where SOS is applied before one clause wihtout SOS is processed.
+         If ratio equals zero, sos will always be applied
+         """
+
+    def should_apply(self) -> bool:
+        """ returns whether in the next resolution step the sos strategy should be applied or not """
+        if self.ratio == 0:
+            # if ratio equals zero, always apply sos
+            return True
+
         self.current += 1
         if self.current >= self.ratio:
             self.current = 0
             return False
         else:
             return True
+
+    def markSos(self, clauseset) -> None:
+        """ marks each clause in a clauseset as part of SOS or not. This method get implemented by the derived
+        strategies.
+        """
+        print("Either the abstract class SosStrategy has been instantiated or the the method markSos is not"
+              "implemented for the selected SosStrategy.")
+        sys.exit(1)
+
+class SosConjecture(SosStrategy):
+    """ division strategy that adds the negated conjecture into
+    the set-of-support and all axioms into the base set.
+    This can be done by assuming that the set of all axioms is
+    satisfiable and only the negated conjecture makes the set
+    unsatisfiable.
+    """
+    def markSos(self, clauseset):
+        for c in clauseset.clauses:
+            if c.type == "negated_conjecture":
+                c.part_of_sos = True
+            else:
+                c.part_of_sos = False
+
+
+class SosOnlyNegLit(SosStrategy):
+    """ division strategy that adds all clauses with only
+    negative literal into the set-of-support. This can be done
+    because the base set consists of clauses with at least one positive
+    literals which makes the clause set satisfiable by
+    interpeting all atoms as true.
+
+    The empty clause (if included) gets added to the SOS.
+    """
+    def markSos(self, clauseset):
+        for c in clauseset.clauses:
+            c.part_of_sos = True
+            for l in c.literals:
+                if l.isPositive():
+                    c.part_of_sos = False
+                    break
+
+
+class SosOnlyPosLit(SosStrategy):
+    """ division strategy that adds all clauses with only
+    positive literal into the set-of-support. This can be done
+    because the base set consists of clauses with at least one negative
+    literals which makes the clause set satisfiable by
+    interpreting all atoms as false.
+
+    The empty clause (if included) gets added to the SOS.
+    """
+    def markSos(self, clauseset):
+        for c in clauseset.clauses:
+            c.part_of_sos = True
+            for l in c.literals:
+                if l.isNegative():
+                    c.part_of_sos = False
+                    break
+
+
+GivenSOSStrategies: dict = {
+    "Conjecture": SosConjecture,
+    "OnlyNegLit": SosOnlyNegLit,
+    "OnlyPosLit": SosOnlyPosLit,
+}
