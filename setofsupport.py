@@ -68,7 +68,6 @@ Germany
 Email: schulz@eprover.org
 """
 import sys
-from typing import Dict
 
 
 class SosStrategy(object):
@@ -85,7 +84,7 @@ class SosStrategy(object):
          If ratio equals zero, sos will always be applied
          """
 
-    def should_apply(self) -> bool:
+    def should_apply(self):
         """ returns whether in the next resolution step the sos strategy should be applied or not """
         if self.ratio == 0:
             # if ratio equals zero, always apply sos
@@ -105,6 +104,7 @@ class SosStrategy(object):
         print("Either the abstract class SosStrategy has been instantiated or the the method markSos is not"
               "implemented for the selected SosStrategy.")
         sys.exit(1)
+
 
 class SosConjecture(SosStrategy):
     """ division strategy that adds the negated conjecture into
@@ -157,7 +157,7 @@ class SosOnlyPosLit(SosStrategy):
                     break
 
 
-GivenSOSStrategies: dict = {
+GivenSOSStrategies = {
     "Conjecture": SosConjecture,
     "OnlyNegLit": SosOnlyNegLit,
     "OnlyPosLit": SosOnlyPosLit,
