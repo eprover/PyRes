@@ -187,7 +187,7 @@ class ProofState(object):
             given_clause.selectInferenceLits(self.params.literal_selection, self.ocb)
         elif(self.params.literal_selection):
             given_clause.selectInferenceLits(self.params.literal_selection)
-        if self.params.ordered_resolution:
+        elif self.params.ordered_resolution:
             selectInferenceLitsOrderedResolution(self.ocb, given_clause)
 
 

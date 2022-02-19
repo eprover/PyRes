@@ -47,22 +47,6 @@ def selectInferenceLitsOrderedResolution(ocb, given_clause):
         lit.setInferenceLit(True)
         if len(given_clause.literals) == 1:
             return
-    """
-    for a in given_clause.literals:
-        for b in given_clause.literals:
-            if a != b:
-                result = kbocompare(ocb, a.atom, b.atom)
-                if result == CompareResult.to_greater:
-                    a.setInferenceLit(True)
-                    b.setInferenceLit(False)
-                elif result == CompareResult.to_lesser:
-                    a.setInferenceLit(False)
-                    break
-                elif result == CompareResult.to_equal or result == CompareResult.to_uncomparable:
-                    a.setInferenceLit(True)
-                else:
-                    assert False
-    """
 
     for iter_lit in range(len(given_clause.literals) - 1, 0, -1):
         a = given_clause.literals[iter_lit]
