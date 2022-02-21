@@ -66,11 +66,14 @@ class ClauseSet(object):
         """
         return len(self.clauses)
 
-    def addClause(self, clause):
+    def addClause(self, clause, beginning=False):
         """
         Add a clause to the clause set.
         """
-        self.clauses.append(clause)
+        if beginning:
+            self.clauses.insert(0, clause)
+        else:
+            self.clauses.append(clause)
 
     def extractClause(self, clause):
         """
