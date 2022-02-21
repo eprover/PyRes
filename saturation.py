@@ -193,7 +193,7 @@ class ProofState(object):
         self.processed.addClause(given_clause)
 
         for c in new:
-            self.unprocessed.addClause(c)
+            self.unprocessed.addClause(c, beginning=True)
         return None
 
     def saturate(self):
