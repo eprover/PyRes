@@ -206,7 +206,7 @@ class ProofState(object):
             self.params.sos_strategy.markSos(self.unprocessed)
 
             if self.params.sos_strategy.ratio == 0:
-                # if no sos_ratio is selected, then all clauses not in sos
+                # if no sos_ratio is selected, then all clauses that are not in sos
                 # will be added to processed
                 for c in self.unprocessed.clauses:
                     if c.part_of_sos is False:
