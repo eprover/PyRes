@@ -203,11 +203,14 @@ class ProofState(object):
         return None.
         """
         if self.params.sos_strategy is not None:
-            self.params.sos_strategy.markSos(self.unprocessed)
+            num_sos_clauses = self.params.sos_strategy.mark_sos(self.unprocessed)
+            if num_sos_clauses == 0:
+                # if the sos is empty then disable sos strategy to do normal proof search
+                self.params.sos_strategy = None
 
             if self.params.sos_strategy.ratio == 0:
-                # if no sos_ratio is selected, then all clauses that are not in sos
-                # will be added to processed
+                # if no sos_ratio is selected, the non-sos-clause would be completly ignored.
+                # Therefore add them to processed to allow resolution with sos-clauses
                 for c in self.unprocessed.clauses:
                     if c.part_of_sos is False:
                         self.unprocessed.extractClause(c)

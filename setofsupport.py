@@ -97,13 +97,20 @@ class SosStrategy(object):
         else:
             return True
 
-    def markSos(self, clauseset) -> None:
-        """ marks each clause in a clauseset as part of SOS or not. This method get implemented by the derived
-        strategies.
+    def mark_sos(self, clauseset):
+        """ iterates over each clause and in the clauseset and marks it as part_of_sos
         """
-        print("Either the abstract class SosStrategy has been instantiated or the the method markSos is not"
-              "implemented for the selected SosStrategy.")
+        sos_clauses = 0
+        for clause in clauseset:
+            mark_clause = self.should_mark_clause(clause)
+            clause.part_of_sos = mark_clause
+            sos_clauses += mark_clause
+        return sos_clauses
+
+    def should_mark_clause(self, clause):
+        print("This method of an abstract class should not be called")
         sys.exit(1)
+        return False
 
 
 class SosConjecture(SosStrategy):
@@ -113,12 +120,8 @@ class SosConjecture(SosStrategy):
     satisfiable and only the negated conjecture makes the set
     unsatisfiable.
     """
-    def markSos(self, clauseset):
-        for c in clauseset.clauses:
-            if c.type == "negated_conjecture":
-                c.part_of_sos = True
-            else:
-                c.part_of_sos = False
+    def should_mark_clause(self, clause):
+        return clause.type == "negated_conjecture"
 
 
 class SosOnlyNegLit(SosStrategy):
@@ -130,13 +133,11 @@ class SosOnlyNegLit(SosStrategy):
 
     The empty clause (if included) gets added to the SOS.
     """
-    def markSos(self, clauseset):
-        for c in clauseset.clauses:
-            c.part_of_sos = True
-            for l in c.literals:
-                if l.isPositive():
-                    c.part_of_sos = False
-                    break
+    def should_mark_clause(self, clause):
+        for lit in clause.literals:
+            if lit.isPositive:
+                return False
+        return True
 
 
 class SosOnlyPosLit(SosStrategy):
@@ -148,13 +149,11 @@ class SosOnlyPosLit(SosStrategy):
 
     The empty clause (if included) gets added to the SOS.
     """
-    def markSos(self, clauseset):
-        for c in clauseset.clauses:
-            c.part_of_sos = True
-            for l in c.literals:
-                if l.isNegative():
-                    c.part_of_sos = False
-                    break
+    def should_mark_clause(self, clause):
+        for lit in clause.literals:
+            if lit.isNegative:
+                return False
+        return True
 
 
 GivenSOSStrategies = {
