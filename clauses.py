@@ -77,7 +77,7 @@ class Clause(Derivable):
         self.literals   = [l for l in literals if not l.isPropFalse()]
         self.type       = type
         self.evaluation = None
-        self.part_of_sos = None
+        self.part_of_sos = False
         Derivable.__init__(self, name)
 
 
