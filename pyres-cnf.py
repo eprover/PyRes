@@ -35,11 +35,11 @@ Options:
   Use the specified heuristic for given-clause selection.
 
  -O <strategy>
---set-of-support=<strategy>
+--sos=<strategy>
   Apply the selected Set-Of-Support strategy.
 
  -R <ratio>
---ratio-sos=<ratio>
+--sos-ratio=<ratio>
   Number of clauses that are processed with SOS before one clause is processed without
   sos
 
@@ -121,7 +121,8 @@ def processOptions(opts):
                 print("Unknown set-of-support strategy", optarg)
                 sys.exit(1)
         elif opt == "-R" or opt == "--ratio-sos":
-            if isinstance(optarg, int) or optarg < 0:
+            optarg = int(optarg)
+            if optarg > 0:
                 try:
                     params.sos_strategy.ratio = optarg
                 except AttributeError:
@@ -135,14 +136,15 @@ def processOptions(opts):
 if __name__ == '__main__':
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                       "htfbH:n:O:",
+                                       "htfbH:n:O:R:",
                                        ["help",
                                         "delete-tautologies",
                                         "forward-subsumption",
                                         "backward-subsumption",
                                         "given-clause-heuristic=",
                                         "neg-lit-selection=",
-                                        "set-of-support="])
+                                        "sos=",
+                                        "sos-ratio="])
     except getopt.GetoptError as err:
         print(sys.argv[0],":", err)
         sys.exit(1)

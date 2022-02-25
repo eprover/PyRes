@@ -53,11 +53,11 @@ Options:
   Use the specified negative literal selection function.
 
  -O <strategy>
---set-of-support=<strategy>
+--sos=<strategy>
   Apply the selected Set-Of-Support strategy.
 
  -R <ratio>
---ratio-sos=<ratio>
+--sos-ratio=<ratio>
   Number of clauses that are processed with SOS before one clause is processed without
   sos
 
@@ -160,7 +160,7 @@ def processOptions(opts):
                 print("Unknown literal selection function", optarg)
                 print("Supported:", LiteralSelectors.keys())
                 sys.exit(1)
-        elif opt=="-O" or opt == "--set-of-support":
+        elif opt=="-O" or opt == "--sos":
             try:
                 # extract the selected sos class from the dictionary 'GivenSOSStrategies'
                 # and call its constructor with ()
@@ -169,8 +169,9 @@ def processOptions(opts):
             except KeyError:
                 print("Unknown set-of-support strategy", optarg)
                 sys.exit(1)
-        elif opt == "-R" or opt == "--ratio-sos":
-            if isinstance(optarg, int) or optarg < 0:
+        elif opt == "-R" or opt == "--sos-ratio":
+            optarg = int(optarg)
+            if optarg > 0:
                 try:
                     params.sos_strategy.ratio = optarg
                 except AttributeError:
@@ -216,7 +217,7 @@ if __name__ == '__main__':
 
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                       "hsVpitfbH:n:O:S",
+                                       "hsVpitfbH:n:O:R:S",
                                        ["help",
                                         "silent",
                                         "version",
@@ -227,7 +228,8 @@ if __name__ == '__main__':
                                         "backward-subsumption"
                                         "given-clause-heuristic=",
                                         "neg-lit-selection=",
-                                        "set-of-support=",
+                                        "sos=",
+                                        "sos-ratio=",
                                         "supress-eq-axioms"])
     except getopt.GetoptError as err:
         print(sys.argv[0],":", err)

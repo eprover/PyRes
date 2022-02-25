@@ -66,14 +66,11 @@ class ClauseSet(object):
         """
         return len(self.clauses)
 
-    def addClause(self, clause, beginning=False):
+    def addClause(self, clause):
         """
         Add a clause to the clause set.
         """
-        if beginning:
-            self.clauses.insert(0, clause)
-        else:
-            self.clauses.append(clause)
+        self.clauses.append(clause)
 
     def extractClause(self, clause):
         """
@@ -164,7 +161,7 @@ class HeuristicClauseSet(ClauseSet):
         self.eval_functions = eval_functions
         self.sos_strategy = sos_strategy
 
-    def addClause(self, clause, beginning=False):
+    def addClause(self, clause):
         """
         Add a clause to the clause set. If the clause set supports
         heuristic evaluations, add the relevant evaluations to the
@@ -172,7 +169,7 @@ class HeuristicClauseSet(ClauseSet):
         """
         evals = self.eval_functions.evaluate(clause)
         clause.addEval(evals)
-        ClauseSet.addClause(self, clause, beginning)
+        ClauseSet.addClause(self, clause)
 
     def extractBestByEval(self, heuristic_index, force_sos=False):
         """

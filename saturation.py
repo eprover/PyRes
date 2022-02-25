@@ -190,10 +190,10 @@ class ProofState(object):
         self.factor_count = self.factor_count+len(factors)
         self.resolvent_count = self.resolvent_count+len(resolvents)
 
-        self.processed.addClause(given_clause, beginning=True)
+        self.processed.addClause(given_clause)
 
         for c in new:
-            self.unprocessed.addClause(c, beginning=True)
+            self.unprocessed.addClause(c)
         return None
 
     def saturate(self):

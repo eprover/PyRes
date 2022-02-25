@@ -101,7 +101,7 @@ class SosStrategy(object):
         """ iterates over each clause and in the clauseset and marks it as part_of_sos
         """
         sos_clauses = 0
-        for clause in clauseset:
+        for clause in clauseset.clauses:
             mark_clause = self.should_mark_clause(clause)
             clause.part_of_sos = mark_clause
             sos_clauses += mark_clause

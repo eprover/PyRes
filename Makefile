@@ -12,8 +12,8 @@
 #------------------------------------------------------------------------
 
 STAREXECPATH=$(HOME)/StarExec
-VERSION=
-
+VERSION=v2.0.4
+TOPIC=sos1r1
 
 all:
 
@@ -42,9 +42,8 @@ distrib: clean
 
 starexec: clean
 	echo $(STAREXECPATH)
-	rm -rf $(STAREXECPATH)
+	rm -rf $(STAREXECPATH)/bin
 	mkdir -p $(STAREXECPATH)/bin
 	find . -name ".#*"  -exec rm {} \;
-	cp *.py starexec_run_PyRes_default $(STAREXECPATH)/bin
-	cp README $(STAREXECPATH)
-	cd $(STAREXECPATH); zip -r PyRes$(VERSION).zip bin
+	cp *.py starexec_run_PyRes_$(TOPIC) $(STAREXECPATH)/bin
+	cd $(STAREXECPATH); zip -r PyRes_$(VERSION)_$(TOPIC).zip bin
