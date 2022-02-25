@@ -91,7 +91,7 @@ class SosStrategy(object):
             return True
 
         self.current += 1
-        if self.current >= self.ratio:
+        if self.current > self.ratio:
             self.current = 0
             return False
         else:
