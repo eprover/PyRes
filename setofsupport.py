@@ -100,18 +100,27 @@ class SosStrategy(object):
     def mark_sos(self, clauseset):
         """ iterates over each clause and in the clauseset and marks it as part_of_sos
         """
-        sos_clauses = 0
+        num_sos_clauses = 0
         for clause in clauseset.clauses:
             mark_clause = self.should_mark_clause(clause)
             clause.part_of_sos = mark_clause
-            sos_clauses += mark_clause
-        return sos_clauses
+            num_sos_clauses += mark_clause
+        return num_sos_clauses
 
     def should_mark_clause(self, clause):
-        print("This method of an abstract class should not be called")
+        print("SosStrategy.should_mark_clause: This is a virtual method that should not be called")
         sys.exit(1)
+
+
+class NoSos(SosStrategy):
+    """ strategy that does not add any clauses to SOS.
+    This class is used as a placeholder if no sos strategy is used
+    """
+    def should_mark_clause(self, clause):
         return False
 
+    def should_apply(self):
+        return False
 
 class SosConjecture(SosStrategy):
     """ division strategy that adds the negated conjecture into

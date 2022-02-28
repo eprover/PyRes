@@ -160,6 +160,7 @@ class HeuristicClauseSet(ClauseSet):
         self.clauses = []
         self.eval_functions = eval_functions
         self.sos_strategy = sos_strategy
+        self.num_sos_clauses = 0
 
     def addClause(self, clause):
         """
@@ -169,28 +170,34 @@ class HeuristicClauseSet(ClauseSet):
         """
         evals = self.eval_functions.evaluate(clause)
         clause.addEval(evals)
+        if clause.part_of_sos:
+            self.num_sos_clauses += 1
         ClauseSet.addClause(self, clause)
 
-    def extractBestByEval(self, heuristic_index, force_sos=False):
+    def extractBestByEval(self, heuristic_index, part_of_sos):
         """
         Find and return the clause with the lowest weight according
         to the selected heuristic. If the set is empty, return None.
-        Also consider the parameter clause_of_sos. If the parameter is True
-        the method will only return clauses that are part of set of support.
+
+        The method also considers the parameter part_of_sos. If the parameter is True
+        the method will only return a clause that is part of sos. If it is False
+        the method will only return a clause that is not part of sos.
+        If no clause matches the sos requirement it will return None.
         """
         if self.clauses:
             best = -1
             besteval = float('inf')
-            # If set-of-support strategy is used, only allow clauses that are part of sos
+
             for i in range(0, len(self.clauses)):
                 if self.clauses[i].evaluation[heuristic_index] < besteval \
-                        and (self.sos_strategy is None or
-                             self.clauses[i].part_of_sos >= force_sos):
+                        and self.clauses[i].part_of_sos == part_of_sos:
                     besteval = self.clauses[i].evaluation[heuristic_index]
                     best = i
             if best == -1:
                 return None
             else:
+                if part_of_sos:
+                    self.num_sos_clauses -= 1
                 return self.clauses.pop(best)
 
     def extractBest(self):
@@ -202,17 +209,21 @@ class HeuristicClauseSet(ClauseSet):
         heuristic_index = self.eval_functions.nextEval()
 
         # determines whether the clause should or should not be part of the set of support
-        force_sos_next = False
-        if self.sos_strategy is not None:
-            force_sos_next = self.sos_strategy.should_apply()
+        part_of_sos = self.sos_strategy.should_apply()
 
-        clause = self.extractBestByEval(heuristic_index, force_sos_next)
-        if clause is not None:
-            return clause
-        else:
-            # if there is no clause that matches the sos requirement, search for a clause with the opposite
-            # sos property
-            return self.extractBestByEval(heuristic_index, not force_sos_next)
+        # treat speacial cases when all clauses or no clause is in sos
+        if not self.constains_sos_clauses():
+            part_of_sos = False
+        if self.contains_only_sos_clauses():
+            part_of_sos = True
+
+        return self.extractBestByEval(heuristic_index, part_of_sos)
+
+    def constains_sos_clauses(self):
+        return self.num_sos_clauses > 0
+
+    def contains_only_sos_clauses(self):
+        return len(self.clauses) == self.num_sos_clauses
 
 
 class IndexedClauseSet(ClauseSet):

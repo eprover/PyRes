@@ -49,6 +49,7 @@ from lexer import Token,Lexer
 from clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
 import heuristics
 from rescontrol import computeAllResolvents, computeAllFactors
+from setofsupport import NoSos
 from subsumption import forwardSubsumption, backwardSubsumption
 
 
@@ -63,7 +64,7 @@ class SearchParams(object):
                  forward_subsumption  = False,
                  backward_subsumption = False,
                  literal_selection    = None,
-                 sos_strategy = None):
+                 sos_strategy = NoSos()):
         """
         Initialize heuristic parameters.
         """
@@ -196,25 +197,25 @@ class ProofState(object):
             self.unprocessed.addClause(c)
         return None
 
+    def init_sos(self):
+        num_sos_clauses = self.params.sos_strategy.mark_sos(self.unprocessed)
+        self.unprocessed.num_sos_clauses += num_sos_clauses
+
+        if self.params.sos_strategy.ratio == 0:
+            # if no sos_ratio is selected, the non-sos-clause would be completly ignored.
+            # Therefore add them to processed to allow resolution with sos-clauses
+            for c in self.unprocessed.clauses:
+                if c.part_of_sos is False:
+                    self.unprocessed.extractClause(c)
+                    self.processed.addClause(c)
+
     def saturate(self):
         """
         Main proof procedure. If the clause set is found
         unsatisfiable, return the empty clause as a witness. Otherwise
         return None.
         """
-        if self.params.sos_strategy is not None:
-            num_sos_clauses = self.params.sos_strategy.mark_sos(self.unprocessed)
-            if num_sos_clauses == 0:
-                # if the sos is empty then disable sos strategy to do normal proof search
-                self.params.sos_strategy = None
-
-            if self.params.sos_strategy.ratio == 0:
-                # if no sos_ratio is selected, the non-sos-clause would be completly ignored.
-                # Therefore add them to processed to allow resolution with sos-clauses
-                for c in self.unprocessed.clauses:
-                    if c.part_of_sos is False:
-                        self.unprocessed.extractClause(c)
-                        self.processed.addClause(c)
+        self.init_sos()
 
         while self.unprocessed:
             res = self.processClause()
