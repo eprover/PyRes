@@ -201,13 +201,19 @@ class ProofState(object):
         num_sos_clauses = self.params.sos_strategy.mark_sos(self.unprocessed)
         self.unprocessed.num_sos_clauses += num_sos_clauses
 
-        if self.params.sos_strategy.ratio == 0:
+        if self.params.sos_strategy.ratio == 0 and self.unprocessed.num_sos_clauses > 0:
             # if no sos_ratio is selected, the non-sos-clause would be completly ignored.
             # Therefore add them to processed to allow resolution with sos-clauses
-            for c in self.unprocessed.clauses:
-                if c.part_of_sos is False:
-                    self.unprocessed.extractClause(c)
-                    self.processed.addClause(c)
+            # The iteration is implemented as a manual while loop because for loops can't handle changing
+            # list size during iteration.
+            i = 0
+            while i < len(self.unprocessed.clauses):
+                clause = self.unprocessed.clauses[i]
+                if clause.part_of_sos is False:
+                    self.unprocessed.extractClause(clause)
+                    self.processed.addClause(clause)
+                    i -= 1
+                i += 1
 
     def saturate(self):
         """
