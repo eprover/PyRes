@@ -12,8 +12,8 @@
 #------------------------------------------------------------------------
 
 STAREXECPATH=$(HOME)/StarExec
-VERSION=v2.0.5
-CONFIGS=sos0 sos1 sos2 sos3 sos1r1 sos1r2 sos1r3 sos1r4 sos1r5 sos1r6
+VERSION=v2.0.9
+CONFIGS=sos0 sos1 sos2 sos3 sos1r1 sos1r2 sos1r3 sos1r4 sos1r5 sos1r6 sos0_lit sos1r1_lit sos1r2_lit sos1r3_lit sos1r4_lit sos1r5_lit sos1r6_lit
 
 all:
 
