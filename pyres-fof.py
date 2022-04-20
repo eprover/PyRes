@@ -162,21 +162,24 @@ def processOptions(opts):
                 sys.exit(1)
         elif opt=="-O" or opt == "--sos":
             try:
+                # store ratio of old sos object
+                # important if -ratio option is called before -set-of-support
+                ratio = params.sos_strategy.ratio
+
                 # extract the selected sos class from the dictionary 'GivenSOSStrategies'
                 # and call its constructor with ()
                 sos_strategy = GivenSOSStrategies[optarg]()
                 params.sos_strategy = sos_strategy
+
+                # restore ratio value in new sos_strategy
+                params.sos_strategy.ratio = ratio
             except KeyError:
                 print("Unknown set-of-support strategy", optarg)
                 sys.exit(1)
         elif opt == "-R" or opt == "--sos-ratio":
             optarg = int(optarg)
-            if optarg > 0:
-                try:
-                    params.sos_strategy.ratio = optarg
-                except AttributeError:
-                    print("SOS Strategy must be defined before assigning sos-ratio")
-                    sys.exit(1)
+            if optarg >= 0:
+                params.sos_strategy.ratio = optarg
             else:
                 print("Illegal value for ratio-sos (only integers >= 0 are allowed)")
                 sys.exit(1)

@@ -41,6 +41,15 @@ S = { C }
 The maximum amount of new clauses is now reduced to three
 because the combinations (A,B), (A,D) and (B,D) are forbidden.
 
+=== Implementation ===
+There are two sos-concepts implemented in PyRes
+1) The first concept removes every non-sos-clause from the unprocessed
+clauses and adds it to the processed clauses at the beginning of the proof search.
+This concept is not compatible with literal selection and ordered resolution
+
+2) The second concept selects sos-clauses and non-sos-clauses in a specific ratio.
+This concept is compatible with literal selection and ordered resolution
+
 
 Copyright 2012-2019 Stephan Schulz, schulz@eprover.org
 
@@ -71,7 +80,7 @@ import sys
 
 
 class SosStrategy(object):
-    """ pure virtual class that represents a divison strategy
+    """ abstract class that represents a divison strategy
     of a clauseset into satisfiable set and set-of-support."""
     def __init__(self, ratio=0):
         self.current = 0
@@ -98,13 +107,16 @@ class SosStrategy(object):
             return True
 
     def mark_sos(self, clauseset):
-        """ iterates over each clause and in the clauseset and marks it as part_of_sos
+        """ iterates over each clause and in the clauseset and marks it as part_of_sos.
+        Returns the total number of sos-clauses.
         """
         num_sos_clauses = 0
         for clause in clauseset.clauses:
-            mark_clause = self.should_mark_clause(clause)
-            clause.part_of_sos = mark_clause
-            num_sos_clauses += mark_clause
+            if self.should_mark_clause(clause):
+                clause.part_of_sos = True
+                num_sos_clauses += 1
+            else:
+                clause.part_of_sos = False
         return num_sos_clauses
 
     def should_mark_clause(self, clause):
@@ -166,6 +178,7 @@ class SosOnlyPosLit(SosStrategy):
 
 
 GivenSOSStrategies = {
+    "NoSos": NoSos,
     "Conjecture": SosConjecture,
     "OnlyNegLit": SosOnlyNegLit,
     "OnlyPosLit": SosOnlyPosLit,
