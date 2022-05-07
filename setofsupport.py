@@ -77,6 +77,10 @@ Germany
 Email: schulz@eprover.org
 """
 import sys
+import unittest
+
+from clausesets import ClauseSet
+from lexer import Lexer
 
 
 class SosStrategy(object):
@@ -107,7 +111,7 @@ class SosStrategy(object):
             return True
 
     def mark_sos(self, clauseset):
-        """ iterates over each clause and in the clauseset and marks it as part_of_sos.
+        """ iterates over each clause in the clauseset and marks it as part_of_sos.
         Returns the total number of sos-clauses.
         """
         num_sos_clauses = 0
@@ -156,7 +160,7 @@ class SosOnlyNegLit(SosStrategy):
     """
     def should_mark_clause(self, clause):
         for lit in clause.literals:
-            if lit.isPositive:
+            if lit.isPositive():
                 return False
         return True
 
@@ -172,7 +176,7 @@ class SosOnlyPosLit(SosStrategy):
     """
     def should_mark_clause(self, clause):
         for lit in clause.literals:
-            if lit.isNegative:
+            if lit.isNegative():
                 return False
         return True
 
@@ -183,3 +187,77 @@ GivenSOSStrategies = {
     "OnlyNegLit": SosOnlyNegLit,
     "OnlyPosLit": SosOnlyPosLit,
 }
+
+
+class TestSos(unittest.TestCase):
+    def read_test_problem(self):
+        clause_definition = self.spec3 = """
+                    cnf(positive_axiom, axiom, p(X)|q(X)).
+                    cnf(negative_axiom, axiom, ~p(X)|~q(X)).
+                    cnf(mixed_axiom, axiom, ~p(X)| q(X)).
+                    cnf(positive_conjecture, negated_conjecture, p(X)|q(X)).
+                    cnf(negative_conjecture, negated_conjecture, ~p(X)|~q(X)).
+                    cnf(mixed_conjecture, negated_conjecture, ~p(X)| q(X)).
+                    """
+        lex = Lexer(clause_definition)
+        problem = ClauseSet()
+        problem.parse(lex)
+        return problem
+
+    def test_mark_no_sos(self):
+        sos_stategy = GivenSOSStrategies["NoSos"]()
+        assert isinstance(sos_stategy, NoSos)
+        problem = self.read_test_problem()
+
+        sos_stategy.mark_sos(problem)
+        sos_marks = [c.part_of_sos for c in problem.clauses]
+        assert sos_marks == [False, False, False, False, False, False]
+
+    def test_mark_sos_conjecture(self):
+        sos_stategy = GivenSOSStrategies["Conjecture"]()
+        assert isinstance(sos_stategy, SosConjecture)
+        problem = self.read_test_problem()
+
+        sos_stategy.mark_sos(problem)
+        sos_marks = [c.part_of_sos for c in problem.clauses]
+        assert sos_marks == [False, False, False, True, True, True]
+
+    def test_mark_sos_pos_lit(self):
+        sos_stategy = GivenSOSStrategies["OnlyPosLit"]()
+        assert isinstance(sos_stategy, SosOnlyPosLit)
+        problem = self.read_test_problem()
+
+        sos_stategy.mark_sos(problem)
+        sos_marks = [c.part_of_sos for c in problem.clauses]
+        assert sos_marks == [True, False, False, True, False, False]
+
+    def test_mark_sos_neg_lit(self):
+        sos_stategy = GivenSOSStrategies["OnlyNegLit"]()
+        assert isinstance(sos_stategy, SosOnlyNegLit)
+        problem = self.read_test_problem()
+
+        sos_stategy.mark_sos(problem)
+        sos_marks = [c.part_of_sos for c in problem.clauses]
+        assert sos_marks == [False, True, False, False, True, False]
+
+    def test_ratio0(self):
+        sos_strategy = GivenSOSStrategies["Conjecture"]()
+        sos_strategy.ratio = 0
+
+        should_apply_list = [sos_strategy.should_apply() for i in range(10)]
+        assert should_apply_list == [True, True, True, True, True, True, True, True, True, True]
+
+    def test_ratio2(self):
+        sos_strategy = GivenSOSStrategies["Conjecture"]()
+        sos_strategy.ratio = 2
+
+        should_apply_list = [sos_strategy.should_apply() for i in range(10)]
+        assert should_apply_list == [True, True, False, True, True, False, True, True, False, True]
+
+    def test_ratio_no_sos(self):
+        sos_strategy = GivenSOSStrategies["NoSos"]()
+        sos_strategy.ratio = 2
+
+        should_apply_list = [sos_strategy.should_apply() for i in range(10)]
+        assert should_apply_list == [False, False, False, False, False, False, False, False, False, False]
+
