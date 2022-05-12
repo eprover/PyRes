@@ -10,7 +10,7 @@
 module add python/python33
 echo -n "% Problem    : " ; head -2 $1 | tail -1 | sed -e "s/.*  : //"
 set ProblemSPC=`grep " SPC " $1 | sed -e "s/.* : //"`
-set flags="-tfbsVp -nlargest -HPickGiven5 -OOnlyNegLit -R6"
+set flags="-tfbsVp -HPickGiven5 -OOnlyPosLit -R32"
 set final=" "$1
 set ecmd="./pyres-fof.py $flags $final"
 
