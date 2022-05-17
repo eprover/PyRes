@@ -52,6 +52,7 @@ from lexer import Token,Lexer
 from clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
 import heuristics
 from rescontrol import computeAllResolvents, computeAllFactors
+from setofsupport import NoSos
 from subsumption import forwardSubsumption, backwardSubsumption
 
 
@@ -66,7 +67,8 @@ class SearchParams(object):
                  forward_subsumption  = False,
                  backward_subsumption = False,
                  literal_selection    = None,
-                 ordered_resolution = False):
+                 ordered_resolution = False,
+                 sos_strategy = NoSos()):
         """
         Initialize heuristic parameters.
         """
@@ -100,9 +102,13 @@ class SearchParams(object):
         """
         self.ordered_resolution = ordered_resolution
         """
-        Use KBO ordered Resolution or not
+        Use KBO ordered Resolution or not.
         """
-
+        self.sos_strategy = sos_strategy
+        """
+        Either None, or a reference to a class that is able to divide the
+        clause set into a base set and a set-of-support.
+        """
 
 class ProofState(object):
     """
@@ -123,7 +129,7 @@ class ProofState(object):
         Initialize the proof state with a set of clauses.
         """
         self.params = params
-        self.unprocessed = HeuristicClauseSet(params.heuristics)
+        self.unprocessed = HeuristicClauseSet(params.heuristics, params.sos_strategy)
 
         if indexed:
             self.processed   = IndexedClauseSet()
@@ -208,12 +214,28 @@ class ProofState(object):
             self.unprocessed.addClause(c)
         return None
 
+    def init_sos(self):
+        num_sos_clauses = self.params.sos_strategy.mark_sos(self.unprocessed)
+        self.unprocessed.num_sos_clauses += num_sos_clauses
+
+        if self.params.sos_strategy.ratio == 0 and self.unprocessed.num_sos_clauses > 0:
+            non_sos_clauses = []
+            for clause in self.unprocessed.clauses:
+                if clause.part_of_sos is False:
+                    non_sos_clauses.append(clause)
+
+            for clause in non_sos_clauses:
+                self.unprocessed.extractClause(clause)
+                self.processed.addClause(clause)
+
     def saturate(self):
         """
         Main proof procedure. If the clause set is found
         unsatisfiable, return the empty clause as a witness. Otherwise
         return None.
         """
+        self.init_sos()
+
         while self.unprocessed:
             res = self.processClause()
             if res != None:

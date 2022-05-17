@@ -52,6 +52,15 @@ Options:
 --neg-lit-selection
   Use the specified negative literal selection function.
 
+ -O <strategy>
+--sos=<strategy>
+  Apply the selected Set-Of-Support strategy.
+
+ -R <ratio>
+--sos-ratio=<ratio>
+  Number of clauses that are processed with SOS before one clause is processed without
+  sos
+
  -S
 --suppress-eq-axioms
   Do not add equality axioms. This makes the prover incomplete for
@@ -97,6 +106,8 @@ from resource import RLIMIT_STACK, setrlimit, getrlimit
 import getopt
 from signal import signal, SIGXCPU
 from resource import getrusage, RUSAGE_SELF
+
+from setofsupport import GivenSOSStrategies
 from version import version
 from lexer import Token, Lexer
 from derivations import enableDerivationOutput, disableDerivationOutput, Derivable, flatDerivation
@@ -153,7 +164,31 @@ def processOptions(opts):
                 print("Unknown literal selection function", optarg)
                 print("Supported:", LiteralSelectors.keys())
                 sys.exit(1)
-        elif opt == "-S" or opt == "--suppress-eq-axioms":
+        elif opt== "-O" or opt == "--sos":
+            try:
+                # store ratio of old sos object
+                # important if -ratio option is called before -set-of-support
+                ratio = params.sos_strategy.ratio
+
+                # extract the selected sos class from the dictionary 'GivenSOSStrategies'
+                # and call its constructor with ()
+                sos_strategy = GivenSOSStrategies[optarg]()
+                params.sos_strategy = sos_strategy
+
+                # restore ratio value in new sos_strategy
+                params.sos_strategy.ratio = ratio
+            except KeyError:
+                print("Unknown set-of-support strategy", optarg)
+                sys.exit(1)
+        elif opt == "-R" or opt == "--sos-ratio":
+            optarg = int(optarg)
+            if optarg >= 0:
+                params.sos_strategy.ratio = optarg
+            else:
+                print("Illegal value for ratio-sos (only integers >= 0 are allowed)")
+                sys.exit(1)
+        elif opt== "-S" or opt=="--suppress-eq-axioms":
+
             suppressEqAxioms = True
         elif opt == "-o" or opt == "--ordered-resolution":
             try:
@@ -199,7 +234,7 @@ if __name__ == '__main__':
 
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                       "hsVpitfbH:n:o:S",
+                                       "hsVpitfbH:n:O:R:o:S",
                                        ["help",
                                         "silent",
                                         "version",
@@ -209,10 +244,12 @@ if __name__ == '__main__':
                                         "forward-subsumption",
                                         "backward-subsumption"
                                         "given-clause-heuristic=",
-                                        "neg-lit-selection="
+                                        "neg-lit-selection=",
+                                        "sos=",
+                                        "sos-ratio=",
                                         "ordered-resolution=",
-                                        "supress-eq-axioms"
-                                        ])
+                                        "supress-eq-axioms"])
+
     except getopt.GetoptError as err:
         print(sys.argv[0], ":", err)
         sys.exit(1)

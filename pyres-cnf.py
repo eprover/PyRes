@@ -34,6 +34,15 @@ Options:
 --given-clause-heuristic=<heuristic>
   Use the specified heuristic for given-clause selection.
 
+ -O <strategy>
+--sos=<strategy>
+  Apply the selected Set-Of-Support strategy.
+
+ -R <ratio>
+--sos-ratio=<ratio>
+  Number of clauses that are processed with SOS before one clause is processed without
+  sos
+
 Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
@@ -63,6 +72,8 @@ Email: schulz@eprover.org
 
 import sys
 import getopt
+
+from setofsupport import GivenSOSStrategies
 from version import version
 from lexer import Token,Lexer
 from derivations import enableDerivationOutput,disableDerivationOutput
@@ -100,18 +111,43 @@ def processOptions(opts):
             except KeyError:
                 print("Unknown literal selection function", optarg)
                 sys.exit(1)
+        elif opt=="-O" or opt == "--set-of-support":
+            try:
+                # store ratio of old sos object
+                # important if -ratio option is called before -set-of-support
+                ratio = params.sos_strategy.ratio
+
+                # extract the selected sos class from the dictionary 'GivenSOSStrategies'
+                # and call its constructor with ()
+                sos_strategy = GivenSOSStrategies[optarg]()
+                params.sos_strategy = sos_strategy
+
+                # restore ratio value in new sos_strategy
+                params.sos_strategy.ratio = ratio
+            except KeyError:
+                print("Unknown set-of-support strategy", optarg)
+                sys.exit(1)
+        elif opt == "-R" or opt == "--ratio-sos":
+            optarg = int(optarg)
+            if optarg > 0:
+                params.sos_strategy.ratio = optarg
+            else:
+                print("Illegal value for ratio-sos (only integers >= 0 are allowed)")
+                sys.exit(1)
     return params
 
 if __name__ == '__main__':
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                       "htfbH:n:",
+                                       "htfbH:n:O:R:",
                                        ["help",
                                         "delete-tautologies",
                                         "forward-subsumption",
-                                        "backward-subsumption"
+                                        "backward-subsumption",
                                         "given-clause-heuristic=",
-                                        "neg-lit-selection="])
+                                        "neg-lit-selection=",
+                                        "sos=",
+                                        "sos-ratio="])
     except getopt.GetoptError as err:
         print(sys.argv[0],":", err)
         sys.exit(1)

@@ -12,8 +12,9 @@
 #------------------------------------------------------------------------
 
 STAREXECPATH=$(HOME)/StarExec
-VERSION=
+VERSION=v2.0.11
 
+CONFIG_SUB_FOLDERS = sos0 sos1 sos2 sos3
 
 all:
 
@@ -42,9 +43,17 @@ distrib: clean
 
 starexec: clean
 	echo $(STAREXECPATH)
-	rm -rf $(STAREXECPATH)
+	rm -rf $(STAREXECPATH)/bin
 	mkdir -p $(STAREXECPATH)/bin
 	find . -name ".#*"  -exec rm {} \;
-	cp *.py starexec_run_PyRes_default $(STAREXECPATH)/bin
-	cp README $(STAREXECPATH)
-	cd $(STAREXECPATH); zip -r PyRes$(VERSION).zip bin
+	cp *.py $(STAREXECPATH)/bin
+	for config in $(CONFIGS) ; do \
+		cp starexec_run_PyRes_$$config $(STAREXECPATH)/bin ; \
+	done
+
+	for subfolder in $(CONFIG_SUB_FOLDERS) ; do \
+		cp ./config/$$subfolder/* ${STAREXECPATH}/bin ; \
+	done
+
+	cd $(STAREXECPATH); zip -r PyRes_$(VERSION).zip bin
+
