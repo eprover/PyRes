@@ -43,6 +43,10 @@ Options:
   Number of clauses that are processed with SOS before one clause is processed without
   sos
 
+ -o
+--ordered-resolution
+  Use ordered Resolution KBO
+
 Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
@@ -134,12 +138,21 @@ def processOptions(opts):
             else:
                 print("Illegal value for ratio-sos (only integers >= 0 are allowed)")
                 sys.exit(1)
+        elif opt == "-o" or opt == "--ordered-resolution":
+            try:
+                params.ordered_resolution = int(optarg)
+                if params.ordered_resolution == 0:
+                    params.ordered_resolution += 1
+            except ValueError:
+                print("Unknown ordered resolution option", optarg)
+                print("Supported: Type int ")
+                sys.exit(1)
     return params
 
 if __name__ == '__main__':
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                       "htfbH:n:O:R:",
+                                       "htfbH:n:O:R:o",
                                        ["help",
                                         "delete-tautologies",
                                         "forward-subsumption",
@@ -147,7 +160,8 @@ if __name__ == '__main__':
                                         "given-clause-heuristic=",
                                         "neg-lit-selection=",
                                         "sos=",
-                                        "sos-ratio="])
+                                        "sos-ratio=",
+                                        "ordered-resolution="])
     except getopt.GetoptError as err:
         print(sys.argv[0],":", err)
         sys.exit(1)
