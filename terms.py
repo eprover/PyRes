@@ -272,6 +272,17 @@ def termWeight(t, fweight, vweight):
         return res
 
 
+def termocbweight(t, ocb):
+    """
+    Return weight of term / var from ocb
+    """
+    if termIsVar(t):
+        return ocb.var_weight
+    else:
+        res = ocb.ocb_funs.get(termFunc(t), 1)
+        for s in termArgs(t):
+            res = res + termocbweight(s, ocb)
+        return res
 
 def subterm(t, pos):
     """
@@ -292,6 +303,39 @@ def subterm(t, pos):
     return subterm(t[index],pos)
 
 
+def termIsSubterm(term, test):
+    """
+    Return if term is subterm of another one
+    """
+    if term == test:
+        return True
+    if not termIsCompound(term):
+        return False
+    for i in range(len(termArgs(term))):
+        if termIsSubterm(subterm(term, [i]), test):
+            return True
+
+    return False
+
+
+def countvaroccurrences(term, increment, occurrences=None):
+    """
+    Returns a dict with the occurrences of each var within the term
+    """
+    if occurrences is None:
+        occurrences = {}
+    if termIsVar(term):
+        old = occurrences.get(term)
+        if old is None:
+            occurrences.update({term: 0})
+            old = occurrences.get(term)
+        occurrences.update({term: old + increment})
+    elif not termIsVar(term):
+        for pos in range(len(termArgs(term))):
+            occurrences = countvaroccurrences(subterm(term, [pos + 1]), increment, occurrences)
+    return occurrences
+
+
 class TestTerms(unittest.TestCase):
     """
     Test basic term functions.
@@ -304,6 +348,7 @@ class TestTerms(unittest.TestCase):
         self.example5 = "g(X, f(Y))"
         self.example6 = "g(b,b)"
         self.example7 = "'g'(b,b)"
+        self.example8 = "g(X, f(X))"
         self.t1 = string2Term(self.example1)
         self.t2 = string2Term(self.example2)
         self.t3 = string2Term(self.example3)
@@ -311,7 +356,7 @@ class TestTerms(unittest.TestCase):
         self.t5 = string2Term(self.example5)
         self.t6 = string2Term(self.example6)
         self.t7 = string2Term(self.example7)
-
+        self.t8 = string2Term(self.example8)
 
     def testToString(self):
         """
@@ -468,6 +513,27 @@ class TestTerms(unittest.TestCase):
         self.assertTrue(subterm(self.t5,[1]) == 'X')
         self.assertTrue(subterm(self.t5,[2,0]) == 'f')
         self.assertTrue(subterm(self.t5,[5,0]) == None)
+
+    def testTermIsSubterm(self):
+        """
+        Test if termIsSubterm() works as expected.
+        """
+        self.assertTrue((termIsSubterm(self.t5, subterm(self.t5, [0]))) == True)
+        self.assertTrue((termIsSubterm(self.t5, self.t5)) == True)
+        self.assertTrue((termIsSubterm(subterm(self.t5, [0]), self.t5)) == False)
+        self.assertTrue((termIsSubterm(self.t5, self.t2)) == False)
+
+    def testCountVarOccurences(self):
+        """
+        Test if getvaroccurences() works as expected.
+        """
+        self.assertTrue(countvaroccurrences(self.t1, 1).keys() == {"X"})
+        self.assertTrue(countvaroccurrences(self.t1, 1).get("X") == 1)
+        self.assertTrue(countvaroccurrences(self.t1, -1).get("X") == -1)
+        self.assertTrue(countvaroccurrences(self.t4, 1).keys() == {"X", "Y"})
+        self.assertTrue(countvaroccurrences(self.t4, 1).get("X") == 1)
+        self.assertTrue(countvaroccurrences(self.t4, 1).get("Y") == 1)
+        self.assertTrue(countvaroccurrences(self.t8, 1).get("X") == 2)
 
 if __name__ == '__main__':
     unittest.main()

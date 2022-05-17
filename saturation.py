@@ -44,7 +44,10 @@ Email: schulz@eprover.org
 """
 
 import unittest
+from builtins import int
+
 from idents import Ident
+from orderedResolution import selectInferenceLitsOrderedResolution, countsymbols, initocb
 from lexer import Token,Lexer
 from clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
 import heuristics
@@ -64,6 +67,7 @@ class SearchParams(object):
                  forward_subsumption  = False,
                  backward_subsumption = False,
                  literal_selection    = None,
+                 ordered_resolution = False,
                  sos_strategy = NoSos()):
         """
         Initialize heuristic parameters.
@@ -96,7 +100,10 @@ class SearchParams(object):
         literals from a set of negative literals (both represented as
         lists, not Python sets) as the inference literal.
         """
-
+        self.ordered_resolution = ordered_resolution
+        """
+        Use KBO ordered Resolution or not.
+        """
         self.sos_strategy = sos_strategy
         """
         Either None, or a reference to a class that is able to divide the
@@ -139,6 +146,11 @@ class ProofState(object):
         self.backward_subsumed    = 0
         self.silent               = silent
 
+        if self.params.ordered_resolution:  # if ordered resolution init ocb and count the symbols
+            option = self.params.ordered_resolution
+            self.symbol_count = countsymbols(clauses)
+            self.ocb = initocb(self.symbol_count, option)
+
     def processClause(self):
         """
         Pick a clause from unprocessed and process it. If the empty
@@ -177,9 +189,14 @@ class ProofState(object):
             # general than the new given clause).
             tmp = backwardSubsumption(given_clause, self.processed)
             self.backward_subsumed = self.backward_subsumed+tmp
-
-        if(self.params.literal_selection):
+        if self.params.ordered_resolution and self.params.literal_selection:
+            given_clause.selectInferenceLits(self.params.literal_selection, self.ocb)
+        elif(self.params.literal_selection):
             given_clause.selectInferenceLits(self.params.literal_selection)
+        elif self.params.ordered_resolution:
+            selectInferenceLitsOrderedResolution(self.ocb, given_clause)
+
+
         if not self.silent:
             print("#", given_clause)
         new = []
