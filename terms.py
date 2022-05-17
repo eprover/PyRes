@@ -66,7 +66,7 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Token,Lexer
+from lexer import Token, Lexer
 from signature import Signature
 
 
@@ -75,7 +75,7 @@ def termIsVar(t):
     Check if the term is a variable. This assumes that t is a
     well-formed term.
     """
-    return type(t)!=type([])
+    return type(t) != type([])
 
 
 def termIsCompound(t):
@@ -114,15 +114,14 @@ def term2String(t):
             return termFunc(t)
         else:
             arg_rep = ",".join([term2String(s) for s in termArgs(t)])
-            return termFunc(t)+"("+arg_rep+")"
+            return termFunc(t) + "(" + arg_rep + ")"
 
 
 def parseTermList(lexer):
     """
     Parse a comma-delimited list of terms.
     """
-    res = []
-    res.append(parseTerm(lexer))
+    res = [parseTerm(lexer)]
     while lexer.TestTok(Token.Comma):
         lexer.AcceptTok(Token.Comma)
         res.append(parseTerm(lexer))
@@ -137,7 +136,7 @@ def parseTerm(lexer):
         res = lexer.Next().literal
     else:
         res = []
-        lexer.CheckTok([Token.IdentLower,Token.DefFunctor,Token.SQString])
+        lexer.CheckTok([Token.IdentLower, Token.DefFunctor, Token.SQString])
         res.append(lexer.Next().literal)
         if lexer.TestTok(Token.OpenPar):
             # It's a term with proper subterms, so parse them
@@ -147,11 +146,11 @@ def parseTerm(lexer):
     return res
 
 
-def string2Term(str):
+def string2Term(string):
     """
     Convert a string into a term.
     """
-    lexer = Lexer(str)
+    lexer = Lexer(string)
     return parseTerm(lexer)
 
 
@@ -159,7 +158,7 @@ def termListEqual(l1, l2):
     """
     Compare two lists of terms.
     """
-    if len(l1)!=len(l2):
+    if len(l1) != len(l2):
         return False
     if not l1:
         # l1 is empty, and so, by the previous test, is l2
@@ -179,7 +178,7 @@ def termEqual(t1, t2):
     elif termIsVar(t2):
         return False
     else:
-        if termFunc(t1)!=termFunc(t2):
+        if termFunc(t1) != termFunc(t2):
             return False
         return termListEqual(termArgs(t1), termArgs(t2))
 
@@ -212,7 +211,7 @@ def termCollectVars(t, res=None):
     Insert all variables in t into the set res. For convenience,
     return res. If res is not given, create and return it.
     """
-    if res == None:
+    if res is None:
         res = set()
     if termIsVar(t):
         res.add(t)
@@ -228,7 +227,7 @@ def termCollectFuns(t, res=None):
     convenience, return res. If res is not given, create and return
     it.
     """
-    if res == None:
+    if res is None:
         res = set()
     if termIsCompound(t):
         res.add(termFunc(t))
@@ -243,10 +242,10 @@ def termCollectSig(t, sig=None):
     the signature sig. For convenience, return it. If sig is not
     given, create it.
     """
-    if sig == None:
+    if sig is None:
         sig = Signature()
     if termIsCompound(t):
-        sig.addFun(termFunc(t), len(t)-1)
+        sig.addFun(termFunc(t), len(t) - 1)
         for s in termArgs(t):
             termCollectSig(s, sig)
     return sig
@@ -284,6 +283,7 @@ def termocbweight(t, ocb):
             res = res + termocbweight(s, ocb)
         return res
 
+
 def subterm(t, pos):
     """
     Return the subterm of t at position pos (or None if pos is not a
@@ -300,7 +300,7 @@ def subterm(t, pos):
     index = pos.pop(0)
     if index >= len(t):
         return None
-    return subterm(t[index],pos)
+    return subterm(t[index], pos)
 
 
 def termIsSubterm(term, test):
@@ -340,6 +340,7 @@ class TestTerms(unittest.TestCase):
     """
     Test basic term functions.
     """
+
     def setUp(self):
         self.example1 = "X"
         self.example2 = "a"
@@ -379,7 +380,6 @@ class TestTerms(unittest.TestCase):
         self.assertTrue(not termIsVar(self.t3))
         self.assertTrue(not termIsVar(self.t4))
 
-
     def testIsCompound(self):
         """
         Test if the classification function work as expected.
@@ -388,7 +388,6 @@ class TestTerms(unittest.TestCase):
         self.assertTrue(termIsCompound(self.t2))
         self.assertTrue(termIsCompound(self.t3))
         self.assertTrue(termIsCompound(self.t4))
-
 
     def testEquality(self):
         """
@@ -408,8 +407,7 @@ class TestTerms(unittest.TestCase):
 
         l1 = []
         l2 = [self.t1]
-        self.assertTrue(not termListEqual(l1,l2))
-
+        self.assertTrue(not termListEqual(l1, l2))
 
     def testCopy(self):
         """
@@ -423,7 +421,6 @@ class TestTerms(unittest.TestCase):
         self.assertTrue(termEqual(t3, self.t3))
         t4 = termCopy(self.t4)
         self.assertTrue(termEqual(t4, self.t4))
-
 
     def testIsGround(self):
         """
@@ -440,19 +437,18 @@ class TestTerms(unittest.TestCase):
         Test the variable collection.
         """
         vars = termCollectVars(self.t1)
-        self.assertEqual(len(vars),1)
+        self.assertEqual(len(vars), 1)
         termCollectVars(self.t2, vars)
-        self.assertEqual(len(vars),1)
+        self.assertEqual(len(vars), 1)
         termCollectVars(self.t3, vars)
-        self.assertEqual(len(vars),1)
+        self.assertEqual(len(vars), 1)
         termCollectVars(self.t4, vars)
-        self.assertEqual(len(vars),2)
+        self.assertEqual(len(vars), 2)
         termCollectVars(self.t5, vars)
-        self.assertEqual(len(vars),2)
+        self.assertEqual(len(vars), 2)
 
         self.assertTrue("X" in vars)
         self.assertTrue("Y" in vars)
-
 
     def testCollectFuns(self):
         """
@@ -462,19 +458,19 @@ class TestTerms(unittest.TestCase):
         self.assertEqual(funs, set())
 
         funs = termCollectFuns(self.t2)
-        self.assertEqual(funs, set(["a"]))
+        self.assertEqual(funs, {"a"})
 
         funs = termCollectFuns(self.t3)
-        self.assertEqual(funs, set(["g", "a", "b"]))
+        self.assertEqual(funs, {"g", "a", "b"})
 
         funs = termCollectFuns(self.t4)
-        self.assertEqual(funs, set(["g", "f"]))
+        self.assertEqual(funs, {"g", "f"})
 
         funs = termCollectFuns(self.t5)
-        self.assertEqual(funs, set(["g", "f"]))
+        self.assertEqual(funs, {"g", "f"})
 
         funs = termCollectFuns(self.t6)
-        self.assertEqual(funs, set(["g", "b"]))
+        self.assertEqual(funs, {"g", "b"})
 
     def testCollectSig(self):
         """
@@ -492,36 +488,35 @@ class TestTerms(unittest.TestCase):
         self.assertEqual(sig.getArity("a"), 0)
         self.assertEqual(sig.getArity("b"), 0)
 
-
     def testWeight(self):
         """
         Test if termWeight() works as expected.
         """
-        self.assertTrue(termWeight(self.t1,1,2) == 2)
-        self.assertTrue(termWeight(self.t2,1,2) == 1)
-        self.assertTrue(termWeight(self.t3,1,2) == 3)
-        self.assertTrue(termWeight(self.t4,1,2) == 6)
-        self.assertTrue(termWeight(self.t5,2,1) == 6)
+        self.assertTrue(termWeight(self.t1, 1, 2) == 2)
+        self.assertTrue(termWeight(self.t2, 1, 2) == 1)
+        self.assertTrue(termWeight(self.t3, 1, 2) == 3)
+        self.assertTrue(termWeight(self.t4, 1, 2) == 6)
+        self.assertTrue(termWeight(self.t5, 2, 1) == 6)
 
     def testSubterm(self):
         """
         Test if subterm() works as expected.
         self.example5 = "g(X, f(Y))"
         """
-        self.assertTrue(subterm(self.t5,[]) == ['g', 'X', ['f', 'Y']])
-        self.assertTrue(subterm(self.t5,[0]) == 'g')
-        self.assertTrue(subterm(self.t5,[1]) == 'X')
-        self.assertTrue(subterm(self.t5,[2,0]) == 'f')
-        self.assertTrue(subterm(self.t5,[5,0]) == None)
+        self.assertTrue(subterm(self.t5, []) == ['g', 'X', ['f', 'Y']])
+        self.assertTrue(subterm(self.t5, [0]) == 'g')
+        self.assertTrue(subterm(self.t5, [1]) == 'X')
+        self.assertTrue(subterm(self.t5, [2, 0]) == 'f')
+        self.assertTrue(subterm(self.t5, [5, 0]) is None)
 
     def testTermIsSubterm(self):
         """
         Test if termIsSubterm() works as expected.
         """
-        self.assertTrue((termIsSubterm(self.t5, subterm(self.t5, [0]))) == True)
-        self.assertTrue((termIsSubterm(self.t5, self.t5)) == True)
-        self.assertTrue((termIsSubterm(subterm(self.t5, [0]), self.t5)) == False)
-        self.assertTrue((termIsSubterm(self.t5, self.t2)) == False)
+        self.assertTrue((termIsSubterm(self.t5, subterm(self.t5, [0]))) is True)
+        self.assertTrue((termIsSubterm(self.t5, self.t5)) is True)
+        self.assertTrue((termIsSubterm(subterm(self.t5, [0]), self.t5)) is False)
+        self.assertTrue((termIsSubterm(self.t5, self.t2)) is False)
 
     def testCountVarOccurences(self):
         """
@@ -534,6 +529,7 @@ class TestTerms(unittest.TestCase):
         self.assertTrue(countvaroccurrences(self.t4, 1).get("X") == 1)
         self.assertTrue(countvaroccurrences(self.t4, 1).get("Y") == 1)
         self.assertTrue(countvaroccurrences(self.t8, 1).get("X") == 2)
+
 
 if __name__ == '__main__':
     unittest.main()

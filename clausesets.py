@@ -35,6 +35,7 @@ Email: schulz@eprover.org
 
 import unittest
 from lexer import Lexer
+from setofsupport import NoSos
 from signature import Signature
 from literals import parseLiteral
 from clauses import parseClause
@@ -48,10 +49,12 @@ class ClauseSet(object):
     a multi-set of clauses).
     """
 
-    def __init__(self, clauses=[]):
+    def __init__(self, clauses=None):
         """
         Initialize the clause.
         """
+        if clauses is None:
+            clauses = []
         self.clauses = list(clauses)
 
     def __repr__(self):
@@ -159,7 +162,7 @@ class HeuristicClauseSet(ClauseSet):
         super().__init__()
         self.clauses = []
         self.eval_functions = eval_functions
-        self.sos_strategy = sos_strategy
+        self.sos_strategy = sos_strategy if sos_strategy is not None else NoSos()
         self.num_sos_clauses = 0
 
     def addClause(self, clause):
@@ -174,7 +177,7 @@ class HeuristicClauseSet(ClauseSet):
             self.num_sos_clauses += 1
         ClauseSet.addClause(self, clause)
 
-    def extractBestByEval(self, heuristic_index, clause_of_sos):
+    def extractBestByEval(self, heuristic_index, clause_of_sos=False):
         """
         Find and return the clause with the lowest weight according
         to the selected heuristic. If the set is empty, return None.
@@ -231,10 +234,12 @@ class IndexedClauseSet(ClauseSet):
     the finding of resolution and subsumption partners.
     """
 
-    def __init__(self, clauses=[]):
+    def __init__(self, clauses=None):
         """
         Create the two indices and call the superclass initializer. 
         """
+        if clauses is None:
+            clauses = []
         self.res_index = ResolutionIndex()
         self.sub_index = SubsumptionIndex()
         ClauseSet.__init__(self, clauses)
@@ -416,7 +421,7 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         print("==========================================")
         clauses = HeuristicClauseSet(PickGiven2)
         lexer = Lexer(self.spec)
-        parsed = clauses.parse(lexer)
+        clauses.parse(lexer)
         c = clauses.extractBest()
         while c is not None:
             print(c)

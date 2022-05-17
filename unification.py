@@ -134,18 +134,18 @@ from substitutions import *
 
 
 def occursCheck(x, t):
-   """
-   Perform an occurs-check, i.e. determine if the variable x occurs in
-   the term t. If that is the case (and t != x), the two can never be
-   unified.
-   """
-   if termIsCompound(t):
+    """
+    Perform an occurs-check, i.e. determine if the variable x occurs in
+    the term t. If that is the case (and t != x), the two can never be
+    unified.
+    """
+    if termIsCompound(t):
         for i in t[1:]:
             if occursCheck(x, i):
                 return True
         return False
-   else:
-       return x == t
+    else:
+        return x == t
 
 
 def mguTermList(l1, l2, subst):
@@ -156,54 +156,54 @@ def mguTermList(l1, l2, subst):
     [t1, t2, t3], this represents the set of equations {s1=t1, s2=t2,
     s3=t3}. This makes several operations easier to implement.
     """
-    assert len(l1)==len(l2)
-    while(len(l1)!=0):
-       # Pop the first term pair to unify off the lists (pop removes
-       # and returns the denoted elements)
-       t1 = l1.pop(0)
-       t2 = l2.pop(0)
-       if termIsVar(t1):
-          if t1==t2:
-             # This implements the "Solved" rule.
-             # We could always test this upfront, but that would
-             # require an expensive check every time.
-             # We descend recursively anyway, so we only check this on
-             # the terminal case.
-             continue
-          if occursCheck(t1, t2):
-             return None
-          # Here is the core of the "Bind" rule
-          # We now create a new substitution that binds t2 to t1, and
-          # apply it to the remaining unification problem. We know
-          # that every variable will only ever be bound once, because
-          # we eliminate all occurances of it in this step - remember
-          # that by the failed occurs-check, t2 cannot contain t1.
-          new_binding = Substitution([(t1, t2)])
-          l1 = [new_binding(t) for t in l1]
-          l2 = [new_binding(t) for t in l2]
-          subst.composeBinding((t1, t2))
-       elif termIsVar(t2):
-          # Symmetric case
-          # We know that t1!=t2, so we can drop this check
-          if occursCheck(t2, t1):
-             return None
-          new_binding = Substitution([(t2, t1)])
-          l1 = [new_binding(t) for t in l1]
-          l2 = [new_binding(t) for t in l2]
-          subst.composeBinding((t2, t1))
-       else:
-          assert termIsCompound(t1) and termIsCompound(t2)
-          # Try to apply "Decompose"
-          # For f(s1, ..., sn) = g(t1, ..., tn), first f and g have to
-          # be equal...
-          if termFunc(t1) != termFunc(t2):
-             # Nope, "Structural fail":
-             return None
-          # But if the symbols are equal, here is the decomposition:
-          # We need to ensure that for all i si=ti get
-          # added to the list of equations to be solved.
-          l1.extend(termArgs(t1))
-          l2.extend(termArgs(t2))
+    assert len(l1) == len(l2)
+    while len(l1) != 0:
+        # Pop the first term pair to unify off the lists (pop removes
+        # and returns the denoted elements)
+        t1 = l1.pop(0)
+        t2 = l2.pop(0)
+        if termIsVar(t1):
+            if t1 == t2:
+                # This implements the "Solved" rule.
+                # We could always test this upfront, but that would
+                # require an expensive check every time.
+                # We descend recursively anyway, so we only check this on
+                # the terminal case.
+                continue
+            if occursCheck(t1, t2):
+                return None
+            # Here is the core of the "Bind" rule
+            # We now create a new substitution that binds t2 to t1, and
+            # apply it to the remaining unification problem. We know
+            # that every variable will only ever be bound once, because
+            # we eliminate all occurances of it in this step - remember
+            # that by the failed occurs-check, t2 cannot contain t1.
+            new_binding = Substitution([(t1, t2)])
+            l1 = [new_binding(t) for t in l1]
+            l2 = [new_binding(t) for t in l2]
+            subst.composeBinding((t1, t2))
+        elif termIsVar(t2):
+            # Symmetric case
+            # We know that t1!=t2, so we can drop this check
+            if occursCheck(t2, t1):
+                return None
+            new_binding = Substitution([(t2, t1)])
+            l1 = [new_binding(t) for t in l1]
+            l2 = [new_binding(t) for t in l2]
+            subst.composeBinding((t2, t1))
+        else:
+            assert termIsCompound(t1) and termIsCompound(t2)
+            # Try to apply "Decompose"
+            # For f(s1, ..., sn) = g(t1, ..., tn), first f and g have to
+            # be equal...
+            if termFunc(t1) != termFunc(t2):
+                # Nope, "Structural fail":
+                return None
+            # But if the symbols are equal, here is the decomposition:
+            # We need to ensure that for all i si=ti get
+            # added to the list of equations to be solved.
+            l1.extend(termArgs(t1))
+            l2.extend(termArgs(t2))
     return subst
 
 
@@ -211,15 +211,15 @@ def mgu(t1, t2):
     """
     Try to unify t1 and t2, return substitution on success, or None on failure.
     """
-    res =  mguTermList([t1], [t2], Substitution())
+    res = mguTermList([t1], [t2], Substitution())
     return res
-
 
 
 class TestUnification(unittest.TestCase):
     """
     Test basic substitution functions.
     """
+
     def setUp(self):
         self.s1 = terms.string2Term("X")
         self.t1 = terms.string2Term("a")
@@ -254,23 +254,21 @@ class TestUnification(unittest.TestCase):
         self.s11 = terms.string2Term("p(X,g(a), f(a, f(a)))")
         self.t11 = terms.string2Term("p(f(a), g(Y), f(Y, Z))")
 
-
-
-    def unif_test(self, s,t, success_expected):
-       """
+    def unif_test(self, s, t, success_expected):
+        """
        Test if s and t can be unified. If yes, report the
        result. Compare to the expected result.
        """
-       print("Trying to unify", term2String(s), "and", term2String(t))
-       sigma = mgu(s,t)
-       if success_expected:
-          self.assertTrue(sigma)
-          self.assertTrue(termEqual(sigma(s), sigma(t)))
-          print(term2String(sigma(s)), term2String(sigma(t)), sigma)
-       else:
-          print("Failure")
-          self.assertTrue(not sigma)
-       print()
+        print("Trying to unify", term2String(s), "and", term2String(t))
+        sigma = mgu(s, t)
+        if success_expected:
+            self.assertTrue(sigma)
+            self.assertTrue(termEqual(sigma(s), sigma(t)))
+            print(term2String(sigma(s)), term2String(sigma(t)), sigma)
+        else:
+            print("Failure")
+            self.assertTrue(not sigma)
+        print()
 
     def testMGU(self):
         """

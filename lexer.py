@@ -33,21 +33,23 @@ Germany
 Email: schulz@eprover.org
 """
 
-import unittest
-import string
 import re
+import unittest
+
 from idents import Ident
+
 
 class ScannerError(Exception):
     """
     A class representing all errors that the scanner can produce.
     """
+
     def __init__(self):
         self.name = "ScannerError"
         self.value = "<none>"
 
     def __repr__(self):
-        return self.name+"("+repr(self.value)+")"
+        return self.name + "(" + repr(self.value) + ")"
 
     def __str__(self):
         return self.__repr__()
@@ -57,8 +59,9 @@ class IllegalCharacterError(ScannerError):
     """
     Class representing an unexpexted character error
     """
+
     def __init__(self, char):
-        self.name  = "Illegal character"
+        self.name = "Illegal character"
         self.value = char
 
 
@@ -66,25 +69,23 @@ class UnexpectedTokenError(ScannerError):
     """
     Class representing an unexpected token error.
     """
-    def __init__(self, token):
-        self.name  = "Unexpected token"
-        self.value = token
 
+    def __init__(self, token):
+        self.name = "Unexpected token"
+        self.value = token
 
 
 class UnexpectedIdentError(ScannerError):
     """
     Class representing an unexpected identifier error.
     """
+
     def __init__(self, token):
-        self.name  = "Unexpected identifier"
+        self.name = "Unexpected identifier"
         self.value = token
 
 
-
-
-nl_re  = re.compile("\n")
-
+nl_re = re.compile("\n")
 
 
 class Token(object):
@@ -92,51 +93,51 @@ class Token(object):
     Represent a single token with name, position, and print
     representation.
     """
-    NoToken        = Ident("No Token")
-    WhiteSpace     = Ident("White Space")
-    Comment        = Ident("Comment")
-    IdentUpper     = Ident("Identifier starting with capital letter")
-    IdentLower     = Ident("Identifier starting with lower case letter")
-    DefFunctor     = Ident("Defined symbol (starting with a $)")
-    Integer        = Ident("Positive or negative Integer")
-    FullStop       = Ident(". (full stop)")
-    OpenPar        = Ident("(")
-    ClosePar       = Ident(")")
-    OpenSquare     = Ident("[")
-    CloseSquare    = Ident("]")
-    Comma          = Ident(",")
-    Colon          = Ident(":")
-    EqualSign      = Ident("=")
-    NotEqualSign   = Ident("!=")
-    Nand           = Ident("~&")
-    Nor            = Ident("~|")
-    Or             = Ident("|")
-    And            = Ident("&")
-    Implies        = Ident("=>")
-    BImplies       = Ident("<=")
-    Equiv          = Ident("<=>")
-    Xor            = Ident("<~>")
-    Universal      = Ident("!")
-    Existential    = Ident("?")
-    Negation       = Ident("~")
-    SQString       = Ident("String in 'single quotes'")
-    EOFToken       = Ident("*EOF*")
+    NoToken = Ident("No Token")
+    WhiteSpace = Ident("White Space")
+    Comment = Ident("Comment")
+    IdentUpper = Ident("Identifier starting with capital letter")
+    IdentLower = Ident("Identifier starting with lower case letter")
+    DefFunctor = Ident("Defined symbol (starting with a $)")
+    Integer = Ident("Positive or negative Integer")
+    FullStop = Ident(". (full stop)")
+    OpenPar = Ident("(")
+    ClosePar = Ident(")")
+    OpenSquare = Ident("[")
+    CloseSquare = Ident("]")
+    Comma = Ident(",")
+    Colon = Ident(":")
+    EqualSign = Ident("=")
+    NotEqualSign = Ident("!=")
+    Nand = Ident("~&")
+    Nor = Ident("~|")
+    Or = Ident("|")
+    And = Ident("&")
+    Implies = Ident("=>")
+    BImplies = Ident("<=")
+    Equiv = Ident("<=>")
+    Xor = Ident("<~>")
+    Universal = Ident("!")
+    Existential = Ident("?")
+    Negation = Ident("~")
+    SQString = Ident("String in 'single quotes'")
+    EOFToken = Ident("*EOF*")
 
     def __init__(self, type, literal, source, pos):
-        self.type    = type;
-        self.literal = literal;
-        self.source  = source;
-        self.pos     = pos
+        self.type = type
+        self.literal = literal
+        self.source = source
+        self.pos = pos
 
     def __repr__(self):
-        return repr( (self.type, self.literal) )
+        return repr((self.type, self.literal))
 
     def linepos(self):
         """
         Return the line number of the token by counting all the
         newlines in the position up to the current token.
         """
-        return len(nl_re.findall(self.source[:self.pos]))+1
+        return len(nl_re.findall(self.source[:self.pos])) + 1
 
 
 class Lexer(object):
@@ -151,35 +152,35 @@ class Lexer(object):
     # returned. This makes it much easier than "longest match", and
     # I have not yet seen a grammar where this causes trouble.
     token_defs = [
-        (re.compile("\."),                    Token.FullStop),
-        (re.compile("\("),                    Token.OpenPar),
-        (re.compile("\)"),                    Token.ClosePar),
-        (re.compile("\["),                    Token.OpenSquare),
-        (re.compile("\]"),                    Token.CloseSquare),
-        (re.compile(","),                     Token.Comma),
-        (re.compile(":"),                     Token.Colon),
-        (re.compile("~\|"),                   Token.Nor),
-        (re.compile("~&"),                    Token.Nand),
-        (re.compile("\|"),                    Token.Or),
-        (re.compile("&"),                     Token.And),
-        (re.compile("=>"),                    Token.Implies),
-        (re.compile("<=>"),                   Token.Equiv),
-        (re.compile("<="),                    Token.BImplies),
-        (re.compile("<~>"),                   Token.Xor),
-        (re.compile("="),                     Token.EqualSign),
-        (re.compile("!="),                    Token.NotEqualSign),
-        (re.compile("~"),                     Token.Negation),
-        (re.compile("!"),                     Token.Universal),
-        (re.compile("\?"),                    Token.Existential),
-	(re.compile("\s+"),                   Token.WhiteSpace),
-        (re.compile("[0-9][0-9]*"),           Token.IdentLower),
-        (re.compile("[a-z][_a-z0-9_A-Z]*"),   Token.IdentLower),
-        (re.compile("[_A-Z][_a-z0-9_A-Z]*"),  Token.IdentUpper),
-        (re.compile("\$[_a-z0-9_A-Z]*"),      Token.DefFunctor),
-        (re.compile("#[^\n]*"),               Token.Comment),
-        (re.compile("%[^\n]*"),               Token.Comment),
-        (re.compile("'[^']*'"),               Token.SQString)
-        ]
+        (re.compile("\."), Token.FullStop),
+        (re.compile("\("), Token.OpenPar),
+        (re.compile("\)"), Token.ClosePar),
+        (re.compile("\["), Token.OpenSquare),
+        (re.compile("\]"), Token.CloseSquare),
+        (re.compile(","), Token.Comma),
+        (re.compile(":"), Token.Colon),
+        (re.compile("~\|"), Token.Nor),
+        (re.compile("~&"), Token.Nand),
+        (re.compile("\|"), Token.Or),
+        (re.compile("&"), Token.And),
+        (re.compile("=>"), Token.Implies),
+        (re.compile("<=>"), Token.Equiv),
+        (re.compile("<="), Token.BImplies),
+        (re.compile("<~>"), Token.Xor),
+        (re.compile("="), Token.EqualSign),
+        (re.compile("!="), Token.NotEqualSign),
+        (re.compile("~"), Token.Negation),
+        (re.compile("!"), Token.Universal),
+        (re.compile("\?"), Token.Existential),
+        (re.compile("\s+"), Token.WhiteSpace),
+        (re.compile("[0-9][0-9]*"), Token.IdentLower),
+        (re.compile("[a-z][_a-z0-9_A-Z]*"), Token.IdentLower),
+        (re.compile("[_A-Z][_a-z0-9_A-Z]*"), Token.IdentUpper),
+        (re.compile("\$[_a-z0-9_A-Z]*"), Token.DefFunctor),
+        (re.compile("#[^\n]*"), Token.Comment),
+        (re.compile("%[^\n]*"), Token.Comment),
+        (re.compile("'[^']*'"), Token.SQString)
+    ]
 
     def __init__(self, source, name="user string"):
         """
@@ -236,8 +237,8 @@ class Lexer(object):
         """
         if not self.TestTok(tokens):
             raise UnexpectedTokenError(
-                repr(self.Look().literal)+
-                " not "+repr(tokens))
+                repr(self.Look().literal) +
+                " not " + repr(tokens))
 
     def AcceptTok(self, tokens):
         """
@@ -247,7 +248,6 @@ class Lexer(object):
         """
         self.CheckTok(tokens)
         return self.Next()
-
 
     def TestLit(self, litvals):
         """
@@ -267,8 +267,8 @@ class Lexer(object):
         """
         if not self.TestLit(litvals):
             raise UnexpectedIdentError(
-                repr(self.Look().literal)+
-                " not "+repr(litvals))
+                repr(self.Look().literal) +
+                " not " + repr(litvals))
 
     def AcceptLit(self, litvals):
         """
@@ -279,12 +279,11 @@ class Lexer(object):
         self.CheckLit(litvals)
         return self.Next()
 
-
     def Next(self):
         """
         Return next semantically relevant token.
         """
-        res = self.NextUnfiltered();
+        res = self.NextUnfiltered()
         while res.type in [Token.WhiteSpace, Token.Comment]:
             res = self.NextUnfiltered()
         return res
@@ -310,7 +309,7 @@ class Lexer(object):
                     type = i[1]
                     break
             if not mr:
-                raise IllegalCharacterError(self.source[self.pos:self.pos+4]+"...")
+                raise IllegalCharacterError(self.source[self.pos:self.pos + 4] + "...")
 
             return Token(type, literal, self.source, old_pos)
 
@@ -328,6 +327,7 @@ class TestLexer(unittest.TestCase):
     """
     Test the lexer functions.
     """
+
     def setUp(self):
         print()
         self.example1 = "f(X,g(a,b))"
@@ -340,8 +340,8 @@ class TestLexer(unittest.TestCase):
         """
         Test that comments and whitespace are normally ignored.
         """
-        lex1=Lexer(self.example1)
-        lex2=Lexer(self.example2)
+        lex1 = Lexer(self.example1)
+        lex2 = Lexer(self.example2)
         res1 = [(i.type, i.literal) for i in lex1.Lex()]
         res2 = [(i.type, i.literal) for i in lex2.Lex()]
         self.assertEqual(res1, res2)
@@ -350,18 +350,18 @@ class TestLexer(unittest.TestCase):
         """
         Test that self.example 1 is split into the expected tokens.
         """
-        lex1=Lexer(self.example1)
-        lex1.AcceptTok([Token.IdentLower]) # f
-        lex1.AcceptTok([Token.OpenPar])    # (
-        lex1.AcceptTok([Token.IdentUpper]) # X
-        lex1.AcceptTok([Token.Comma])      # ,
-        lex1.AcceptTok([Token.IdentLower]) # g
-        lex1.AcceptTok([Token.OpenPar])    # (
-        lex1.AcceptTok([Token.IdentLower]) # a
-        lex1.AcceptTok([Token.Comma])      # ,
-        lex1.AcceptTok([Token.IdentLower]) # b
-        lex1.AcceptTok([Token.ClosePar])   # )
-        lex1.AcceptTok([Token.ClosePar])   # )
+        lex1 = Lexer(self.example1)
+        lex1.AcceptTok([Token.IdentLower])  # f
+        lex1.AcceptTok([Token.OpenPar])  # (
+        lex1.AcceptTok([Token.IdentUpper])  # X
+        lex1.AcceptTok([Token.Comma])  # ,
+        lex1.AcceptTok([Token.IdentLower])  # g
+        lex1.AcceptTok([Token.OpenPar])  # (
+        lex1.AcceptTok([Token.IdentLower])  # a
+        lex1.AcceptTok([Token.Comma])  # ,
+        lex1.AcceptTok([Token.IdentLower])  # b
+        lex1.AcceptTok([Token.ClosePar])  # )
+        lex1.AcceptTok([Token.ClosePar])  # )
 
     def testClause(self):
         """

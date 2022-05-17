@@ -109,10 +109,7 @@ from resource import getrusage, RUSAGE_SELF
 
 from setofsupport import GivenSOSStrategies
 from version import version
-from lexer import Token, Lexer
 from derivations import enableDerivationOutput, disableDerivationOutput, Derivable, flatDerivation
-from clausesets import ClauseSet
-from clauses import firstLit, varSizeLit, eqResVarSizeLit
 from fofspec import FOFSpec
 from heuristics import GivenClauseHeuristics
 from saturation import SearchParams, ProofState
@@ -164,7 +161,7 @@ def processOptions(opts):
                 print("Unknown literal selection function", optarg)
                 print("Supported:", LiteralSelectors.keys())
                 sys.exit(1)
-        elif opt== "-O" or opt == "--sos":
+        elif opt == "-O" or opt == "--sos":
             try:
                 # store ratio of old sos object
                 # important if -ratio option is called before -set-of-support
@@ -187,7 +184,7 @@ def processOptions(opts):
             else:
                 print("Illegal value for ratio-sos (only integers >= 0 are allowed)")
                 sys.exit(1)
-        elif opt== "-S" or opt=="--suppress-eq-axioms":
+        elif opt == "-S" or opt == "--suppress-eq-axioms":
 
             suppressEqAxioms = True
         elif opt == "-o" or opt == "--ordered-resolution":
@@ -221,7 +218,7 @@ if __name__ == '__main__':
     try:
         soft, hard = getrlimit(RLIMIT_STACK)
         soft = 10 * soft
-        if hard > 0 and soft > hard:
+        if 0 < hard < soft:
             soft = hard
         setrlimit(RLIMIT_STACK, (soft, hard))
     except ValueError:
@@ -267,7 +264,7 @@ if __name__ == '__main__':
     state = ProofState(params, cnf, silent, indexed)
     res = state.saturate()
 
-    if res != None:
+    if res is not None:
         if problem.isFof and problem.hasConj:
             print("# SZS status Theorem")
         else:

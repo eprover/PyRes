@@ -68,14 +68,12 @@ Germany
 Email: schulz@eprover.org
 """
 
-import unittest
-from lexer import Token,Lexer
-from derivations import Derivable,Derivation,flatDerivation,enableDerivationOutput,toggleDerivationOutput
-from terms import *
-from substitutions import Substitution, freshVar
-from literals import Literal
 from clauses import Clause
+from derivations import Derivation, flatDerivation, enableDerivationOutput, toggleDerivationOutput
 from formulas import Formula, WFormula, parseWFormula, parseFormula
+from literals import Literal
+from substitutions import Substitution, freshVar
+from terms import *
 
 
 class SkolemSymbols(object):
@@ -96,8 +94,7 @@ class SkolemSymbols(object):
         "skolemXXXX" are in the input.
         """
         SkolemSymbols.skolemCount += 1
-        return "skolem%04d"%(SkolemSymbols.skolemCount,)
-
+        return "skolem%04d" % (SkolemSymbols.skolemCount,)
 
     def newSkolemTerm(self, varlist):
         """
@@ -117,7 +114,6 @@ class SkolemSymbols(object):
 
 
 skolemGenerator = SkolemSymbols()
-
 
 
 def formulaOpSimplify(f):
@@ -151,7 +147,7 @@ def formulaOpSimplify(f):
         child2 = None
 
     if modified:
-        f  = Formula(f.op, child1, child2)
+        f = Formula(f.op, child1, child2)
 
     if f.op == "<~>":
         handle = Formula("<=>", f.child1, f.child2)
@@ -169,7 +165,6 @@ def formulaOpSimplify(f):
         newform = Formula("~", handle)
         return newform, True
     return f, modified
-
 
 
 def formulaTopSimplify(f):
@@ -261,11 +256,10 @@ def formulaTopSimplify(f):
         # ![X] F -> F if X is not free in F
         # ?[X] F -> F if X is not free in F
         vars = f.child2.collectFreeVars()
-        if not f.child1 in vars:
+        if f.child1 not in vars:
             return f.child2, True
         assert f.op == "" or "Unexpected op"
     return f, False
-
 
 
 def formulaSimplify(f):
@@ -297,7 +291,7 @@ def formulaSimplify(f):
         child2 = None
 
     if modified:
-        f  = Formula(f.op, child1, child2)
+        f = Formula(f.op, child1, child2)
 
     topmod = True
 
@@ -315,7 +309,7 @@ def rootFormulaNNF(f, polarity):
     """
 
     normalform = False
-    modified   = False
+    modified = False
 
     while not normalform:
         normalform = True
@@ -332,7 +326,7 @@ def rootFormulaNNF(f, polarity):
                             Formula("~", f.child1.child1),
                             Formula("~", f.child1.child2))
                 m = True
-            elif  f.child1.op == "&":
+            elif f.child1.op == "&":
                 # De Morgan: ~(P&Q) -> ~P | ~Q
                 f = Formula("|",
                             Formula("~", f.child1.child1),
@@ -386,7 +380,7 @@ def formulaNNF(f, polarity):
     """
 
     normalform = False
-    modified   = False
+    modified = False
 
     while not normalform:
         normalform = True
@@ -416,6 +410,7 @@ def formulaNNF(f, polarity):
 
     return f, modified
 
+
 def formulaMiniScope(f):
     """
     Perform miniscoping, i.e. move quantors in as far as possible, so
@@ -424,10 +419,10 @@ def formulaMiniScope(f):
     """
     res = False
     if f.isQuantified():
-        op    = f.child2.op
+        op = f.child2.op
         quant = f.op
-        var   = f.child1
-        subf  = f.child2
+        var = f.child1
+        subf = f.child2
         if op == "&" or op == "|":
             if not var in subf.child1.collectFreeVars():
                 # q[X]:(P op Q)  -> P op (q[X]:Q) if X not free in P
@@ -446,9 +441,9 @@ def formulaMiniScope(f):
                     # ![X]:(P&Q) -> ![X]:P & ![X]:Q
                     arg1 = Formula("!", var, subf.child1)
                     arg2 = Formula("!", var, subf.child2)
-                    f = Formula("&" , arg1, arg2)
+                    f = Formula("&", arg1, arg2)
                     res = True
-                elif  op == "|" and quant == "?":
+                elif op == "|" and quant == "?":
                     # ?[X]:(P|Q) -> ?[X]:P | ?[X]:Q
                     arg1 = Formula("?", var, subf.child1)
                     arg2 = Formula("?", var, subf.child2)
@@ -465,16 +460,16 @@ def formulaMiniScope(f):
         modified |= m
     if modified:
         f = Formula(f.op, arg1, arg2)
-        f,m = formulaMiniScope(f)
+        f, m = formulaMiniScope(f)
         res = True
     return f, res
 
 
-def formulaVarRename(f, subst = None):
+def formulaVarRename(f, subst=None):
     """
     Rename variables in f so that all bound variables are unique.
     """
-    if subst == None:
+    if subst is None:
         subst = Substitution()
 
     if f.isQuantified():
@@ -525,7 +520,7 @@ def formulaRekSkolemize(f, variables, subst):
     elif f.op == "?":
         var = f.child1
         skTerm = skolemGenerator(variables)
-        oldbinding = subst.modifyBinding((var,skTerm))
+        oldbinding = subst.modifyBinding((var, skTerm))
         f = formulaRekSkolemize(f.child2, variables, subst)
         subst.modifyBinding((var, oldbinding))
     elif f.op == "!":
@@ -543,7 +538,6 @@ def formulaRekSkolemize(f, variables, subst):
             arg2 = formulaRekSkolemize(f.child2, variables, subst)
         f = Formula(f.op, arg1, arg2)
     return f
-
 
 
 def formulaSkolemize(f):
@@ -588,6 +582,7 @@ def separateQuantors(f, varlist=None):
         f = Formula(f.op, arg1, arg2)
     return f, varlist
 
+
 def formulaShiftQuantorsOut(f):
     """
     Shift all (universal) quantor to the outermost level.
@@ -624,17 +619,15 @@ def formulaDistributeDisjunctions(f):
             # (P&Q)|R -> (P|R) & (Q|R)
             arg1 = Formula("|", f.child1.child1, f.child2)
             arg2 = Formula("|", f.child1.child2, f.child2)
-            f    = Formula("&", arg1, arg2)
-            f    = formulaDistributeDisjunctions(f)
-        elif  f.child2.op == "&":
+            f = Formula("&", arg1, arg2)
+            f = formulaDistributeDisjunctions(f)
+        elif f.child2.op == "&":
             # (R|(P&Q) -> (R|P) & (R|Q)
             arg1 = Formula("|", f.child1, f.child2.child1)
             arg2 = Formula("|", f.child1, f.child2.child2)
-            f    = Formula("&", arg1, arg2)
-            f    = formulaDistributeDisjunctions(f)
+            f = Formula("&", arg1, arg2)
+            f = formulaDistributeDisjunctions(f)
     return f
-
-
 
 
 def formulaCNFSplit(f):
@@ -647,12 +640,11 @@ def formulaCNFSplit(f):
     conjuncts = matrix.conj2List()
 
     for c in conjuncts:
-        litlist = [l.child1 for l in c.disj2List()]
+        litlist = [lit.child1 for lit in c.disj2List()]
         clause = Clause(litlist, f.type)
         res.append(clause)
 
     return res
-
 
 
 def wFormulaCNF(wf):
@@ -666,13 +658,13 @@ def wFormulaCNF(wf):
         tmp.setDerivation(flatDerivation("fof_simplification", [wf]))
         wf = tmp
 
-    f,m = formulaNNF(f,1)
+    f, m = formulaNNF(f, 1)
     if m:
         tmp = WFormula(f, wf.type)
         tmp.setDerivation(flatDerivation("fof_nnf", [wf]))
         wf = tmp
 
-    f,m = formulaMiniScope(f)
+    f, m = formulaMiniScope(f)
     if m:
         tmp = WFormula(f, wf.type)
         tmp.setDerivation(flatDerivation("shift_quantors", [wf]))
@@ -704,6 +696,7 @@ def wFormulaCNF(wf):
 
     return wf
 
+
 def wFormulaClausify(wf):
     """
     Convert a formula into Clause Normal Form.
@@ -718,8 +711,6 @@ def wFormulaClausify(wf):
     return clauses
 
 
-
-
 # ------------------------------------------------------------------
 #                  Unit test section
 # ------------------------------------------------------------------
@@ -728,6 +719,7 @@ class TestCNF(unittest.TestCase):
     """
     Test cases for clausification.
     """
+
     def setUp(self):
         """
         Setup function for clause/literal unit tests. Initialize
@@ -747,10 +739,10 @@ class TestCNF(unittest.TestCase):
         self.f3 = parseFormula(lex)
         self.f4 = parseFormula(lex)
         self.f5 = parseFormula(lex)
-        self.simple_ops = set(["", "!", "?", "~", "&","|", "=>", "<=>"])
-        self.nnf_ops = set(["", "!", "?", "&","|"])
+        self.simple_ops = {"", "!", "?", "~", "&", "|", "=>", "<=>"}
+        self.nnf_ops = {"", "!", "?", "&", "|"}
 
-        self.covformulas ="""
+        self.covformulas = """
         (a|$true)
         ($true|a)
         (a|$false)
@@ -819,29 +811,27 @@ fof(cc1_funct_2,axiom,(
 fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         """
 
-
-
     def testOpSimplification(self):
         """
         Test that operator simplification works.
         """
-        f,m = formulaOpSimplify(self.f1)
+        f, m = formulaOpSimplify(self.f1)
         self.assertTrue(m)
         self.assertTrue(f.collectOps() <= self.simple_ops)
 
-        f,m = formulaOpSimplify(self.f2)
+        f, m = formulaOpSimplify(self.f2)
         self.assertTrue(m)
         self.assertTrue(f.collectOps() <= self.simple_ops)
 
-        f,m = formulaOpSimplify(self.f3)
+        f, m = formulaOpSimplify(self.f3)
         self.assertTrue(m)
         self.assertTrue(f.collectOps() <= self.simple_ops)
 
-        f,m = formulaOpSimplify(self.f4)
+        f, m = formulaOpSimplify(self.f4)
         self.assertTrue(m)
         self.assertTrue(f.collectOps() <= self.simple_ops)
 
-        f,m = formulaOpSimplify(self.f5)
+        f, m = formulaOpSimplify(self.f5)
         self.assertTrue(not m)
         self.assertTrue(f.collectOps() <= self.simple_ops)
 
@@ -856,43 +846,41 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
 
         funs = f.collectFuns()
         if f.isPropConst(True) or f.isPropConst(False):
-            self.assertTrue(funs in [set(["$true"]), set(["$false"])])
+            self.assertTrue(funs in [{"$true"}, {"$false"}])
         else:
-            self.assertTrue(not "$true" in funs )
-            self.assertTrue(not "$false" in funs )
-
+            self.assertTrue("$true" not in funs)
+            self.assertTrue("$false" not in funs)
 
     def testSimplification(self):
         """
         Test that simplification works.
         """
-        f,m = formulaOpSimplify(self.f1)
-        f,m = formulaSimplify(f)
+        f, m = formulaOpSimplify(self.f1)
+        f, m = formulaSimplify(f)
         self.checkSimplificationResult(f)
 
-        f,m = formulaOpSimplify(self.f2)
-        f,m = formulaSimplify(f)
+        f, m = formulaOpSimplify(self.f2)
+        f, m = formulaSimplify(f)
         self.checkSimplificationResult(f)
 
-        f,m = formulaOpSimplify(self.f3)
-        f,m = formulaSimplify(f)
+        f, m = formulaOpSimplify(self.f3)
+        f, m = formulaSimplify(f)
         self.checkSimplificationResult(f)
 
-        f,m = formulaOpSimplify(self.f4)
-        f,m = formulaSimplify(f)
+        f, m = formulaOpSimplify(self.f4)
+        f, m = formulaSimplify(f)
         self.checkSimplificationResult(f)
 
-        f,m = formulaOpSimplify(self.f5)
-        f,m = formulaSimplify(f)
+        f, m = formulaOpSimplify(self.f5)
+        f, m = formulaSimplify(f)
         self.checkSimplificationResult(f)
 
         lex = Lexer(self.covformulas)
         while not lex.TestTok(Token.EOFToken):
             f = parseFormula(lex)
-            f,m = formulaOpSimplify(f)
-            f,m = formulaSimplify(f)
+            f, m = formulaOpSimplify(f)
+            f, m = formulaSimplify(f)
             self.checkSimplificationResult(f)
-
 
     def checkNNFResult(self, f):
         """
@@ -904,47 +892,46 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         print("NNF:", f)
         if f.isPropConst(True) or f.isPropConst(False):
             funs = f.collectFuns()
-            self.assertTrue(funs in [set(["$true"]), set(["$false"])])
+            self.assertTrue(funs in [{"$true"}, {"$false"}])
         else:
             ops = f.collectOps()
             self.assertTrue(ops <= self.nnf_ops)
-
 
     def testNNF(self):
         """
         Test NNF transformation
         """
-        f,m = formulaOpSimplify(self.f1)
-        f,m = formulaSimplify(f)
-        f,m = formulaNNF(f, 1)
+        f, m = formulaOpSimplify(self.f1)
+        f, m = formulaSimplify(f)
+        f, m = formulaNNF(f, 1)
         self.checkNNFResult(f)
 
-        f,m = formulaOpSimplify(self.f2)
-        f,m = formulaSimplify(f)
-        f,m = formulaNNF(f,1)
+        f, m = formulaOpSimplify(self.f2)
+        f, m = formulaSimplify(f)
+        f, m = formulaNNF(f, 1)
         self.checkNNFResult(f)
 
-        f,m = formulaOpSimplify(self.f3)
-        f,m = formulaSimplify(f)
-        f,m = formulaNNF(f,1)
+        f, m = formulaOpSimplify(self.f3)
+        f, m = formulaSimplify(f)
+        f, m = formulaNNF(f, 1)
         self.checkNNFResult(f)
 
-        f,m = formulaOpSimplify(self.f4)
-        f,m = formulaSimplify(f)
-        f,m = formulaNNF(f,1)
+        f, m = formulaOpSimplify(self.f4)
+        f, m = formulaSimplify(f)
+        f, m = formulaNNF(f, 1)
         self.checkNNFResult(f)
 
-        f,m = formulaOpSimplify(self.f5)
-        f,m = formulaSimplify(f)
-        f,m = formulaNNF(f,1)
+        f, m = formulaOpSimplify(self.f5)
+        f, m = formulaSimplify(f)
+        f, m = formulaNNF(f, 1)
         self.checkNNFResult(f)
 
         lex = Lexer(self.covformulas)
         while not lex.TestTok(Token.EOFToken):
             f = parseFormula(lex)
-            f,m = formulaOpSimplify(f)
-            f,m = formulaSimplify(f)
-            f,m = formulaNNF(f,1)
+            f, m = formulaOpSimplify(f)
+            f, m = formulaSimplify(f)
+            f, m = formulaNNF(f, 1)
             self.checkNNFResult(f)
 
     def testMiniScope(self):
@@ -964,7 +951,7 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         while not lex.TestTok(Token.EOFToken):
             expected = res.pop(0)
             f = parseFormula(lex)
-            f1,m = formulaMiniScope(f)
+            f1, m = formulaMiniScope(f)
             print(f, f1, m, expected)
             self.assertEqual(expected, m)
             if m:
@@ -997,7 +984,7 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         symbols = []
         for i in range(10):
             newsymbol = skolemGenerator.newSkolemSymbol()
-            self.assertTrue(not newsymbol in symbols)
+            self.assertTrue(newsymbol not in symbols)
             symbols.append(newsymbol)
 
         var = ["X", "Y"]
@@ -1006,18 +993,16 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
             self.assertTrue(termIsCompound(t))
             self.assertEqual(termArgs(t), var)
 
-
     def preprocFormula(self, f):
         """
         Bring formula into miniscoped variable normalized NNF.
         """
-        f,m = formulaOpSimplify(f)
-        f,m = formulaSimplify(f)
-        f,m = formulaNNF(f,1)
-        f,m = formulaMiniScope(f)
-        f   = formulaVarRename(f)
+        f, m = formulaOpSimplify(f)
+        f, m = formulaSimplify(f)
+        f, m = formulaNNF(f, 1)
+        f, m = formulaMiniScope(f)
+        f = formulaVarRename(f)
         return f
-
 
     def testSkolemization(self):
         """
@@ -1025,17 +1010,17 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         """
         f = self.preprocFormula(self.f2)
         f = formulaSkolemize(f)
-        self.assertTrue(not "?" in f.collectOps())
+        self.assertTrue("?" not in f.collectOps())
         print(f)
 
         f = self.preprocFormula(self.f3)
         f = formulaSkolemize(f)
-        self.assertTrue(not "?" in f.collectOps())
+        self.assertTrue("?" not in f.collectOps())
         print(f)
 
         f = self.preprocFormula(self.f4)
         f = formulaSkolemize(f)
-        self.assertTrue(not "?" in f.collectOps())
+        self.assertTrue("?" not in f.collectOps())
         print(f)
 
     def testShiftQuantors(self):
@@ -1059,7 +1044,6 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
         f = formulaShiftQuantorsOut(f)
         if "!" in f.collectOps():
             self.assertEqual(f.op, "!")
-
 
     def testDistributeDisjunctions(self):
         """
@@ -1118,7 +1102,6 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
             for c in clauses:
                 print(c)
             toggleDerivationOutput()
-
 
 
 if __name__ == '__main__':

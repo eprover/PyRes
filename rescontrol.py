@@ -34,10 +34,11 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Token,Lexer
-from resolution import resolution, factor
+
 from clauses import parseClause
 from clausesets import ClauseSet
+from lexer import Lexer
+from resolution import resolution, factor
 
 
 def computeAllResolvents(clause, clauseset):
@@ -65,10 +66,10 @@ def computeAllResolvents(clause, clauseset):
     for lit in range(len(clause)):
         if clause.getLiteral(lit).isInferenceLit():
             partners = \
-                     clauseset.getResolutionLiterals(clause.getLiteral(lit))
+                clauseset.getResolutionLiterals(clause.getLiteral(lit))
             for (cl2, lit2) in partners:
                 resolvent = resolution(clause, lit, cl2, lit2)
-                if resolvent!=None:
+                if resolvent is not None:
                     res.append(resolvent)
     return res
 
@@ -82,9 +83,9 @@ def computeAllFactors(clause):
     """
     res = []
     for i in range(len(clause)):
-        for j in range(i+1, len(clause)):
+        for j in range(i + 1, len(clause)):
             if clause.getLiteral(i).isInferenceLit() or \
-               clause.getLiteral(j).isInferenceLit():
+                    clause.getLiteral(j).isInferenceLit():
                 fact = factor(clause, i, j)
                 if fact:
                     res.append(fact)
@@ -95,6 +96,7 @@ class TestSetInferences(unittest.TestCase):
     """
     Unit test class for simple resolution inference control.
     """
+
     def setUp(self):
         """
         Setup function for clause/literal unit tests. Initialize
@@ -107,7 +109,7 @@ cnf(c1, axiom, a|b|c).
 cnf(c2, axiom, b|c).
 cnf(c3, axiom, c).
 """
-        lex  = Lexer(spec)
+        lex = Lexer(spec)
         self.conj = parseClause(lex)
         self.cset = ClauseSet()
         self.cset.parse(lex)
@@ -124,7 +126,6 @@ cnf(c3, axiom, c).
         print("Test set resolution")
         res = computeAllResolvents(self.conj, self.cset)
         print(res)
-
 
     def testFactoring(self):
         """

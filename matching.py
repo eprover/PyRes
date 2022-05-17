@@ -76,8 +76,6 @@ from terms import *
 from substitutions import *
 
 
-   
-       
 def match(matcher, target, subst):
     """
     Match t1 onto t2. If this succeeds, return true and modify subst
@@ -101,7 +99,7 @@ def match(matcher, target, subst):
         if termIsVar(target) or termFunc(matcher) != termFunc(target):
             result = False
         else:
-            for (s,t) in zip(termArgs(matcher), termArgs(target)):
+            for (s, t) in zip(termArgs(matcher), termArgs(target)):
                 result = match(s, t, subst)
                 if not result:
                     break
@@ -109,8 +107,7 @@ def match(matcher, target, subst):
         return True
     subst.backtrackToState(bt_state)
     return False
-             
- 
+
 
 def match_norec(t1, t2, subst):
     """
@@ -127,40 +124,41 @@ def match_norec(t1, t2, subst):
     mlist = [t1]
     tlist = [t2]
     while mlist:
-       matcher  = mlist.pop()
-       target   = tlist.pop()
+        matcher = mlist.pop()
+        target = tlist.pop()
 
-       if termIsVar(matcher):
-          if subst.isBound(matcher):
-             if not termEqual(subst.value(matcher), target):
+        if termIsVar(matcher):
+            if subst.isBound(matcher):
+                if not termEqual(subst.value(matcher), target):
+                    result = False
+                    break
+                # No else case - variable is already bound correctly
+            else:
+                subst.addBinding((matcher, target))
+        else:
+            if termIsVar(target) or termFunc(matcher) != termFunc(target):
                 result = False
                 break
-             # No else case - variable is already bound correctly
-          else:
-             subst.addBinding((matcher, target))
-       else:
-          if termIsVar(target) or termFunc(matcher) != termFunc(target):
-             result = False
-             break
-          else:
-             # We now know that matcher is of the form f(s1, ..., sn)
-             # and target is of the form f(t1, ..., tn). So now we
-             # need to find a common substitution for s1 onto t1,
-             # ..., sn onto tn. To do this, we add the argument lists
-             # to the work lists and let them be processed in the same
-             # loop. 
-             mlist.extend(termArgs(matcher))
-             tlist.extend(termArgs(target))
+            else:
+                # We now know that matcher is of the form f(s1, ..., sn)
+                # and target is of the form f(t1, ..., tn). So now we
+                # need to find a common substitution for s1 onto t1,
+                # ..., sn onto tn. To do this, we add the argument lists
+                # to the work lists and let them be processed in the same
+                # loop.
+                mlist.extend(termArgs(matcher))
+                tlist.extend(termArgs(target))
     if result:
-       return True
+        return True
     subst.backtrackToState(bt_state)
     return False
-              
+
 
 class TestMatching(unittest.TestCase):
     """
     Test basic substitution functions.
     """
+
     def setUp(self):
         self.s1 = terms.string2Term("X")
         self.t1 = terms.string2Term("a")
@@ -183,22 +181,22 @@ class TestMatching(unittest.TestCase):
         self.s7 = terms.string2Term("g(X)")
         self.t7 = terms.string2Term("g(f(g(X),b))")
 
-    def match_test(self, match, s,t, success_expected):
-       """
+    def match_test(self, match, s, t, success_expected):
+        """
        Test if s can be matched onto t. If yes, report the
        result. Compare to the expected result.
        """
-       print("Trying to match", term2String(s), "onto", term2String(t))
-       sigma = BTSubst()
-       res = match(s,t, sigma)
-       if success_expected:
-          self.assertTrue(res)
-          self.assertTrue(termEqual(sigma(s), t))
-          print(term2String(sigma(s)), term2String(t), sigma)
-       else:
-          print("Failure")
-          self.assertTrue(not res)
-       print()
+        print("Trying to match", term2String(s), "onto", term2String(t))
+        sigma = BTSubst()
+        res = match(s, t, sigma)
+        if success_expected:
+            self.assertTrue(res)
+            self.assertTrue(termEqual(sigma(s), t))
+            print(term2String(sigma(s)), term2String(t), sigma)
+        else:
+            print("Failure")
+            self.assertTrue(not res)
+        print()
 
     def testMatch(self):
         """
@@ -222,8 +220,6 @@ class TestMatching(unittest.TestCase):
         self.match_test(match, self.t7, self.s7, False)
 
         self.match_test(match, self.t6, self.t6, True)
-
-        
 
     def testMatchNoRec(self):
         """
@@ -249,8 +245,5 @@ class TestMatching(unittest.TestCase):
         self.match_test(match_norec, self.t6, self.t6, True)
 
 
-
-
 if __name__ == '__main__':
     unittest.main()
-

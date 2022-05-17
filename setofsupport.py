@@ -86,6 +86,7 @@ from lexer import Lexer
 class SosStrategy(object):
     """ abstract class that represents a divison strategy
     of a clauseset into satisfiable set and set-of-support."""
+
     def __init__(self, ratio=0):
         self.current = 0
         """ current count of processed clauses modulo ratio.
@@ -132,11 +133,13 @@ class NoSos(SosStrategy):
     """ strategy that does not add any clauses to SOS.
     This class is used as a placeholder if no sos strategy is used
     """
+
     def should_mark_clause(self, clause):
         return False
 
     def should_apply(self):
         return False
+
 
 class SosConjecture(SosStrategy):
     """ division strategy that adds the negated conjecture into
@@ -145,6 +148,7 @@ class SosConjecture(SosStrategy):
     satisfiable and only the negated conjecture makes the set
     unsatisfiable.
     """
+
     def should_mark_clause(self, clause):
         return clause.type == "negated_conjecture"
 
@@ -158,6 +162,7 @@ class SosOnlyNegLit(SosStrategy):
 
     The empty clause (if included) gets added to the SOS.
     """
+
     def should_mark_clause(self, clause):
         for lit in clause.literals:
             if lit.isPositive():
@@ -174,6 +179,7 @@ class SosOnlyPosLit(SosStrategy):
 
     The empty clause (if included) gets added to the SOS.
     """
+
     def should_mark_clause(self, clause):
         for lit in clause.literals:
             if lit.isNegative():
@@ -244,20 +250,19 @@ class TestSos(unittest.TestCase):
         sos_strategy = GivenSOSStrategies["Conjecture"]()
         sos_strategy.ratio = 0
 
-        should_apply_list = [sos_strategy.should_apply() for i in range(10)]
+        should_apply_list = [sos_strategy.should_apply() for _ in range(10)]
         assert should_apply_list == [True, True, True, True, True, True, True, True, True, True]
 
     def test_ratio2(self):
         sos_strategy = GivenSOSStrategies["Conjecture"]()
         sos_strategy.ratio = 2
 
-        should_apply_list = [sos_strategy.should_apply() for i in range(10)]
+        should_apply_list = [sos_strategy.should_apply() for _ in range(10)]
         assert should_apply_list == [True, True, False, True, True, False, True, True, False, True]
 
     def test_ratio_no_sos(self):
         sos_strategy = GivenSOSStrategies["NoSos"]()
         sos_strategy.ratio = 2
 
-        should_apply_list = [sos_strategy.should_apply() for i in range(10)]
+        should_apply_list = [sos_strategy.should_apply() for _ in range(10)]
         assert should_apply_list == [False, False, False, False, False, False, False, False, False, False]
-

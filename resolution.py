@@ -64,12 +64,11 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Lexer
-import substitutions
-from unification import mgu
-from literals import Literal
-from derivations import flatDerivation
+
 import clauses
+from derivations import flatDerivation
+from lexer import Lexer
+from unification import mgu
 
 
 def resolution(clause1, lit1, clause2, lit2):
@@ -86,10 +85,10 @@ def resolution(clause1, lit1, clause2, lit2):
     if l1.isNegative() == l2.isNegative():
         return None
     sigma = mgu(l1.atom, l2.atom)
-    if sigma == None:
+    if sigma is None:
         return None
-    lits1 = [l.instantiate(sigma) for l in clause1.literals if l!=l1]
-    lits2 = [l.instantiate(sigma) for l in clause2.literals if l!=l2]
+    lits1 = [lit.instantiate(sigma) for lit in clause1.literals if lit != l1]
+    lits2 = [lit.instantiate(sigma) for lit in clause2.literals if lit != l2]
     lits1.extend(lits2)
     res = clauses.Clause(lits1)
     res.removeDupLits()
@@ -109,9 +108,9 @@ def factor(clause, lit1, lit2):
     if l1.isNegative() != l2.isNegative():
         return None
     sigma = mgu(l1.atom, l2.atom)
-    if sigma == None:
+    if sigma is None:
         return None
-    lits = [l.instantiate(sigma) for l in clause.literals if l!=l2]
+    lits = [lit.instantiate(sigma) for lit in clause.literals if lit != l2]
     res = clauses.Clause(lits)
     res.removeDupLits()
     res.setDerivation(flatDerivation("factor", [clause]))
@@ -125,6 +124,7 @@ class TestResolution(unittest.TestCase):
     Unit test class for clauses. Test clause and literal
     functionality.
     """
+
     def setUp(self):
         """
         Setup function for resolution testing
@@ -153,23 +153,23 @@ cnf(taut,axiom,p(X4)|~p(X4)).
         Test resolution
         """
         print("Resolution:")
-        res1 = resolution(self.c1, 0, self.c2,0)
+        res1 = resolution(self.c1, 0, self.c2, 0)
         self.assertTrue(res1)
         print(res1)
 
-        res2 = resolution(self.c1, 0, self.c3,0)
-        self.assertTrue(res2==None)
+        res2 = resolution(self.c1, 0, self.c3, 0)
+        self.assertTrue(res2 is None)
         print(res2)
 
-        res3 = resolution(self.c2, 0, self.c3,0)
+        res3 = resolution(self.c2, 0, self.c3, 0)
         self.assertTrue(res3)
         print(res3)
 
-        res4 = resolution(self.c1, 0, self.c3,1)
-        self.assertTrue(res4==None)
+        res4 = resolution(self.c1, 0, self.c3, 1)
+        self.assertTrue(res4 is None)
         print(res4)
 
-        res5 = resolution(self.c6, 0, self.c7,0)
+        res5 = resolution(self.c6, 0, self.c7, 0)
         self.assertTrue(res5)
         print(res5)
 
@@ -177,22 +177,23 @@ cnf(taut,axiom,p(X4)|~p(X4)).
         """
         Test the factoring inference.
         """
-        f1 = factor(self.c1,0,1)
+        f1 = factor(self.c1, 0, 1)
         self.assertTrue(f1)
-        self.assertTrue(len(f1)==1)
+        self.assertTrue(len(f1) == 1)
         print("Factor:", f1)
 
-        f2 = factor(self.c2,0,1)
-        self.assertTrue(f2==None)
+        f2 = factor(self.c2, 0, 1)
+        self.assertTrue(f2 is None)
         print(f2)
 
-        f4 = factor(self.c4,0,1)
-        self.assertTrue(f4==None)
+        f4 = factor(self.c4, 0, 1)
+        self.assertTrue(f4 is None)
         print(f4)
 
-        f5 = factor(self.c5,1,3)
+        f5 = factor(self.c5, 1, 3)
         self.assertTrue(f5)
         print(f5)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -41,31 +41,32 @@ class Ident:
     Dummy class for generating distinct named objects.
     """
 
-    def __init__(self, name = ""):
+    def __init__(self, name=""):
         self.name = name
 
     def __repr__(self):
         return self.name
-    
+
 
 class TestIdents(unittest.TestCase):
     """
     Test collection for idents.
-    """       
+    """
+
     def testIdent(self):
         """
         Test that idents work.
         """
-        yes  = Ident("yes")
-        no   = Ident("no")
-        yes2 = Ident("yes")    
+        yes = Ident("yes")
+        no = Ident("no")
+        yes2 = Ident("yes")
         self.assertEqual(yes, yes)
-        self.assertEqual(no,no)
-        self.assertNotEqual(yes,no)
-        self.assertNotEqual(yes,no)
-        self.assertNotEqual(yes,yes2)
-        self.assertEqual(repr(yes),repr(yes2))
-        
+        self.assertEqual(no, no)
+        self.assertNotEqual(yes, no)
+        self.assertNotEqual(yes, no)
+        self.assertNotEqual(yes, yes2)
+        self.assertEqual(repr(yes), repr(yes2))
+
 
 if __name__ == '__main__':
     unittest.main()

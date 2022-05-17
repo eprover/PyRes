@@ -72,10 +72,10 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Token,Lexer
-from terms import termFunc
-from literals import Literal
+
 import clauses
+from lexer import Lexer
+from terms import termFunc
 
 
 class ResolutionIndex(object):
@@ -86,6 +86,7 @@ class ResolutionIndex(object):
     polarity of the query literal and the same top symbol (i.e. we
     implement a simple version of top symbol hashing).
     """
+
     def __init__(self):
         """
         We use separate dicts for mapping predicate symbols to
@@ -93,7 +94,6 @@ class ResolutionIndex(object):
         """
         self.pos_idx = {}
         self.neg_idx = {}
-
 
     def insertData(self, idx, topsymbol, payload):
         """
@@ -103,7 +103,7 @@ class ResolutionIndex(object):
         where pos is the position of the indexed literal in the clause
         (counting from 0).
         """
-        if not topsymbol in idx:
+        if topsymbol not in idx:
             idx[topsymbol] = set()
         idx[topsymbol].add(payload)
 
@@ -156,6 +156,7 @@ class ResolutionIndex(object):
         except KeyError:
             return list()
 
+
 def predAbstractionIsSubSequence(candidate, superseq):
     """
     Check if candidate is a subsequence of superseq. That is a
@@ -166,9 +167,9 @@ def predAbstractionIsSubSequence(candidate, superseq):
     end = len(superseq)
     try:
         for la in candidate:
-            while superseq[i]!=la:
-                i = i+1
-            i = i+1
+            while superseq[i] != la:
+                i = i + 1
+            i = i + 1
     except IndexError:
         return False
     return True
@@ -183,6 +184,7 @@ class SubsumptionIndex(object):
     abstraction is a subset of c's predicate abstraction, we can
     exclude whole sets of clauses at once.
     """
+
     def __init__(self):
         """
         We store predicate abstractions (with associated clauses) in a
@@ -204,7 +206,7 @@ class SubsumptionIndex(object):
         pa = clause.predicateAbstraction()
 
         try:
-            entry =  self.pred_abstr_set[pa]
+            entry = self.pred_abstr_set[pa]
         except KeyError:
             entry = set()
             self.pred_abstr_set[pa] = entry
@@ -213,7 +215,7 @@ class SubsumptionIndex(object):
             for (len_pa, spa, clauses) in self.pred_abstr_arr:
                 if len_pa >= l:
                     break
-                i = i+1
+                i = i + 1
             self.pred_abstr_arr.insert(i, (l, pa, entry))
 
         entry.add(clause)
@@ -237,7 +239,7 @@ class SubsumptionIndex(object):
         pa = clause.predicateAbstraction()
 
         try:
-            entry =  self.pred_abstr_set[pa]
+            entry = self.pred_abstr_set[pa]
             return clause in entry
         except KeyError:
             return False
@@ -280,6 +282,7 @@ class TestIndexing(unittest.TestCase):
     Unit test class for clauses. Test clause and literal
     functionality.
     """
+
     def setUp(self):
         """
         Setup function for resolution testing
@@ -361,19 +364,19 @@ cnf(c9,axiom, p(X,Y)).
         cands = index.getResolutionLiterals(lit)
         print(cands)
         self.assertEqual(len(cands), 8)
-        for (c,i) in cands:
-            l = c.getLiteral(i)
-            self.assertEqual(l.isNegative(), not lit.isNegative())
-            self.assertEqual(termFunc(l.atom), termFunc(lit.atom))
+        for (c, i) in cands:
+            lit = c.getLiteral(i)
+            self.assertEqual(lit.isNegative(), not lit.isNegative())
+            self.assertEqual(termFunc(lit.atom), termFunc(lit.atom))
 
         lit = self.c7.getLiteral(0)
         cands = index.getResolutionLiterals(lit)
         print(cands)
         self.assertEqual(len(cands), 3)
-        for (c,i) in cands:
-            l = c.getLiteral(i)
-            self.assertEqual(l.isNegative(), not lit.isNegative())
-            self.assertEqual(termFunc(l.atom), termFunc(lit.atom))
+        for (c, i) in cands:
+            lit = c.getLiteral(i)
+            self.assertEqual(lit.isNegative(), not lit.isNegative())
+            self.assertEqual(termFunc(lit.atom), termFunc(lit.atom))
 
         lit = self.c8.getLiteral(0)
         cands = index.getResolutionLiterals(lit)

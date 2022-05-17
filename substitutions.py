@@ -64,12 +64,14 @@ class Substitution(object):
     A counter to generate fresh variables.
     """
 
-    def __init__(self, init = []):
+    def __init__(self, init=None):
         """
         Initialize. The optional argument is a list of variable/term
         pairs representing the initial binding. This is taken as-is,
         without any checks for consistency.
         """
+        if init is None:
+            init = []
         self.subst = {}
         for i in init:
             self.subst[i[0]]=i[1]

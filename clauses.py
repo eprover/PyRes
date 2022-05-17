@@ -45,19 +45,13 @@ Germany
 Email: schulz@eprover.org
 """
 
-import unittest
-from lexer import Token,Lexer
-from derivations import Derivable,Derivation
+import substitutions
+from derivations import Derivable, Derivation
+from literals import parseLiteralList, literalList2String, litInLitList, oppositeInLitList
+from litselection import firstLit, varSizeLit
 from ocb import OCBCell
 from orderedResolution import selectInferenceLitsOrderedResolution
-from signature import Signature
-
 from terms import *
-import substitutions
-from literals import Literal, parseLiteral, parseLiteralList,\
-     literalList2String, litInLitList, oppositeInLitList
-from litselection import firstLit, varSizeLit, eqResVarSizeLit
-
 
 
 class Clause(Derivable):
@@ -72,26 +66,26 @@ class Clause(Derivable):
     - A list of evaulation of the clause
     - A flag that inidicated if the clause is part of the Set-Of-Support (SOS)
     """
-    def __init__(self, literals, type="plain", name=None):
+
+    def __init__(self, literals, clause_type="plain", name=None):
         """
         Initialize the clause.
         """
-        self.literals   = [l for l in literals if not l.isPropFalse()]
-        self.type       = type
+        self.literals = [lit for lit in literals if not lit.isPropFalse()]
+        self.type = clause_type
         self.evaluation = None
         self.part_of_sos = False
         Derivable.__init__(self, name)
-
 
     def __repr__(self):
         """
         Return a string representation of the clause.
         """
-        res = "cnf(%s,%s,%s%s)."%(self.name, self.type,\
-                                  literalList2String(self.literals),\
-                                  self.strDerivation())
+        res = "cnf(%s,%s,%s%s)." % (self.name, self.type,
+                                    literalList2String(self.literals),
+                                    self.strDerivation())
         if self.evaluation:
-            res = res+"/* %s */"%(repr(self.evaluation),)
+            res = res + "/* %s */" % (repr(self.evaluation))
         return res
 
     def __len__(self):
@@ -116,7 +110,7 @@ class Clause(Derivable):
         """
         Return true if the clause is a Horn clause.
         """
-        tmp = [l for l in self.literals if l.isPositive()]
+        tmp = [lit for lit in self.literals if lit.isPositive()]
         return len(tmp) <= 1
 
     def getLiteral(self, position):
@@ -132,7 +126,7 @@ class Clause(Derivable):
         """
         Return a list of all negative literals in the clause.
         """
-        return [l for l in self.literals if l.isNegative()]
+        return [lit for lit in self.literals if lit.isNegative()]
 
     def collectVars(self, res=None):
         """
@@ -157,14 +151,13 @@ class Clause(Derivable):
             i.collectSig(sig)
         return sig
 
-
     def weight(self, fweight, vweight):
         """
         Return the symbol-count weight of the clause.
         """
         res = 0
-        for l in self.literals:
-            res = res + l.weight(fweight, vweight)
+        for lit in self.literals:
+            res = res + lit.weight(fweight, vweight)
         return res
 
     def selectInferenceLits(self, lit_selection_fun=firstLit, ocb=None):
@@ -179,14 +172,12 @@ class Clause(Derivable):
                 selectInferenceLitsOrderedResolution(ocb, self)
             return
         # print("Got: ", candidates)
-        for l in self.literals:
-            l.setInferenceLit(False)
+        for lit in self.literals:
+            lit.setInferenceLit(False)
 
         selected = lit_selection_fun(candidates)
-        for l in selected:
-            l.setInferenceLit(True)
-
-
+        for lit in selected:
+            lit.setInferenceLit(True)
 
     def predicateAbstraction(self):
         """
@@ -197,17 +188,16 @@ class Clause(Derivable):
         q > p). We will use this later to implement a simple
         subsumption index.
         """
-        res = [l.predicateAbstraction() for l in self.literals]
+        res = [lit.predicateAbstraction() for lit in self.literals]
         res.sort()
         return tuple(res)
-
 
     def instantiate(self, subst):
         """
         Return an instantiated copy of self. Name and type are copied
         and need to be overwritten if that is not desired.
         """
-        lits = [l.instantiate(subst) for l in self.literals]
+        lits = [lit.instantiate(subst) for lit in self.literals]
         res = Clause(lits, self.type, self.name)
         res.setDerivation(self.derivation)
         res.part_of_sos = self.part_of_sos
@@ -217,26 +207,26 @@ class Clause(Derivable):
         """
         Return a copy of self with fresh variables.
         """
-        vars  = self.collectVars()
-        subst = substitutions.freshVarSubst(vars)
+        variables = self.collectVars()
+        subst = substitutions.freshVarSubst(variables)
         return self.instantiate(subst)
 
-    def addEval(self, eval):
+    def addEval(self, evaluation):
         """
         Add an evaluation to the clause. "eval" is an ordered list of
         numerical evaluations, one for each of the different
         evaluation functions used.
         """
-        self.evaluation = eval
+        self.evaluation = evaluation
 
     def removeDupLits(self):
         """
         Remove duplicated literals from clause.
         """
         res = []
-        for l in self.literals:
-            if not litInLitList(l,res):
-                res.append(l)
+        for lit in self.literals:
+            if not litInLitList(lit, res):
+                res.append(lit)
         self.literals = res
 
     def isTautology(self):
@@ -246,7 +236,7 @@ class Clause(Derivable):
         """
         for i in range(len(self.literals)):
             if oppositeInLitList(self.literals[i],
-                                 self.literals[i+1:]):
+                                 self.literals[i + 1:]):
                 return True
         return False
 
@@ -264,14 +254,14 @@ def parseClause(lexer):
     distinguish "axiom", "negated_conjecture", and map everything else
     to "plain".
     """
-    lexer.AcceptLit("cnf");
+    lexer.AcceptLit("cnf")
     lexer.AcceptTok(Token.OpenPar)
     name = lexer.LookLit()
     lexer.AcceptTok(Token.IdentLower)
     lexer.AcceptTok(Token.Comma)
-    type = lexer.LookLit()
-    if not type in ["axiom", "negated_conjecture"]:
-        type = "plain"
+    clause_type = lexer.LookLit()
+    if clause_type not in ["axiom", "negated_conjecture"]:
+        clause_type = "plain"
     lexer.AcceptTok(Token.IdentLower)
     lexer.AcceptTok(Token.Comma)
     if lexer.TestTok(Token.OpenPar):
@@ -283,10 +273,9 @@ def parseClause(lexer):
     lexer.AcceptTok(Token.ClosePar)
     lexer.AcceptTok(Token.FullStop)
 
-    res = Clause(lits, type, name)
+    res = Clause(lits, clause_type, name)
     res.setDerivation(Derivation("input"))
     return res
-
 
 
 class TestClauses(unittest.TestCase):
@@ -294,6 +283,7 @@ class TestClauses(unittest.TestCase):
     Unit test class for clauses. Test clause and literal
     functionality.
     """
+
     def setUp(self):
         """
         Setup function for clause/literal unit tests. Initialize
@@ -327,8 +317,8 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         print(c1)
         print(cf)
 
-        self.assertEqual(cf.weight(2,1), c1.weight(2,1))
-        self.assertEqual(cf.weight(1,1), c1.weight(1,1))
+        self.assertEqual(cf.weight(2, 1), c1.weight(2, 1))
+        self.assertEqual(cf.weight(1, 1), c1.weight(1, 1))
 
         cnew = Clause(c4.literals)
         self.assertTrue(cnew.getLiteral(0).isEqual(c4.getLiteral(0)))
@@ -346,14 +336,12 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         self.assertTrue(not c1.isHorn())
         self.assertTrue(c3.isHorn())
 
-
         self.assertTrue(c4.isTautology())
         self.assertTrue(not c5.isTautology())
 
         oldlen = len(c5)
         c5.removeDupLits()
-        self.assertTrue(len(c5)<oldlen)
-
+        self.assertTrue(len(c5) < oldlen)
 
         sig = c1.collectSig()
         c2.collectSig(sig)
@@ -374,21 +362,20 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         self.assertEqual(len(negs), 0)
 
         c2.selectInferenceLits()
-        for l in c2.literals:
-            self.assertTrue(l.isInferenceLit())
+        for lit in c2.literals:
+            self.assertTrue(lit.isInferenceLit())
 
         c3.selectInferenceLits()
-        for l in c3.literals:
-            self.assertEqual(l.isNegative(), l.isInferenceLit())
-
+        for lit in c3.literals:
+            self.assertEqual(lit.isNegative(), lit.isInferenceLit())
 
         c2.selectInferenceLits(varSizeLit)
-        for l in c2.literals:
-            self.assertTrue(l.isInferenceLit())
+        for lit in c2.literals:
+            self.assertTrue(lit.isInferenceLit())
 
         c3.selectInferenceLits(varSizeLit)
-        for l in c3.literals:
-            self.assertEqual(l.isNegative(), l.isInferenceLit())
+        for lit in c3.literals:
+            self.assertEqual(lit.isNegative(), lit.isInferenceLit())
 
         self.assertEqual(c1.predicateAbstraction(), ((True, "p"), (True, "p")))
         self.assertEqual(c2.predicateAbstraction(), ((True, "p"), (True, "p")))
@@ -406,6 +393,7 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         c5.selectInferenceLits(firstLit, ocb)
         self.assertTrue(not c5.literals[0].isInferenceLit())
         self.assertTrue(c5.literals[1].isInferenceLit())
+
 
 if __name__ == '__main__':
     unittest.main()

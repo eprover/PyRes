@@ -6,9 +6,8 @@
 """
 
 """
-from kbo import *
 from clauses import *
-from literals import *
+from kbo import *
 from ocb import *
 
 

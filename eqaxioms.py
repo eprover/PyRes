@@ -70,13 +70,10 @@ Germany
 Email: schulz@eprover.org
 """
 
-import unittest
-from lexer import Token,Lexer
-from derivations import Derivable,Derivation
-from signature import Signature
-from terms import *
+from clauses import Clause, parseClause
+from derivations import Derivation
 from literals import Literal
-from clauses import Clause,parseClause
+from terms import *
 
 
 def generateEquivAxioms():
@@ -102,18 +99,18 @@ def generateVarList(x, n):
     Generate a list of variables of the form x1,...,xn, where x is any
     string, and n is >= 0.
     """
-    return [x+"%d"%(i) for i in range(1,n+1)]
-    
+    return [x + "%d" % i for i in range(1, n + 1)]
+
 
 def generateEqPremise(arity):
     """
     Generate a list of literals of the form
     X1!=Y1|...|Xn!=Yn.
     """
-    res = [Literal(list(["=", vars[0],vars[1]]), True) for vars in
-    zip(generateVarList("X", arity), generateVarList("Y",arity))]
+    res = [Literal(list(["=", variables[0], variables[1]]), True) for variables in
+           zip(generateVarList("X", arity), generateVarList("Y", arity))]
     return res
-    
+
 
 def generateFunCompatAx(f, arity):
     """
@@ -123,16 +120,16 @@ def generateFunCompatAx(f, arity):
     """
     res = generateEqPremise(arity)
     lterm = list([f])
-    lterm.extend(generateVarList("X",arity))
+    lterm.extend(generateVarList("X", arity))
     rterm = list([f])
-    rterm.extend(generateVarList("Y",arity))
+    rterm.extend(generateVarList("Y", arity))
     concl = Literal(["=", lterm, rterm], False)
     res.append(concl)
 
     resclause = Clause(res)
     resclause.setDerivation(Derivation("eq_axiom"))
     return resclause
-    
+
 
 def generatePredCompatAx(p, arity):
     """
@@ -143,13 +140,13 @@ def generatePredCompatAx(p, arity):
     res = generateEqPremise(arity)
 
     negp = list([p])
-    negp.extend(generateVarList("X",arity))
+    negp.extend(generateVarList("X", arity))
     res.append(Literal(negp, True))
 
     posp = list([p])
-    posp.extend(generateVarList("Y",arity))
+    posp.extend(generateVarList("Y", arity))
     res.append(Literal(posp, False))
-    
+
     resclause = Clause(res)
     resclause.setDerivation(Derivation("eq_axiom"))
     return resclause
@@ -163,13 +160,13 @@ def generateCompatAxioms(sig):
     res = []
     for f in sig.funs:
         arity = sig.getArity(f)
-        if arity>0:
+        if arity > 0:
             c = generateFunCompatAx(f, arity)
             res.append(c)
 
     for p in sig.preds:
         arity = sig.getArity(p)
-        if arity>0 and p!="=":
+        if arity > 0 and p != "=":
             c = generatePredCompatAx(p, arity)
             res.append(c)
 
@@ -184,12 +181,12 @@ class TestEqAxioms(unittest.TestCase):
     """
     Test cases for equality axiom generation.
     """
+
     def setUp(self):
         """
         """
         print()
-        
-       
+
     def testEquivAxioms(self):
         """
         Test that the equivalence axioms are generated (or at least
@@ -203,13 +200,13 @@ class TestEqAxioms(unittest.TestCase):
         """
         Test variable and premise generation.
         """
-        vars = generateVarList("X", 4)
-        self.assertTrue("X1" in vars)
-        self.assertTrue("X4" in vars)
-        self.assertTrue(not "X5" in vars)
-        self.assertTrue(not "Y1" in vars)
-        self.assertEqual(len(vars), 4)
-        print(vars)
+        variables = generateVarList("X", 4)
+        self.assertTrue("X1" in variables)
+        self.assertTrue("X4" in variables)
+        self.assertTrue("X5" not in variables)
+        self.assertTrue("Y1" not in variables)
+        self.assertEqual(len(variables), 4)
+        print(variables)
 
         lits = generateEqPremise(3)
         self.assertEqual(len(lits), 3)
@@ -220,11 +217,11 @@ class TestEqAxioms(unittest.TestCase):
         Test that compatibility axioms are generated as expected.
         """
         ax = generateFunCompatAx("f", 3)
-        self.assertEqual(len(ax),4)
+        self.assertEqual(len(ax), 4)
         print(ax)
 
         ax = generatePredCompatAx("p", 5)
-        self.assertEqual(len(ax),7)
+        self.assertEqual(len(ax), 7)
         print(ax)
 
         sig = Signature()

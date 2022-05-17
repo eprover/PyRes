@@ -45,12 +45,13 @@ Email: schulz@eprover.org
 
 """
 
-import sys
 import getopt
-from version import version
-from lexer import Token,Lexer
+import sys
+
 from clausesets import ClauseSet
+from lexer import Lexer
 from simplesat import SimpleProofState
+from version import version
 
 
 def processOptions(opts):
@@ -59,9 +60,10 @@ def processOptions(opts):
     """
     for opt, optarg in opts:
         if opt == "-h" or opt == "--help":
-            print("pyres-simple.py "+version)
+            print("pyres-simple.py " + version)
             print(__doc__)
             sys.exit()
+
 
 if __name__ == '__main__':
     try:
@@ -69,7 +71,7 @@ if __name__ == '__main__':
                                        "h",
                                        ["help"])
     except getopt.GetoptError as err:
-        print(sys.argv[0],":", err)
+        print(sys.argv[0], ":", err)
         sys.exit(1)
 
     processOptions(opts)
@@ -85,7 +87,7 @@ if __name__ == '__main__':
     state = SimpleProofState(problem)
     res = state.saturate()
 
-    if res != None:
+    if res is not None:
         print("# SZS status Unsatisfiable")
     else:
         print("# SZS status Satisfiable")

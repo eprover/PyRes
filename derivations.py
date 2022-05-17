@@ -57,26 +57,28 @@ class Derivable(object):
     Indicate if derivations shouldbe printed as part of Derivable
     objects. It's up to the concrete classes to support this.
     """
-    def __init__(self, name=None, derivation = None):
+
+    def __init__(self, name=None, derivation=None):
         """
         Initialize the object..
         """
-        self.setName(name)
+        self.name = None
         self.derivation = derivation
         self.refCount = 0
+        self.setName(name)
 
     def __repr__(self):
         return self.name
 
-    def setName(self, name = None):
+    def setName(self, name=None):
         """
         Set the name. If no name is given, generate a default name.
         """
         if name:
             self.name = name
         else:
-            self.name = "c%d"%(Derivable.derivedIdCounter,)
-            Derivable.derivedIdCounter=Derivable.derivedIdCounter+1
+            self.name = "c%d" % (Derivable.derivedIdCounter,)
+            Derivable.derivedIdCounter = Derivable.derivedIdCounter + 1
 
     def setDerivation(self, derivation):
         self.derivation = derivation
@@ -96,13 +98,13 @@ class Derivable(object):
         Increase reference counter (counts virtual edges in the
         derivation graph coming from the children).
         """
-        self.refCount = self.refCount+1
+        self.refCount = self.refCount + 1
 
     def decRefCount(self):
         """
         See above.
         """
-        self.refCount = self.refCount-1
+        self.refCount = self.refCount - 1
 
     def strDerivation(self):
         """
@@ -113,7 +115,7 @@ class Derivable(object):
         if not self.derivation:
             return ""
         if Derivable.printDerivation:
-            return ","+repr(self.derivation)
+            return "," + repr(self.derivation)
         return ""
 
     def annotateDerivationGraph(self):
@@ -127,14 +129,14 @@ class Derivable(object):
                 p.annotateDerivationGraph()
         self.incRefCount()
 
-    def linearizeDerivation(self, res = None):
+    def linearizeDerivation(self, res=None):
         """
         Return linearized derivation.
         """
-        if res == None:
+        if res is None:
             res = list()
         self.decRefCount()
-        if self.refCount==0:
+        if self.refCount == 0:
             res.append(self)
             parents = self.getParents()
             for p in parents:
@@ -147,14 +149,18 @@ class Derivable(object):
         res.reverse()
         return res
 
+
 def enableDerivationOutput():
     Derivable.printDerivation = True
+
 
 def disableDerivationOutput():
     Derivable.printDerivation = False
 
+
 def toggleDerivationOutput():
-     Derivable.printDerivation = not Derivable.printDerivation
+    Derivable.printDerivation = not Derivable.printDerivation
+
 
 class Derivation(object):
     """
@@ -162,6 +168,7 @@ class Derivation(object):
     reference to an existing Derivable object ("reference"), or an
     inference with a list of premises.
     """
+
     def __init__(self, operator, parents=None, status="status(thm)"):
         """
         Initialize  a derivation object with the operator and a list
@@ -169,8 +176,8 @@ class Derivation(object):
         "reference", Derivables).
         """
         self.operator = operator
-        self.parents  = parents
-        self.status   = status
+        self.parents = parents
+        self.status = status
 
     def __repr__(self):
         """
@@ -181,13 +188,11 @@ class Derivation(object):
         elif self.operator == "eq_axiom":
             return "eq_axiom"
         elif self.operator == "reference":
-            assert(len(self.parents)==1)
+            assert (len(self.parents) == 1)
             return self.parents[0].name
         else:
-            return "inference(%s,%s,%s)"%\
+            return "inference(%s,%s,%s)" % \
                    (self.operator, self.status, repr(self.parents))
-
-
 
     def getParents(self):
         """
@@ -199,14 +204,13 @@ class Derivation(object):
         elif self.operator == "eq_axiom":
             return []
         elif self.operator == "reference":
-            assert(len(self.parents)==1)
+            assert (len(self.parents) == 1)
             return self.parents
         else:
             res = []
             for p in self.parents:
                 res.extend(p.getParents())
             return res
-
 
 
 def flatDerivation(operator, parents, status="status(thm)"):
@@ -218,10 +222,10 @@ def flatDerivation(operator, parents, status="status(thm)"):
     return Derivation(operator, parentlist, status)
 
 
-
 class TestDerivations(unittest.TestCase):
     """
     """
+
     def setUp(self):
         print()
 
@@ -233,8 +237,8 @@ class TestDerivations(unittest.TestCase):
         o2 = Derivable()
         o3 = Derivable()
         o3.setDerivation(flatDerivation("resolution", [o1, o2]))
-        self.assertEqual(o1.getParents(),[])
-        self.assertEqual(o2.getParents(),[])
+        self.assertEqual(o1.getParents(), [])
+        self.assertEqual(o2.getParents(), [])
         self.assertEqual(len(o3.getParents()), 2)
         print(o3)
         print(o3.derivation)
@@ -258,12 +262,12 @@ class TestDerivations(unittest.TestCase):
         o2.setDerivation(Derivation("input"))
         o3.setDerivation(flatDerivation("factor", [o1]))
         o4.setDerivation(flatDerivation("factor", [o3]))
-        o5.setDerivation(flatDerivation("resolution", [o1,o2]))
+        o5.setDerivation(flatDerivation("resolution", [o1, o2]))
         o6.setDerivation(Derivation("reference", [o5]))
-        o7.setDerivation(flatDerivation("resolution", [o5,o1]))
+        o7.setDerivation(flatDerivation("resolution", [o5, o1]))
         proof = o7.orderedDerivation()
         print(proof)
-        self.assertEqual(len(proof),4)
+        self.assertEqual(len(proof), 4)
         self.assertTrue(o1 in proof)
         self.assertTrue(o2 in proof)
         self.assertTrue(o5 in proof)
@@ -281,16 +285,15 @@ class TestDerivations(unittest.TestCase):
         o2.setDerivation(Derivation("input"))
         o3.setDerivation(flatDerivation("resolution", [o1, o2]))
         enableDerivationOutput()
-        self.assertTrue(o2.strDerivation()!="")
-        self.assertTrue(o3.strDerivation()!="")
-        self.assertTrue(o4.strDerivation()=="")
+        self.assertTrue(o2.strDerivation() != "")
+        self.assertTrue(o3.strDerivation() != "")
+        self.assertTrue(o4.strDerivation() == "")
         disableDerivationOutput()
-        self.assertTrue(o3.strDerivation()=="")
-        self.assertTrue(o4.strDerivation()=="")
+        self.assertTrue(o3.strDerivation() == "")
+        self.assertTrue(o4.strDerivation() == "")
         toggleDerivationOutput()
-        self.assertTrue(o3.strDerivation()!="")
-        self.assertTrue(o4.strDerivation()=="")
-
+        self.assertTrue(o3.strDerivation() != "")
+        self.assertTrue(o4.strDerivation() == "")
 
 
 if __name__ == '__main__':

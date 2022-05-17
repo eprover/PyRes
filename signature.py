@@ -53,16 +53,18 @@ Email: schulz@eprover.org
 
 import unittest
 
+
 class Signature(object):
     """
     A signature object, containing function symbols, predicate
     symbols, and their associated arities.
     """
+
     def __init__(self):
         """
         Initialize the signature.
         """
-        self.funs  = {}
+        self.funs = {}
         self.preds = {}
 
     def __repr__(self):
@@ -70,11 +72,11 @@ class Signature(object):
         Return a printable representation of the signture.
         """
         res = ["Predicates:\n-----------"]
-        funs = [ "%s: %d"%(f, self.preds[f]) for f in self.preds.keys()]
+        funs = ["%s: %d" % (f, self.preds[f]) for f in self.preds.keys()]
         res.extend(funs)
 
         res.append("Functions:\n-----------")
-        funs = [ "%s: %d"%(f, self.funs[f]) for f in self.funs.keys()]
+        funs = ["%s: %d" % (f, self.funs[f]) for f in self.funs.keys()]
         res.extend(funs)
 
         return "\n".join(res)
@@ -84,7 +86,6 @@ class Signature(object):
         Add a function symbol with associated arity.
         """
         self.funs[f] = arity
-
 
     def addPred(self, p, arity):
         """
@@ -104,11 +105,11 @@ class Signature(object):
         """
         return f in self.funs
 
-    def isConstant(self,f):
+    def isConstant(self, f):
         """
         Return True if f is a constant function symbol.
         """
-        return self.isFun(f) and self.getArity(f)==0
+        return self.isFun(f) and self.getArity(f) == 0
 
     def getArity(self, symbol):
         """
@@ -119,12 +120,11 @@ class Signature(object):
         return self.preds[symbol]
 
 
-
 class TestSignature(unittest.TestCase):
     """
     Test basic functionality of the signature data type.
     """
-    
+
     def testSig(self):
         """
         Test signature object.
@@ -134,7 +134,6 @@ class TestSignature(unittest.TestCase):
         sig.addFun("mult", 2)
         sig.addFun("a", 0)
         sig.addPred("weird", 4)
-        
 
         print(sig)
         self.assertTrue(sig.isPred("weird"))
@@ -145,8 +144,8 @@ class TestSignature(unittest.TestCase):
         self.assertTrue(not sig.isFun("unknown"))
         self.assertTrue(not sig.isFun("weird"))
 
-        self.assertEqual(sig.getArity("a"),0)
-        self.assertEqual(sig.getArity("weird"),4)
+        self.assertEqual(sig.getArity("a"), 0)
+        self.assertEqual(sig.getArity("weird"), 4)
 
 
 if __name__ == '__main__':
