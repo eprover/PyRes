@@ -170,7 +170,7 @@ class Clause(Derivable):
         """
         candidates = self.getNegativeLits()
         if not candidates:
-            if ocb is not None:
+            if ocb is not None:  # negLitSelection and ordered Resolution
                 selectInferenceLitsOrderedResolution(ocb, self)
             return
         # print("Got: ", candidates)

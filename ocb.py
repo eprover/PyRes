@@ -4,7 +4,8 @@
 # Module ocb.py
 
 """
-
+Implementation of the order control block (ocb)
+OCB contains weights for funs (Dict) and weight of variables (unsigned int)
 """
 import unittest
 
@@ -47,6 +48,10 @@ class TestOCB(unittest.TestCase):
         self.t2 = string2Term(self.example2)
         self.ocb = OCBCell()
         self.ocb.insert2dic(self.t1)
+
+    """
+    Test basic ocb functions.
+    """
     def testOCB(self):
         self.assertEqual(self.ocb.ocb_funs.keys(), {"b", "f", "g"})
         print(self.ocb.ocb_funs.values())

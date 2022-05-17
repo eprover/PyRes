@@ -13,6 +13,9 @@ from ocb import *
 
 
 def countsymbols(clauses):
+    """
+    Count the symbols in all the literals
+    """
     symbol_count = {}
     for clause in clauses.clauses:
         for lit in clause.literals:
@@ -27,6 +30,10 @@ def countsymbols(clauses):
 
 
 def initocb(symbolcount, option=1):
+    """
+    Initialize ocb with sorted counted symbols of all literals and
+    weights of var and variable weights of funs
+    """
     fun_dict = {}
     var_weight = 1
     sorted_list = sorted(symbolcount.items(), key=lambda x: x[1], reverse=True)
@@ -34,7 +41,7 @@ def initocb(symbolcount, option=1):
         for fun in sorted_list:
             fun_dict.update({fun[0]: 2})
         # var_weight = 1 default
-    else:   #default case option = 1
+    else:   # default case option = 1
         for fun in sorted_list:
             fun_dict.update({fun[0]: 1})
         # var_weight = 1 default
@@ -43,6 +50,11 @@ def initocb(symbolcount, option=1):
 
 
 def selectInferenceLitsOrderedResolution(ocb, given_clause):
+    """
+    Select the inferenceLits via kbo
+    (Compatible with negLitSelection)
+    Maximal Lits are interferenceLits
+    """
     for lit in given_clause.literals:
         lit.setInferenceLit(True)
         if len(given_clause.literals) == 1:
@@ -57,46 +69,19 @@ def selectInferenceLitsOrderedResolution(ocb, given_clause):
                 b.setInferenceLit(False)
             elif result == CompareResult.to_lesser:
                 a.setInferenceLit(False)
-                #break
             elif result == CompareResult.to_uncomparable or result == CompareResult.to_equal:
                 if a.isNegative():
                     if not b.isNegative():
                         b.setInferenceLit(False)    # a greater b
                 elif b.isNegative():
                     a.setInferenceLit(False)        # b greater a
-                    #break
             else:
                 assert False
 
 
-"""
-    candidates = given_clause.literals.copy()
-    for a in given_clause.literals:
-        if a in candidates:
-            for b in given_clause.literals:
-                if a != b:
-                    result = kbocompare(ocb, a.atom, b.atom)
-                    if result == CompareResult.to_greater or result == CompareResult.to_equal:
-                        a.setInferenceLit(True)
-                        b.setInferenceLit(False)
-                        if b in candidates:
-                            candidates.remove(b)
-                    elif result == CompareResult.to_lesser:
-                        a.setInferenceLit(False)
-                        if a in candidates:
-                            candidates.remove(a)
-                        break
-                    else:
-                        a.setInferenceLit(True)
-                        pass
-    #for lit in candidates:
-       # lit.setInferenceLit(True)
-"""
-
-
 class TestOrderedResolution(unittest.TestCase):
     """
-    Test basic  functions.
+    Test basic functions
     """
 
     def setUp(self):
