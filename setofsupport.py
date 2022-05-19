@@ -150,11 +150,12 @@ class SosConjecture(SosStrategy):
 
 
 class SosOnlyNegLit(SosStrategy):
-    """ division strategy that adds all clauses with only
-    negative literal into the set-of-support. This can be done
-    because the base set consists of clauses with at least one positive
-    literals which makes the clause set satisfiable by
-    interpeting all atoms as true.
+    """ Division strategy that adds all clauses with only
+    negative literal into the set-of-support.
+
+    This is allowed because the base set consists of clauses with
+    at least one positive literals which makes the clause set
+    satisfiable by interpeting all atoms as true.
 
     The empty clause (if included) gets added to the SOS.
     """
@@ -166,10 +167,11 @@ class SosOnlyNegLit(SosStrategy):
 
 
 class SosOnlyPosLit(SosStrategy):
-    """ division strategy that adds all clauses with only
-    positive literal into the set-of-support. This can be done
-    because the base set consists of clauses with at least one negative
-    literals which makes the clause set satisfiable by
+    """ Division strategy that adds all clauses with only
+    positive literal into the set-of-support.
+
+    This is allowed because the base set consists of clauses with
+    at least one negative literals which makes the this set satisfiable by
     interpreting all atoms as false.
 
     The empty clause (if included) gets added to the SOS.
@@ -181,11 +183,33 @@ class SosOnlyPosLit(SosStrategy):
         return True
 
 
+class SosOptimal(SosStrategy):
+    """ This is the optimal strategy which acts like SosConjecture
+    if at least one negated_conjecture exists.
+    If no conjecture exists it acts like SosOnlyNegLit.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.sos_conjecture = SosConjecture()
+        self.sos_only_neg_lit = SosOnlyNegLit()
+
+    def mark_sos(self, clauseset):
+
+        number_clauses = self.sos_conjecture.mark_sos(clauseset)
+        if number_clauses > 0:
+            return number_clauses
+        else:
+            return self.sos_only_neg_lit.mark_sos(clauseset)
+
+
+
 GivenSOSStrategies = {
     "NoSos": NoSos,
     "Conjecture": SosConjecture,
     "OnlyNegLit": SosOnlyNegLit,
     "OnlyPosLit": SosOnlyPosLit,
+    "Optimal": SosOptimal
 }
 
 
@@ -236,6 +260,33 @@ class TestSos(unittest.TestCase):
         assert isinstance(sos_stategy, SosOnlyNegLit)
         problem = self.read_test_problem()
 
+        sos_stategy.mark_sos(problem)
+        sos_marks = [c.part_of_sos for c in problem.clauses]
+        assert sos_marks == [False, True, False, False, True, False]
+
+    def test_mark_sos_optimal_with_conjecture(self):
+        sos_stategy = GivenSOSStrategies["Optimal"]()
+        assert isinstance(sos_stategy, SosOptimal)
+        problem = self.read_test_problem()
+
+        sos_stategy.mark_sos(problem)
+        sos_marks = [c.part_of_sos for c in problem.clauses]
+        assert sos_marks == [False, False, False, True, True, True]
+
+    def test_mark_sos_optimal_without_conjecture(self):
+        clause_definition = self.spec3 = """
+                    cnf(positive_axiom, axiom, p(X)|q(X)).
+                    cnf(negative_axiom, axiom, ~p(X)|~q(X)).
+                    cnf(mixed_axiom, axiom, ~p(X)| q(X)).
+                    cnf(positive_conjecture, axiom, p(X)|q(X)).
+                    cnf(negative_conjecture, axiom, ~p(X)|~q(X)).
+                    cnf(mixed_conjecture, axiom, ~p(X)| q(X)).
+                    """
+        lex = Lexer(clause_definition)
+        problem = ClauseSet()
+        problem.parse(lex)
+
+        sos_stategy = GivenSOSStrategies["Optimal"]()
         sos_stategy.mark_sos(problem)
         sos_marks = [c.part_of_sos for c in problem.clauses]
         assert sos_marks == [False, True, False, False, True, False]
