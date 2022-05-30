@@ -66,7 +66,7 @@ Options:
   Do not add equality axioms. This makes the prover incomplete for
   equality problems.
 
- -o
+ -o <int mode>
 --ordered-resolution
   Use ordered Resolution KBO
 
