@@ -4,11 +4,11 @@
 # Module orderedResolution.py
 
 """
-
+Implementation of ordered resolution with KBO
+via an order control block
 """
 from kbo import *
 from clauses import *
-from literals import *
 from ocb import *
 
 

@@ -36,7 +36,7 @@ class CompareResult(enum.Enum):
 def kbocomparevars(term_s, term_t):
     """
     variable compare, one term must be a variable, checks for equality and subterms else uncomparable
-    retruns CompareResult
+    returns CompareResult
     """
     if termIsVar(term_t):
         if term_s == term_t:
@@ -102,20 +102,13 @@ def kbocompare(ocb, term_s, term_t):
             return CompareResult.to_uncomparable
         else:
             assert False
-    elif topsymbolcompare == CompareResult.to_equal:  # same topsymbol, comapre aritys
-        sarity = 0
-        tarity = 0
+    elif topsymbolcompare == CompareResult.to_equal:  # same topsymbol, recursive comparison
 
-        for fun in termCollectFuns(term_s):
-            arity = termCollectSig(term_s).getArity(fun)
-            if arity > sarity:
-                sarity = arity
-        for fun in termCollectFuns(term_t):
-            arity = termCollectSig(term_t).getArity(fun)
-            if arity > tarity:
-                tarity = arity
+        sarity = termCollectSig(term_s).getArity(termFunc(term_s))
+        tarity = termCollectSig(term_t).getArity(termFunc(term_t))
+
         for i in range(max(sarity, tarity)):
-            if tarity <= i:
+            if tarity <= i:  # tarity < sarity
                 case = kbovarcompare(term_s, term_t)
                 if case == CompareResult.to_greater or case == CompareResult.to_equal:
                     return CompareResult.to_greater
@@ -123,7 +116,7 @@ def kbocompare(ocb, term_s, term_t):
                     return CompareResult.to_uncomparable
                 else:
                     assert False
-            if sarity <= i:
+            if sarity <= i:  # tarity > sarity
                 case = kbovarcompare(term_s, term_t)
                 if case == CompareResult.to_lesser or case == CompareResult.to_equal:
                     return CompareResult.to_lesser
@@ -131,6 +124,7 @@ def kbocompare(ocb, term_s, term_t):
                     return CompareResult.to_uncomparable
                 else:
                     assert False
+            # recursive comparison
             res = kbocompare(ocb, subterm(term_s, [i + 1]), subterm(term_t, [i + 1]))  # args from t and s
             if res == CompareResult.to_greater:
                 case = kbovarcompare(term_s, term_t)
