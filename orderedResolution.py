@@ -117,14 +117,14 @@ def selectInferenceLitsOrderedResolution(ocb, given_clause):
                 b.setInferenceLit(False)
             elif result == CompareResult.to_lesser:
                 a.setInferenceLit(False)
-            elif result == CompareResult.to_uncomparable or result == CompareResult.to_equal:
+            elif result == CompareResult.to_equal:
                 if a.isNegative():
                     if not b.isNegative():
                         b.setInferenceLit(False)  # a greater b
                 elif b.isNegative():
                     a.setInferenceLit(False)  # b greater a
             else:
-                assert False
+                assert result == CompareResult.to_uncomparable
 
 
 if __name__ == '__main__':
