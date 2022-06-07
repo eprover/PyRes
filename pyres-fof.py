@@ -67,7 +67,7 @@ Options:
   equality problems.
 
  -o <int mode>
---ordered-resolution
+--ordered-resolution=<mode>
   Use ordered Resolution KBO
 
 A reasonable command line to run the prover would be:

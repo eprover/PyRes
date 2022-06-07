@@ -6,6 +6,39 @@
 """
 Implementation of ordered resolution with KBO
 via an order control block
+
+
+It restricts inferences without sacrificing completeness.
+A so-called simplification order is used on the literals
+and only resolution steps with (in this order) maximum Literals are allowed.
+
+Ordered Resolution is compatible with negative Literalselection.
+Ordered Resolution is then only used if negative Literalselection doesn't select a literal.
+
+Copyright 2010-2021 Stephan Schulz, schulz@eprover.org
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program ; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+MA  02111-1307 USA
+
+The original copyright holder can be contacted as
+
+Stephan Schulz
+Auf der Altenburg 7
+70376 Stuttgart
+Germany
+Email: schulz@eprover.org
 """
 from kbo import *
 from clauses import *
@@ -40,6 +73,10 @@ def initocb(symbolcount, option=1):
     if option == 2:
         for fun in sorted_list:
             fun_dict.update({fun[0]: 2})
+        # var_weight = 1 default
+    if option == 3:  # weight = index
+        for fun in sorted_list:
+            fun_dict.update({fun[0]: sorted_list.index(fun)})
         # var_weight = 1 default
     else:   # default case option = 1
         for fun in sorted_list:
