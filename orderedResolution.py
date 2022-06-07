@@ -41,16 +41,19 @@ Germany
 Email: schulz@eprover.org
 """
 from kbo import *
-from clauses import *
 from ocb import *
 
 
 def countsymbols(clauses):
     """
     Count the symbols in all the literals
+    Collect signature of symbols
+    Return count and signature
     """
     symbol_count = {}
+    sig = Signature()
     for clause in clauses.clauses:
+        clause.collectSig(sig)
         for lit in clause.literals:
             funs = termCollectFuns(lit.atom)
             for fun in funs:
@@ -59,31 +62,39 @@ def countsymbols(clauses):
                     symbol_count.update({fun: 0})
                     old = symbol_count.get(fun)
                 symbol_count.update({fun: old + 1})
-    return symbol_count
+    return symbol_count, sig
 
 
-def initocb(symbolcount, option=1):
+def initocb(symbolcount, signature, option=1):
     """
     Initialize ocb with sorted counted symbols of all literals and
     weights of var and variable weights of funs
     """
-    fun_dict = {}
+    fun_weight_dict = {}
+    fun_prec_dict = {}
     var_weight = 1
+    i = 0
     sorted_list = sorted(symbolcount.items(), key=lambda x: x[1], reverse=True)
     if option == 2:
         for fun in sorted_list:
-            fun_dict.update({fun[0]: 2})
+            fun_weight_dict.update({fun[0]: 2})
+            fun_prec_dict.update({fun[0]: i})
+            i = i + 1
         # var_weight = 1 default
     if option == 3:  # weight = index
         for fun in sorted_list:
-            fun_dict.update({fun[0]: sorted_list.index(fun)})
+            fun_weight_dict.update({fun[0]: sorted_list.index(fun)})
+            fun_prec_dict.update({fun[0]: i})
+            i = i + 1
         # var_weight = 1 default
-    else:   # default case option = 1
+    else:  # default case option = 1
         for fun in sorted_list:
-            fun_dict.update({fun[0]: 1})
+            fun_weight_dict.update({fun[0]: 1})
+            fun_prec_dict.update({fun[0]: i})
+            i = i + 1
         # var_weight = 1 default
 
-    return OCBCell(fun_dict, var_weight)
+    return OCBCell(fun_weight_dict, var_weight, fun_prec_dict, signature)
 
 
 def selectInferenceLitsOrderedResolution(ocb, given_clause):
@@ -109,32 +120,11 @@ def selectInferenceLitsOrderedResolution(ocb, given_clause):
             elif result == CompareResult.to_uncomparable or result == CompareResult.to_equal:
                 if a.isNegative():
                     if not b.isNegative():
-                        b.setInferenceLit(False)    # a greater b
+                        b.setInferenceLit(False)  # a greater b
                 elif b.isNegative():
-                    a.setInferenceLit(False)        # b greater a
+                    a.setInferenceLit(False)  # b greater a
             else:
                 assert False
-
-
-class TestOrderedResolution(unittest.TestCase):
-    """
-    Test basic functions
-    """
-
-    def setUp(self):
-        self.input1 = "cnf(c96,plain,butler!=X264|X266!=X265|hates(X264,X265)|~hates(agatha,X266))."
-        lex = Lexer(self.input1)
-        self.given_clause = parseClause(lex)
-        self.ocb = OCBCell()
-
-    def testselectInferenceLitsOrderedResolution(self):
-        for lit in self.given_clause.literals:
-            self.ocb.insert2dic(lit.atom)
-        selectInferenceLitsOrderedResolution(self.ocb, self.given_clause)
-        self.assertEqual(self.given_clause.literals[0].inference_lit, False)
-        self.assertEqual(self.given_clause.literals[1].inference_lit, True)
-        self.assertEqual(self.given_clause.literals[2].inference_lit, False)
-        self.assertEqual(self.given_clause.literals[3].inference_lit, True)
 
 
 if __name__ == '__main__':

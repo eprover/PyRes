@@ -108,7 +108,9 @@ def kbocompare(ocb, term_s, term_t):
             assert False
 
     assert (sweight == tweight)  # equal weight
-    topsymbolcompare = ocbfuncompare(ocb, termFunc(term_s), termFunc(term_t))  # compare the top symbol of each term
+    sfunc = termFunc(term_s)
+    tfunc = termFunc(term_t)
+    topsymbolcompare = ocbfuncompare(ocb, sfunc, tfunc)  # compare the top symbol of each term
     if topsymbolcompare == CompareResult.to_uncomparable:
         return CompareResult.to_uncomparable
     elif topsymbolcompare == CompareResult.to_greater:
@@ -128,8 +130,8 @@ def kbocompare(ocb, term_s, term_t):
         else:
             assert False
     elif topsymbolcompare == CompareResult.to_equal:  # same topsymbol, recursive comparison
-        sarity = termCollectSig(term_s).getArity(termFunc(term_s))
-        tarity = termCollectSig(term_t).getArity(termFunc(term_t))
+        sarity = ocb.ocb_signature.getArity(sfunc)
+        tarity = ocb.ocb_signature.getArity(tfunc)
         for i in range(max(sarity, tarity)):
             if tarity <= i:  # tarity < sarity
                 case = kbovarcompare(term_s, term_t)
@@ -200,8 +202,8 @@ def ocbfuncomparepos(ocb, f1, f2):
     Compare positions / precedence of 2 funs in the ocb
     Returns CompareResult
     """
-    idx1 = list(ocb.ocb_funs.keys()).index(f1)
-    idx2 = list(ocb.ocb_funs.keys()).index(f2)
+    idx1 = ocb.ocb_funs_prec.get(f1)
+    idx2 = ocb.ocb_funs_prec.get(f2)
     res = idx1 - idx2
     if res > 0:
         return CompareResult.to_greater
@@ -274,13 +276,21 @@ class TestKBO(unittest.TestCase):
         """
         Test if the kbocompare() function work as expected.
         """
+        signature = Signature()
+        signature.addFun("f", 1)
+        signature.addFun("g", 2)
+        signature.addFun("h", 2)
+        signature.addFun("b", 0)
         ocb = OCBCell()
         ocb.insert2dic(self.t4)
         ocb.insert2dic(self.t3)
         ocb.insert2dic(self.t8)
         ocb.insert2dic(self.t2)
+        ocb.insertsig2dic(signature)
+
         print("Ordering:")
         print(ocb.ocb_funs.keys())
+        print(ocb.ocb_funs_prec.keys())
         self.assertTrue(kbocompare(ocb, self.t1, self.t1) == CompareResult.to_equal)
         self.assertTrue(kbocompare(ocb, self.t1, self.t3) == CompareResult.to_lesser)
         self.assertTrue(kbocompare(ocb, self.t3, self.t1) == CompareResult.to_greater)
@@ -304,10 +314,19 @@ class TestKBO(unittest.TestCase):
         """
         Test with literals
         """
+        signature = Signature()
+        signature.addFun("f", 2)
+        signature.addPred("p", 1)
+        signature.addPred("q", 2)
+        signature.addPred("!=", 2)
+        signature.addFun("a", 0)
+        signature.addFun("b", 0)
         ocb_lit = OCBCell()
         ocb_lit.insert2dic(self.a3)
         ocb_lit.insert2dic(self.a1)
         ocb_lit.insert2dic(self.a2)
+        ocb_lit.insertsig2dic(signature)
+
         print(ocb_lit.ocb_funs.keys())
         self.assertTrue(kbocompare(ocb_lit, self.a1, self.a1) == CompareResult.to_equal)
         self.assertTrue(kbocompare(ocb_lit, self.a2, self.a2) == CompareResult.to_equal)

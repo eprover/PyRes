@@ -148,8 +148,8 @@ class ProofState(object):
 
         if self.params.ordered_resolution:  # if ordered resolution init ocb and count the symbols
             option = self.params.ordered_resolution
-            self.symbol_count = countsymbols(clauses)
-            self.ocb = initocb(self.symbol_count, option)
+            symbol_count, signature = countsymbols(clauses)
+            self.ocb = initocb(symbol_count, signature, option)
 
     def processClause(self):
         """
