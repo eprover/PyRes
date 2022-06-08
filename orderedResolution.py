@@ -75,23 +75,23 @@ def initocb(symbolcount, signature, option=1):
     var_weight = 1
     i = 0
     sorted_list = sorted(symbolcount.items(), key=lambda x: x[1], reverse=True)
-    if option == 2:
-        for fun in sorted_list:
+    # mode selection
+    if option == 2:  # fun_weights = 2
+        for idx, fun in enumerate(sorted_list):
             fun_weight_dict.update({fun[0]: 2})
-            fun_prec_dict.update({fun[0]: i})
-            i = i + 1
+            fun_prec_dict.update({fun[0]: idx})
         # var_weight = 1 default
-    if option == 3:  # weight = index
-        for fun in sorted_list:
+
+    if option == 3:  # fun_weights = fun_index
+        for idx, fun in enumerate(sorted_list):
             fun_weight_dict.update({fun[0]: sorted_list.index(fun)})
-            fun_prec_dict.update({fun[0]: i})
-            i = i + 1
+            fun_prec_dict.update({fun[0]: idx})
         # var_weight = 1 default
-    else:  # default case option = 1
-        for fun in sorted_list:
+
+    else:  # default case: all weights 1
+        for idx, fun in enumerate(sorted_list):
             fun_weight_dict.update({fun[0]: 1})
-            fun_prec_dict.update({fun[0]: i})
-            i = i + 1
+            fun_prec_dict.update({fun[0]: idx})
         # var_weight = 1 default
 
     return OCBCell(fun_weight_dict, var_weight, fun_prec_dict, signature)
