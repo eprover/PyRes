@@ -407,5 +407,32 @@ cnf(dup,axiom,p(a)|q(a)|p(a)).
         self.assertTrue(not c5.literals[0].isInferenceLit())
         self.assertTrue(c5.literals[1].isInferenceLit())
 
+        
+class TestOrderedResolution(unittest.TestCase):
+    """
+    Test basic ordered resolution functions
+    """
+
+    def setUp(self):
+        self.input1 = "cnf(c96,plain,butler!=X|X!=X|hates(X,X)|~hates(agatha,X)|hates(agatha,X))."
+        lex = Lexer(self.input1)
+        self.given_clause = parseClause(lex)
+        self.ocb = OCBCell()
+        self.ocb.insertsig2dic(self.given_clause.collectSig())
+
+    def testselectInferenceLitsOrderedResolution(self):
+        for lit in self.given_clause.literals:
+            self.ocb.insert2dic(lit.atom)
+        print(self.ocb.ocb_signature)
+        print(self.ocb.ocb_funs)
+        print(self.ocb.ocb_funs_prec)
+        selectInferenceLitsOrderedResolution(self.ocb, self.given_clause)
+        self.assertEqual(self.given_clause.literals[0].inference_lit, False)
+        self.assertEqual(self.given_clause.literals[1].inference_lit, False)
+        self.assertEqual(self.given_clause.literals[2].inference_lit, True)
+        self.assertEqual(self.given_clause.literals[3].inference_lit, True)
+        self.assertEqual(self.given_clause.literals[4].inference_lit, False)
+
+
 if __name__ == '__main__':
     unittest.main()

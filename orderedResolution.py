@@ -67,14 +67,15 @@ def countsymbols(clauses):
 
 def initocb(symbolcount, signature, option=1):
     """
-    Initialize ocb with sorted counted symbols of all literals and
-    weights of var and variable weights of funs
+    Initialize ocb with weights of var, variable weights of funs
+    and symbols of all literals sorted by occurrences for fun precedence
+    fewer occurrences -> higher in precedence/value in dict
+    values of variable fun weights is chosen by the option parameter given in the commandline
     """
     fun_weight_dict = {}
     fun_prec_dict = {}
     var_weight = 1
-    i = 0
-    sorted_list = sorted(symbolcount.items(), key=lambda x: x[1], reverse=True)
+    sorted_list = sorted(symbolcount.items(), key=lambda x: x[1], reverse=True)  # largest entry/fewest occurrences last
     # mode selection
     if option == 2:  # fun_weights = 2
         for idx, fun in enumerate(sorted_list):

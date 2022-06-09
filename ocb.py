@@ -5,8 +5,8 @@
 
 """
 Implementation of the order control block (ocb)
-OCB contains weights for funs (Dict) precendece of funs(Dict) and weight of variables (unsigned int)
-
+OCB contains weights for funs (Dict) precendece of funs(Dict), weight of variables (unsigned int)
+and the signature
 Copyright 2010-2021 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
