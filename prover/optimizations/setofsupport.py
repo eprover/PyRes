@@ -79,8 +79,8 @@ Email: schulz@eprover.org
 import sys
 import unittest
 
-from clausesets import ClauseSet
-from lexer import Lexer
+from prover.clauses.clausesets import ClauseSet
+from prover.parser.lexer import Lexer
 
 
 class SosStrategy(object):

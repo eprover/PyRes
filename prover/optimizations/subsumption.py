@@ -47,10 +47,10 @@ Email: schulz@eprover.org
 
 import unittest
 
-from clauses import parseClause
-from clausesets import ClauseSet
-from lexer import Lexer
-from substitutions import BTSubst
+from prover.clauses.clauses import parseClause
+from prover.clauses.clausesets import ClauseSet
+from prover.parser.lexer import Lexer
+from prover.proof.substitutions import BTSubst
 
 
 def subsumeLitLists(subsumer, subsumed, subst):

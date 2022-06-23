@@ -71,9 +71,9 @@ Email: schulz@eprover.org
 
 from collections import deque
 
-from derivations import Derivable, Derivation, flatDerivation, toggleDerivationOutput
-from literals import parseLiteral
-from terms import *
+from prover.clauses.derivations import Derivable, Derivation, flatDerivation, toggleDerivationOutput
+from prover.clauses.literals import parseLiteral
+from prover.clauses.terms import *
 
 
 class Formula(object):

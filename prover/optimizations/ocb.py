@@ -8,7 +8,7 @@ Implementation of the order control block (ocb)
 OCB contains weights for funs (Dict) and weight of variables (unsigned int)
 """
 
-from terms import *
+from prover.clauses.terms import *
 
 
 class OCBCell:

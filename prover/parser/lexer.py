@@ -36,7 +36,7 @@ Email: schulz@eprover.org
 import re
 import unittest
 
-from idents import Ident
+from prover.convenience.idents import Ident
 
 
 class ScannerError(Exception):

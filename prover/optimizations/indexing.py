@@ -73,9 +73,9 @@ Email: schulz@eprover.org
 
 import unittest
 
-import clauses
-from lexer import Lexer
-from terms import termFunc
+from prover.clauses import clauses
+from prover.parser.lexer import Lexer
+from prover.clauses.terms import termFunc
 
 
 class ResolutionIndex(object):

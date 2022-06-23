@@ -70,10 +70,10 @@ Germany
 Email: schulz@eprover.org
 """
 
-from clauses import Clause, parseClause
-from derivations import Derivation
-from literals import Literal
-from terms import *
+from prover.clauses.clauses import Clause, parseClause
+from prover.clauses.derivations import Derivation
+from prover.clauses.literals import Literal
+from prover.clauses.terms import *
 
 
 def generateEquivAxioms():

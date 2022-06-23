@@ -48,9 +48,9 @@ Email: schulz@eprover.org
 import getopt
 import sys
 
-from clausesets import ClauseSet
-from lexer import Lexer
-from simplesat import SimpleProofState
+from prover.clauses.clausesets import ClauseSet
+from prover.parser.lexer import Lexer
+from prover.proof.simplesat import SimpleProofState
 from version import version
 
 

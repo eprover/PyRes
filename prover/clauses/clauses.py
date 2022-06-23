@@ -45,12 +45,12 @@ Germany
 Email: schulz@eprover.org
 """
 
-import substitutions
+from prover.proof import substitutions
 from derivations import Derivable, Derivation
 from literals import parseLiteralList, literalList2String, litInLitList, oppositeInLitList
-from litselection import firstLit, varSizeLit
-from ocb import OCBCell
-from orderedResolution import selectInferenceLitsOrderedResolution
+from prover.optimizations.litselection import firstLit, varSizeLit
+from prover.optimizations.ocb import OCBCell
+from prover.optimizations.orderedResolution import selectInferenceLitsOrderedResolution
 from terms import *
 
 

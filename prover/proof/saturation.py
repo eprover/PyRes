@@ -45,13 +45,13 @@ Email: schulz@eprover.org
 
 import unittest
 
-import heuristics
-from clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
-from lexer import Lexer
-from orderedResolution import selectInferenceLitsOrderedResolution, countsymbols, initocb
+from prover.optimizations import heuristics
+from prover.clauses.clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
+from prover.parser.lexer import Lexer
+from prover.optimizations.orderedResolution import selectInferenceLitsOrderedResolution, countsymbols, initocb
 from rescontrol import computeAllResolvents, computeAllFactors
-from setofsupport import NoSos
-from subsumption import forwardSubsumption, backwardSubsumption
+from prover.optimizations.setofsupport import NoSos
+from prover.optimizations.subsumption import forwardSubsumption, backwardSubsumption
 
 
 class SearchParams(object):

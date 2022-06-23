@@ -6,9 +6,9 @@
 """
 
 """
-from clauses import *
-from kbo import *
-from ocb import *
+from prover.clauses.clauses import *
+from prover.optimizations.kbo import *
+from prover.optimizations.ocb import *
 
 
 def countsymbols(clauses):

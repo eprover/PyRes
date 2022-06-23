@@ -65,9 +65,9 @@ Email: schulz@eprover.org
 
 import unittest
 
-import clauses
-from derivations import flatDerivation
-from lexer import Lexer
+from prover.clauses import clauses
+from prover.clauses.derivations import flatDerivation
+from prover.parser.lexer import Lexer
 from unification import mgu
 
 

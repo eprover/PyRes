@@ -38,13 +38,13 @@ import os
 import os.path
 import unittest
 
-from clauses import parseClause
-from clausesets import ClauseSet
-from eqaxioms import generateEquivAxioms, generateCompatAxioms
-from formulacnf import wFormulaClausify
-from formulas import parseWFormula, negateConjecture
+from prover.clauses.clauses import parseClause
+from prover.clauses.clausesets import ClauseSet
+from prover.proof.eqaxioms import generateEquivAxioms, generateCompatAxioms
+from prover.clauses.formulacnf import wFormulaClausify
+from prover.clauses.formulas import parseWFormula, negateConjecture
 from lexer import Lexer, Token
-from signature import Signature
+from prover.clauses.signature import Signature
 
 
 def tptpLexer(source, refdir):

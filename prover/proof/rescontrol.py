@@ -35,10 +35,10 @@ Email: schulz@eprover.org
 
 import unittest
 
-from clauses import parseClause
-from clausesets import ClauseSet
-from lexer import Lexer
-from resolution import resolution, factor
+from prover.clauses.clauses import parseClause
+from prover.clauses.clausesets import ClauseSet
+from prover.parser.lexer import Lexer
+from prover.proof.resolution import resolution, factor
 
 
 def computeAllResolvents(clause, clauseset):

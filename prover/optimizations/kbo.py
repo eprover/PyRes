@@ -20,9 +20,9 @@ to >F, and s, t ∈ Term(F, V). Then s >kbo t if
 """
 import enum
 
-from literals import *
-from ocb import OCBCell
-from terms import *
+from prover.clauses.literals import *
+from prover.optimizations.ocb import OCBCell
+from prover.clauses.terms import *
 
 
 class CompareResult(enum.Enum):

@@ -60,8 +60,8 @@ Email: schulz@eprover.org
 
 import unittest
 
-from lexer import Lexer
-from literals import parseLiteralList
+from prover.parser.lexer import Lexer
+from prover.clauses.literals import parseLiteralList
 
 
 def firstLit(litlist):

@@ -35,9 +35,9 @@ Email: schulz@eprover.org
 
 import unittest
 
-from clausesets import ClauseSet
-from lexer import Lexer
-from rescontrol import computeAllResolvents, computeAllFactors
+from prover.clauses.clausesets import ClauseSet
+from prover.parser.lexer import Lexer
+from prover.proof.rescontrol import computeAllResolvents, computeAllFactors
 
 
 class SimpleProofState(object):

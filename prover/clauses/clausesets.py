@@ -34,13 +34,13 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Lexer
-from setofsupport import NoSos
-from signature import Signature
+from prover.parser.lexer import Lexer
+from prover.optimizations.setofsupport import NoSos
+from prover.clauses.signature import Signature
 from literals import parseLiteral
-from clauses import parseClause
-from heuristics import PickGiven2
-from indexing import ResolutionIndex, SubsumptionIndex
+from prover.clauses.clauses import parseClause
+from prover.optimizations.heuristics import PickGiven2
+from prover.optimizations.indexing import ResolutionIndex, SubsumptionIndex
 
 
 class ClauseSet(object):

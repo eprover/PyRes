@@ -77,13 +77,13 @@ Email: schulz@eprover.org
 import getopt
 import sys
 
-from clausesets import ClauseSet
-from derivations import enableDerivationOutput, disableDerivationOutput
-from heuristics import GivenClauseHeuristics
-from lexer import Lexer
-from litselection import LiteralSelectors
-from saturation import SearchParams, ProofState
-from setofsupport import GivenSOSStrategies
+from prover.clauses.clausesets import ClauseSet
+from prover.clauses.derivations import enableDerivationOutput, disableDerivationOutput
+from prover.optimizations.heuristics import GivenClauseHeuristics
+from prover.parser.lexer import Lexer
+from prover.optimizations.litselection import LiteralSelectors
+from prover.proof.saturation import SearchParams, ProofState
+from prover.optimizations.setofsupport import GivenSOSStrategies
 from version import version
 
 

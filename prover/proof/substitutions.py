@@ -48,7 +48,7 @@ Germany
 Email: schulz@eprover.org
 """
 
-import terms
+from prover.clauses import terms
 import unittest
 
 
@@ -81,7 +81,7 @@ class Substitution(object):
         Return a print representation of the substitution.
         """
         return "{"+\
-               ",".join([i+"<-"+terms.term2String(self.subst[i])
+               ",".join([i +"<-" + terms.term2String(self.subst[i])
                          for i in self.subst])\
                          +"}"
 
@@ -293,9 +293,9 @@ class TestSubst(unittest.TestCase):
         """
         Check application of substitutions
         """
-        self.assertEqual(terms.term2String(self.sigma1(self.t1)),"f(a,g(a))")
-        self.assertTrue(terms.termEqual(self.sigma1(self.t1),  self.t4))
-        self.assertTrue(terms.termEqual(self.sigma2(self.t1),  self.t5))
+        self.assertEqual(terms.term2String(self.sigma1(self.t1)), "f(a,g(a))")
+        self.assertTrue(terms.termEqual(self.sigma1(self.t1), self.t4))
+        self.assertTrue(terms.termEqual(self.sigma2(self.t1), self.t5))
 
 
     def testFreshVarSubst(self):

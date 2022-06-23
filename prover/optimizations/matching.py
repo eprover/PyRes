@@ -72,8 +72,8 @@ Germany
 Email: schulz@eprover.org
 """
 
-from terms import *
-from substitutions import *
+from prover.clauses.terms import *
+from prover.proof.substitutions import *
 
 
 def match(matcher, target, subst):

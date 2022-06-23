@@ -107,13 +107,13 @@ import getopt
 from signal import signal, SIGXCPU
 from resource import getrusage, RUSAGE_SELF
 
-from setofsupport import GivenSOSStrategies
+from prover.optimizations.setofsupport import GivenSOSStrategies
 from version import version
-from derivations import enableDerivationOutput, disableDerivationOutput, Derivable, flatDerivation
-from fofspec import FOFSpec
-from heuristics import GivenClauseHeuristics
-from saturation import SearchParams, ProofState
-from litselection import LiteralSelectors
+from prover.clauses.derivations import enableDerivationOutput, disableDerivationOutput, Derivable, flatDerivation
+from prover.parser.fofspec import FOFSpec
+from prover.optimizations.heuristics import GivenClauseHeuristics
+from prover.proof.saturation import SearchParams, ProofState
+from prover.optimizations.litselection import LiteralSelectors
 
 suppressEqAxioms = False
 silent = False

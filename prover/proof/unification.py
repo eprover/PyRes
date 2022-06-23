@@ -129,7 +129,7 @@ Germany
 Email: schulz@eprover.org
 """
 
-from terms import *
+from prover.clauses.terms import *
 from substitutions import *
 
 

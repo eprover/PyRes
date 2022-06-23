@@ -69,8 +69,8 @@ Germany
 Email: schulz@eprover.org
 """
 
-from matching import match
-from substitutions import BTSubst
+from prover.optimizations.matching import match
+from prover.proof.substitutions import BTSubst
 from terms import *
 
 

@@ -68,12 +68,12 @@ Germany
 Email: schulz@eprover.org
 """
 
-from clauses import Clause
-from derivations import Derivation, flatDerivation, enableDerivationOutput, toggleDerivationOutput
+from prover.clauses.clauses import Clause
+from prover.clauses.derivations import Derivation, flatDerivation, enableDerivationOutput, toggleDerivationOutput
 from formulas import Formula, WFormula, parseWFormula, parseFormula
-from literals import Literal
-from substitutions import Substitution, freshVar
-from terms import *
+from prover.clauses.literals import Literal
+from prover.proof.substitutions import Substitution, freshVar
+from prover.clauses.terms import *
 
 
 class SkolemSymbols(object):

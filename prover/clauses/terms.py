@@ -66,8 +66,8 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Token, Lexer
-from signature import Signature
+from prover.parser.lexer import Token, Lexer
+from prover.clauses.signature import Signature
 
 
 def termIsVar(t):
