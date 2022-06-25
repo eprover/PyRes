@@ -63,12 +63,9 @@ Germany
 Email: schulz@eprover.org
 """
 
-import unittest
-
 from prover.clauses import clauses
 from prover.clauses.derivations import flatDerivation
-from prover.parser.lexer import Lexer
-from unification import mgu
+from prover.proof.unification import mgu
 
 
 def resolution(clause1, lit1, clause2, lit2):
@@ -117,83 +114,3 @@ def factor(clause, lit1, lit2):
 
     res.part_of_sos = clause.part_of_sos
     return res
-
-
-class TestResolution(unittest.TestCase):
-    """
-    Unit test class for clauses. Test clause and literal
-    functionality.
-    """
-
-    def setUp(self):
-        """
-        Setup function for resolution testing
-        """
-        print()
-        self.spec = """
-cnf(c1,axiom,p(a, X)|p(X,a)).
-cnf(c2,axiom,~p(a,b)|p(f(Y),a)).
-cnf(c3,axiom,p(Z,X)|~p(f(Z),X0)).
-cnf(c4,axiom,p(X,X)|p(a,f(Y))).
-cnf(c5,axiom,p(X)|~q|p(a)|~q|p(Y)).
-cnf(not_p,axiom,~p(a)).
-cnf(taut,axiom,p(X4)|~p(X4)).
-"""
-        lex = Lexer(self.spec)
-        self.c1 = clauses.parseClause(lex)
-        self.c2 = clauses.parseClause(lex)
-        self.c3 = clauses.parseClause(lex)
-        self.c4 = clauses.parseClause(lex)
-        self.c5 = clauses.parseClause(lex)
-        self.c6 = clauses.parseClause(lex)
-        self.c7 = clauses.parseClause(lex)
-
-    def testResolution(self):
-        """
-        Test resolution
-        """
-        print("Resolution:")
-        res1 = resolution(self.c1, 0, self.c2, 0)
-        self.assertTrue(res1)
-        print(res1)
-
-        res2 = resolution(self.c1, 0, self.c3, 0)
-        self.assertTrue(res2 is None)
-        print(res2)
-
-        res3 = resolution(self.c2, 0, self.c3, 0)
-        self.assertTrue(res3)
-        print(res3)
-
-        res4 = resolution(self.c1, 0, self.c3, 1)
-        self.assertTrue(res4 is None)
-        print(res4)
-
-        res5 = resolution(self.c6, 0, self.c7, 0)
-        self.assertTrue(res5)
-        print(res5)
-
-    def testFactoring(self):
-        """
-        Test the factoring inference.
-        """
-        f1 = factor(self.c1, 0, 1)
-        self.assertTrue(f1)
-        self.assertTrue(len(f1) == 1)
-        print("Factor:", f1)
-
-        f2 = factor(self.c2, 0, 1)
-        self.assertTrue(f2 is None)
-        print(f2)
-
-        f4 = factor(self.c4, 0, 1)
-        self.assertTrue(f4 is None)
-        print(f4)
-
-        f5 = factor(self.c5, 1, 3)
-        self.assertTrue(f5)
-        print(f5)
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -51,8 +51,6 @@ Germany
 Email: schulz@eprover.org
 """
 
-import unittest
-
 
 class Signature(object):
     """
@@ -118,35 +116,3 @@ class Signature(object):
         if self.isFun(symbol):
             return self.funs[symbol]
         return self.preds[symbol]
-
-
-class TestSignature(unittest.TestCase):
-    """
-    Test basic functionality of the signature data type.
-    """
-
-    def testSig(self):
-        """
-        Test signature object.
-        """
-        sig = Signature()
-
-        sig.addFun("mult", 2)
-        sig.addFun("a", 0)
-        sig.addPred("weird", 4)
-
-        print(sig)
-        self.assertTrue(sig.isPred("weird"))
-        self.assertTrue(not sig.isPred("unknown"))
-        self.assertTrue(not sig.isPred("a"))
-        self.assertTrue(sig.isFun("a"))
-        self.assertTrue(sig.isConstant("a"))
-        self.assertTrue(not sig.isFun("unknown"))
-        self.assertTrue(not sig.isFun("weird"))
-
-        self.assertEqual(sig.getArity("a"), 0)
-        self.assertEqual(sig.getArity("weird"), 4)
-
-
-if __name__ == '__main__':
-    unittest.main()

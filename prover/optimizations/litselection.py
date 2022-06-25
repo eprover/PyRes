@@ -58,11 +58,6 @@ Germany
 Email: schulz@eprover.org
 """
 
-import unittest
-
-from prover.parser.lexer import Lexer
-from prover.clauses.literals import parseLiteralList
-
 
 def firstLit(litlist):
     """
@@ -133,66 +128,3 @@ LiteralSelectors = {
 Table associating name and selection function, so that we can select
 the function by name.
 """
-
-
-class TestLitSelection(unittest.TestCase):
-    """
-    Unit test class for literal selection.
-    """
-
-    def setUp(self):
-        """
-        Setup function for literal selection.
-        """
-        print()
-        self.str1 = """
-        ~p(a)|~p(f(X,g(a)))|X!=Y|~q(a,g(a))
-"""
-        self.str2 = """
-        ~p(a)|~p(f(X,g(a)))|~q(a,g(a))
-"""
-
-    def testClauses(self):
-        """
-        Test that basic literal parsing works correctly.
-        """
-        lex = Lexer(self.str1)
-        ll1 = parseLiteralList(lex)
-        l1, l2, l3, l4 = ll1
-
-        ll = firstLit(ll1)
-        self.assertEqual(len(ll), 1)
-        lit = ll[0]
-        self.assertEqual(lit, l1)
-
-        ll = smallestLit(ll1)
-        self.assertEqual(len(ll), 1)
-        lit = ll[0]
-        self.assertEqual(lit, l1)
-
-        ll = largestLit(ll1)
-        self.assertEqual(len(ll), 1)
-        lit = ll[0]
-        self.assertEqual(lit, l2)
-
-        ll = varSizeLit(ll1)
-        self.assertEqual(len(ll), 1)
-        lit = ll[0]
-        self.assertEqual(lit, l4)
-
-        ll = eqResVarSizeLit(ll1)
-        self.assertEqual(len(ll), 1)
-        lit = ll[0]
-        self.assertEqual(lit, l3)
-
-        lex = Lexer(self.str2)
-        ll1 = parseLiteralList(lex)
-        l1, l2, l3 = ll1
-        ll = eqResVarSizeLit(ll1)
-        self.assertEqual(len(ll), 1)
-        lit = ll[0]
-        self.assertEqual(lit, l3)
-
-
-if __name__ == '__main__':
-    unittest.main()

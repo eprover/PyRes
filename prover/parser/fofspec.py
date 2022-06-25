@@ -36,15 +36,14 @@ Email: schulz@eprover.org
 import errno
 import os
 import os.path
-import unittest
 
 from prover.clauses.clauses import parseClause
 from prover.clauses.clausesets import ClauseSet
-from prover.proof.eqaxioms import generateEquivAxioms, generateCompatAxioms
 from prover.clauses.formulacnf import wFormulaClausify
 from prover.clauses.formulas import parseWFormula, negateConjecture
-from lexer import Lexer, Token
 from prover.clauses.signature import Signature
+from prover.parser.lexer import Lexer, Token
+from prover.proof.eqaxioms import generateEquivAxioms, generateCompatAxioms
 
 
 def tptpLexer(source, refdir):
@@ -173,91 +172,3 @@ class FOFSpec(object):
             self.clauses.extend(res)
             return True
         return False
-
-
-# ------------------------------------------------------------------
-#                  Unit test section
-# ------------------------------------------------------------------
-
-class TestFormulas(unittest.TestCase):
-    """
-    Unit test class for clauses. Test clause and literal
-    functionality.
-    """
-
-    def setUp(self):
-        """
-        Setup function for clause/literal unit tests. Initialize
-        variables needed throughout the tests.
-        """
-        print()
-
-        self.seed = """
-        cnf(agatha,plain,lives(agatha)).
-        cnf(butler,plain,lives(butler)).
-        cnf(charles,plain,lives(charles)).
-        include('includetest.txt').
-        """
-        inctext = """
-        fof(dt_m1_filter_2,axiom,(
-        ! [A] :
-        ( ( ~ v3_struct_0(A)
-        & v10_lattices(A)
-        & l3_lattices(A) )
-        => ! [B] :
-        ( m1_filter_2(B,A)
-        => ( ~ v1_xboole_0(B)
-        & m2_lattice4(B,A) ) ) ) )).
-        """
-        fp = open("includetest.txt", "w")
-        fp.write(inctext)
-        fp.close()
-
-        self.testeq = """
-        cnf(clause, axiom, a=b).
-        fof(eqab, axiom, a=b).
-        fof(pa, axiom, p(a)).
-        fof(fb, axiom, ![X]:f(X)=b).
-        fof(pa, conjecture, ?[X]:p(f(X))).
-        """
-
-    def testParse(self):
-        """
-        Test the parsing and printing of a FOF spec.
-        """
-
-        lex = Lexer(self.seed)
-        spec = FOFSpec()
-
-        spec.parse(lex)
-        print("MIX:\n===")
-        print(spec)
-
-    def testCNF(self):
-        """
-        Test CNFization.
-        """
-
-        lex = Lexer(self.seed)
-        spec = FOFSpec()
-        spec.parse(lex)
-        spec.clausify()
-        print("CNF:\n===")
-        print(spec)
-
-    def testEqAxioms(self):
-        """
-        Test equality handling.
-        """
-        lex = Lexer(self.testeq)
-        spec = FOFSpec()
-        spec.parse(lex)
-
-        spec.addEqAxioms()
-
-        print("EQ:\n===")
-        print(spec)
-
-
-if __name__ == '__main__':
-    unittest.main()

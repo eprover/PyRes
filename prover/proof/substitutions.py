@@ -49,7 +49,6 @@ Email: schulz@eprover.org
 """
 
 from prover.clauses import terms
-import unittest
 
 
 class Substitution(object):
@@ -252,79 +251,3 @@ def freshVarSubst(vars):
     """
     l = [(var, freshVar()) for var in vars]
     return Substitution(l)
-
-
-
-
-class TestSubst(unittest.TestCase):
-    """
-    Test basic substitution functions.
-    """
-    def setUp(self):
-        self.t1 = terms.string2Term("f(X, g(Y))")
-        self.t2 = terms.string2Term("a")
-        self.t3 = terms.string2Term("b")
-        self.t4 = terms.string2Term("f(a, g(a))")
-        self.t5 = terms.string2Term("f(a, g(b))")
-
-        self.sigma1 = Substitution([("X", self.t2), ("Y", self.t2)])
-        self.sigma2 = Substitution([("X", self.t2), ("Y", self.t3)])
-
-    def testSubstBasic(self):
-        """
-        Test basic stuff.
-        """
-        tau = self.sigma1.copy()
-        self.assertTrue(terms.termEqual(tau("X"), self.sigma1("X")))
-        self.assertTrue(terms.termEqual(tau("Y"), self.sigma1("Y")))
-        self.assertTrue(terms.termEqual(tau("Z"), self.sigma1("Z")))
-
-        t = tau.modifyBinding(("X", self.t1))
-        self.assertTrue(terms.termEqual(t, self.t2))
-        t = tau.modifyBinding(("U", self.t1))
-        self.assertEqual(t, None)
-        self.assertTrue(tau.isBound("U"))
-        self.assertTrue(terms.termEqual(tau.value("U"), self.t1))
-        t = tau.modifyBinding(("U", None))
-        self.assertTrue(not tau.isBound("U"))
-
-
-    def testSubstApply(self):
-        """
-        Check application of substitutions
-        """
-        self.assertEqual(terms.term2String(self.sigma1(self.t1)), "f(a,g(a))")
-        self.assertTrue(terms.termEqual(self.sigma1(self.t1), self.t4))
-        self.assertTrue(terms.termEqual(self.sigma2(self.t1), self.t5))
-
-
-    def testFreshVarSubst(self):
-        """
-        Test that
-        """
-        var1 = freshVar()
-        var2 = freshVar()
-        self.assertTrue(var1!=var2)
-
-        vars = terms.termCollectVars(self.t1)
-        sigma = freshVarSubst(vars)
-        vars2 = terms.termCollectVars(sigma(self.t1))
-        shared = set(vars).intersection(set(vars2))
-        self.assertTrue(not shared)
-
-    def testBacktrack(self):
-        """
-        Test backtrackable substitutions.
-        """
-        sigma = BTSubst()
-        state = sigma.getState()
-        sigma.addBinding(('X', terms.string2Term("f(Y)")))
-        res = sigma.backtrackToState(state)
-        self.assertEqual(res, 1)
-        res = sigma.backtrack()
-        self.assertTrue(not res)
-
-
-
-if __name__ == '__main__':
-    unittest.main()
