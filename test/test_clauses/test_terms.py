@@ -4,41 +4,6 @@
 # Module terms.py
 
 """
-A simple implementation of first-order terms. We use nested Python
-lists in the style of s-expressions as the term data type.
-
-Definition: Let F be a finite set of function symbols and V be an
-enumerable set of variable symbols. Let ar:F->N be the arity function
-associating a natural number (the "arity") with each function
-symbol. The set of all terms over F and V, Terms(F,V) is defined as
-follows:
-- For all X in V, X in Term(F,V)
-- For all f|n in F and t1,..,tn in Term(F,V), f(t1, ..., tn) in
-  Term(F,V).
-- Term(F,V) is the smallest set with the above two properties.
-
-
-In the concrete syntax (i.e. the syntax we use to write terms in ASCII
-text form), we represent elements of F by identifers starting with a
-lower-case letter. The arity is implicitly given by the number of
-argument terms in a term. For function symbols with arity 0, we omit
-the parenthesis of the empty argument list.
-
-We represent elements of V by identifiers starting with an upper-case
-letter or underscore.
-
-A composite term f(t1, ..., tn) is represented by the list
-[f lt1, ..., ltn], where lt1, ..., ltn are lists representing the
-subterms. See below for exmples:
-
-"X"          -> "X"
-"a"          -> ["a"]
-"g(a,b)"     -> ["g", ["a"], ["b"]]
-"g(X, f(Y))" -> ["g", "X", ["f", "Y"]]
-
-Note in particular that constant terms are lists with one elements,
-not plain strings.
-
 Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify

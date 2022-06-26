@@ -4,45 +4,6 @@
 # Module formulas.py
 
 """
-A simple implementation of first-order formulas and their associated
-meta-information.
-
-See literals.py for the definition of atoms.
-
-A formula is either a first-order-atom, or build from pre-existing
-formulas using the various logical connectives and quantifiers:
-
-Assume F,G are arbitrary formulas and X is an arbitrary variable. Then
-
-(~F)
-(F&G)
-(F|G)
-(F->G)
-(F<=>G)
-(F<~>G)
-(F<-G)
-(F~&G)
-(F~|G)
-(![X]:F)
-(?[X]:F)
-
-are formulas.
-
-The set of all formulas for a given signature is denoted as
-Formulas(P,F,V).
-
-In the external representation, some parentheses can be omitted. Lists
-of either conjunctively or disjunctively connected subformula are
-assumed to associate left. (F & G & H) is equivalent to ((F&G)&H)
-
-Formulas are represented on two levels: The actual logical formula is
-a recursive data structure. This is wrapped in a container that
-associates the formula with its meta-information. The implementation
-uses literals as the base case, not atoms. That allows us to reuse
-some code for parsing and printing infix equality, but also to
-represent a formula in Negation Normal Form without any negations in
-the frame of the formula.
-
 Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify

@@ -4,10 +4,7 @@
 # Module rescontrol.py
 
 """
-Functions wrapping basic inference rules for convenience.
-
-
-Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,6 +29,7 @@ Auf der Altenburg 7
 Germany
 Email: schulz@eprover.org
 """
+
 import unittest
 
 from prover.clauses.clauses import parseClause

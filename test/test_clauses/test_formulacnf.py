@@ -4,44 +4,6 @@
 # Module formulacnf.py
 
 """
-Clausification of first-order formulas. Clausification is done in
-several steps:
-
-1) Simplification
-
-   Exhaustively apply the simplifiction rules described in the header
-   to FormulaSimplify
-
-2) Construction of the Negation Normal Form
-
-3) Miniscoping
-
-4) Variable renaming
-
-5) Skolemization
-
-6) Shift out universal quantors
-
-7) Distribute disjunctions
-
-8) Extract clauses
-
-This basically follows [NW:SmallCNF-2001], albeit with some minor
-changes. The first version does not use formula renaming.
-
-@InCollection{NW:SmallCNF-2001,
-  author =       {A. Nonnengart and C. Weidenbach},
-  title =        {{Computing Small Clause Normal Forms}},
-  booktitle =    {Handbook of Automated Reasoning},
-  publisher =    {Elsevier Science and MIT Press},
-  year =         {2001},
-  editor =       {A. Robinson and A. Voronkov},
-  volume =       {I},
-  chapter =      {5},
-  pages =        {335--367}
-}
-
-
 Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify

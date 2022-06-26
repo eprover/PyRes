@@ -4,54 +4,7 @@
 # Module setofsupport.py
 
 """
-
-Implementation of the set-of-support strategy (SOS)
-
-=== Set-Of-Support ===
-
-The set-of-support strategy is an optional extension of
-the basic resolution mechanism. The idea is to divide a whole
-unsatisfiable clauseset into two disjoint subsets N and S where
-N is a satisfiable clauseset. S is called the set-of-support (SOS).
-
-Because N is satisfiable, any derivations from N will never
-result in the empty clause. Therefore at least one clause from the
-set-of-support S must be part of every resolution process in order
-to derivate the empty clause.
-
-It has been proven (by Lawrence Wos et al. in 1965) that resolution
-is still complete if we only allow deductions where at least
-one parent clause comes from the set-of-support. This rule decreases
-the number of possible derivations and hopefully increases
-the overall-performance of the proof.
-
-Example:
-
-We got the following clauseset { A, B, C, D }
-Without the set-of-support strategy a new clause may be derived by
-every combination of two clauses if resolution is possible.This would
-result in a maximum of 6 new clauses because of the 6 combinations
-(A,B), (A,C), (A,D), (B,C), (B,D), (C,D).
-
-Now the clauseset is divided into a satisfiable clauseset N
-and the set-of-support S.
-N = { A, B, D },
-S = { C }
-
-The maximum amount of new clauses is now reduced to three
-because the combinations (A,B), (A,D) and (B,D) are forbidden.
-
-=== Implementation ===
-There are two sos-concepts implemented in PyRes
-1) The first concept removes every non-sos-clause from the unprocessed
-clauses and adds it to the processed clauses at the beginning of the proof search.
-This concept is not compatible with literal selection and ordered resolution
-
-2) The second concept selects sos-clauses and non-sos-clauses in a specific ratio.
-This concept is compatible with literal selection and ordered resolution
-
-
-Copyright 2012-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -76,6 +29,7 @@ Auf der Altenburg 7
 Germany
 Email: schulz@eprover.org
 """
+
 import unittest
 
 from prover.clauses.clausesets import ClauseSet

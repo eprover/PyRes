@@ -4,40 +4,7 @@
 # Module resolution.py
 
 """
-This module implements the rules of the simple resolution calculus,
-namely binary resolution and factoring.
-inference rule:
-
-Binary resolution:
-
-c1|a1     c2|~a2
----------------- where sigma=mgu(a1,a2)
- sigma(c1|c2)
-
-Note that c1 and c2 are arbitrary disjunctions of literals (each of
-which may be positive or negative). Both c1 and c2 may be empty.  Both
-a1 and a2 are atoms (so a1 and ~a2 are a positive and a negative
-literal, respectively).  Also, since | is AC (or, alternatively, the
-clauses are unordered multisets), the order of literals is irrelevant.
-
-Clauses are interpreted as implicitly universally quantified
-disjunctions of literals. This implies that the scope of the variables
-is a single clause. In other words, from a theoretical point of view,
-variables in different clauses are different. In practice, we have to
-enforce this explicitly by making sure that all clauses used as
-premises in an inference are indeed variable disjoint.
-
-
-Factoring:
-
-   c|a|b
-----------  where sigma = mgu(a,b)
-sigma(c|a)
-
-Again, c is an arbitray disjunction.
-
-
-Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -62,6 +29,7 @@ Auf der Altenburg 7
 Germany
 Email: schulz@eprover.org
 """
+
 import unittest
 
 from prover.parser.lexer import Lexer

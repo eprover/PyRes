@@ -4,46 +4,6 @@
 # Module indexing.py
 
 """
-In general, an index is a data structure that allows us to reasonably
-efficiently retrieve items from a set of data items that are in a
-defined relation with a query item.
-
-In theorem proving, we use indexing to find suitable inference
-partners for a clause. There are many different indexing techniques
-with different strengths and weaknesses. Two of the more important
-classifications are term indexes vs. clause indexes, and perfect
-indexes vs. non-perfect indexes.
-
-As the name suggests, a term index indexes terms (or, since the
-strucure is the same, atoms) - although it often indexes clauses via
-(some of) the terms that occur in it. Typical retrieval relations are
-identity, match (for a query term t, find all terms s for which a
-substitution sigma exists such that sigma(s)=t), instance (for a query
-term t, find all terms s for which a substitution sigma exists such
-that s=sigma(t), and unifiability (find all terms with a sigma such
-that sigma(s)=sigma(t).
-
-Clause indexed directly index clauses, typically by abstracting a
-clause into some kind of sequential vector. Typical retrieval
-relations are subsumption (both ways).
-
-Perfect indexes return exactly the terms in the given retrieval
-relation (somtimes along with the substitution, if any). Non-perfect
-indices return a superset of candidates, on which the actual
-relationship still needs to be tested. Perfect indexes have the
-advantage that no extra tests are necessary, but non-perfect indexes
-are often simpler to implement and more efficient to maintain.
-
-Here we are implementing an non-perfect index that returns potential
-resolution partners. Given an inference literal l (in one clause), the
-index returns a set of pairs (c, i), where c is a clause and i is the
-position of a potential inference literal, so that l and c[i] have
-diffent polarity and the underlying atoms are potentially
-unifiable. The indexing technique used is called "top symbol hashing",
-and it assumes two terms (or atoms) are potentially unifiable if they
-share the same top symbol.
-
-
 Copyright 2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
@@ -68,7 +28,6 @@ Auf der Altenburg 7
 70376 Stuttgart
 Germany
 Email: schulz@eprover.org
-
 """
 
 import unittest

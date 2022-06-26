@@ -4,47 +4,7 @@
 # Module eqaxioms.py
 
 """
-Equality is a central relation in automated deduction. The simplest
-way of handling equality is to add axioms describing its
-properties. In this way, any calculus that is complete for first-order
-logic can be applied to proof problems with equality. 
-
-Equality is a congruence relation, i.e. it is an equivalence relation
-that is compatible with the term structure. As an equivalence
-relation, it has to conform the the axioms of reflexivity, symmetry,
-and transitivity. These can be written as follows:
-
-Reflexivity:  ![X]:X=X
-Symmetry:     ![X,Y]:(X=Y -> Y=X)
-Transitivity: ![X,Y,Z]:((X=Y & Y=Z) -> X=Z)
-
-The compatibility property requires that we can replace "equals with
-equals". The need to be stated for each function symbol and each
-predicate symbols in the problem:
-
-Assume f|n in F, i.e. f is s function symbol of arity n. Then
-![X1,...,Xn,Y1,...,Yn]:((X1=Y1 & ... & Xn=Yn)->f(X1,...,Xn)=f(Y1,...,Yn))
-describes the compatibility of the equality relation (=) with f.
-
-Assume p|n in P. Then
-![X1,...,Xn,Y1,...,Yn]:((X1=Y1 & ... & Xn=Yn)->(p(X1,...Xn)->p(Y1,...Yn)))
-describes the compatibility of the equality relation with p. Note that
-we do not need to specify the symmetric case p(X1,...Xn)<-p(Y1,...Yn)
-because it follows from the contrapositive (~p(Y1,...Yn)->~p(X1,...Xn)
-and the symmetry of equality.
-[* Make easier *]
-
-The axioms can be directly converted into clausal logic, yielding:
-
-X=X
-X!=Y | Y=X
-X!=Y | Y!=Z | X=Z
-
-X1!=Y1|...|Xn!=Yn|f(X1,...,Xn)=f(Y1,...Yn) for all f|n in F.
-X1!=Y1|...|Xn!=Yn|~p(X1,...Xn)|p(Y1,...,Yn) for all p|n in P.
-
-
-Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -59,7 +19,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program ; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston,
- MA  02111-1307 USA 
+MA  02111-1307 USA
 
 The original copyright holder can be contacted as
 
@@ -69,6 +29,7 @@ Auf der Altenburg 7
 Germany
 Email: schulz@eprover.org
 """
+
 import unittest
 
 from prover.proof.eqaxioms import *

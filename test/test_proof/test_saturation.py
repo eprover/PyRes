@@ -4,20 +4,7 @@
 # Module saturation.py
 
 """
-Implementation of the given-clause algorithm for saturation of clause
-sets under the rules of the resolution calculus. This improves on the
-very basic implementation in simplesat in several ways.
-
-- It supports heuristic clause selection, not just first-in first-out
-- It supports tautology deletion
-- It supports forward and backwards subsumption
-- It keeps some statistics to enable the user to understand the
-  practical impact of different steps of the algorithm better.
-
-Most of these changes can be found in the function processClause() of
-the ProofState class.
-
-Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

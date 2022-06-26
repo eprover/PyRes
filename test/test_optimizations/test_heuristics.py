@@ -4,18 +4,6 @@
 # Module heuristics.py
 
 """
-This module implements heuristic evaluation functions for clauses.
-The purpose of heuristic evaluation is selection of clauses during the
-resolution process.
-
-A heuristical evaluation function is a function h:Clauses(F,P,X)->R
-(where R denotes the set of real numbers, or, in the actual
-implementation, the set of floating point numbers).
-
-A lower value of h(C) for some clause C implies that C is assumed to
-be better (or more useful) in a given proof search, and should be
-processed before a clause C' with larger value h(C').
-
 Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify

@@ -4,35 +4,7 @@
 # Module litselection.py
 
 """
-Functions supporting (negative) literal selection. Literal selection
-indicates certain literals of a clause as "inference literals", and
-only allows factoring, if at least one of the involved literals is an
-inference literal, and resolution, if both involved literals are
-inference literals.
-
-Literal selection reduces the number of possible inferences, and hence
-the explosion of the search space. The resolution calculus with
-literal selection remains complete, if the literal selection function
-has certain properties. One sufficient condition is formulated as
-follows ("negative literal selection"):
-
-   In a clause, either at least one negatve literal is selected, or
-   all literals are selected.
-
-Intuitively, this can be explained as follows: A clause -a1 v -a2 v a3
-v a4 can be read as a conditional statement: (a1 ^ a2)->(a3 v a4). In
-other words, the negative literals are seen as conditions that must be
-met to be able to deduce the disjunction of positive
-literals. In that case, all conditions must be resolved. Negative
-literal selection simply imposes an arbitrary order on the solution of
-this condition.
-
-Much of the mechanism of literal selection has been implemented in
-literals.py and rescontrol.py. This module implements function that
-select a given subset of inference literals from a list of negative
-literals.
-
-Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

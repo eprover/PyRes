@@ -4,22 +4,7 @@
 # Module subsumption.py
 
 """
-This module implements first-order subsumption, as defined by the
-simplification rule below:
-
-Subsumption:
-
- C|R    D
-=========== if sigma(D)=C for some substitution sigma
-     D
-
-Note that C, D, R (and hence C|R) are clauses, i.e. they are
-multi-sets of literals interpreted as disjunctions. The multi-set
-aspect is important for this particular calculus, otherwise
-p(X)|p(Y) would be able to subsume p(X), i.e. a clause would subsume
-its own factors. This would destroy completeness.
-
-Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

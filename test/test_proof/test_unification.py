@@ -4,106 +4,7 @@
 # Module unification.py
 
 """
-This code implements unification for first-order terms (and, by
-inheritance, atoms).
-
-
-=== Unification ===
-
-The goal of a unification algorithm is to find a substitution sigma
-that will make two term s and t equal, i.e. sigma(s)=sigma(t).  The
-unification algorithm we implement here is based on simultaneous
-solution of sets of equations over terms. It operates on a tuple with
-two elements: A set of equations and a substitution.
-
-The initial tuple for unifying s and t is
-{s=t}, {}
-i.e. it consists of the single equation s=t and the empty
-substitution. The goal is to step by step build a substitution that
-will make s and t equal.
-
-The unification algorithm picks an arbitray equation and tries to
-handle it by one of the following rules. It terminates either when the
-set of equations is empty (in that case the resulting substitution is
-the most general unifier), or if it derives FAIL, in which case the
-two original terms are not unifiable.
-
-The "Bind" rules handle the case that one of the two terms of the
-given equation is a variable X. If X does not occur in the
-other term t, the rule binds t to X, applies this binding to the open
-equations, and records it in sigma.
-
-
-Bind 1
-{X=t} \cup R, sigma
-========================= if X does not occur in t
-{X<-t}(R), sigma \circ {X<-t}
-
-Bind 2
-{t=X} \cup R, sigma
-=========================  if X does not occur in t
-{X<-t}(R), sigma \circ {X<-t}
-
-
-The "Decompose" rule handles two terms with the same top function
-symbol. Since this symbol is already equal, we just need to make the
-individual argument terms equal. This is reflected by creating a new
-equation for each pair of corresponding arguments, and adding them to
-the list of open equations.
-
-
-Decompose:
-{f(s1, ..., sn)=f(t1, ..., tn)} \cup R, sigma
-==============================================
-{s1=t1, ..., sn=tn} \cup R, sigma
-
-
-A trivial case easily overlooked is the case of an equation between
-two variables that are already equal:
-
-
-Solved:
-{X=X} \cup R, sigma
-=========================
-R, sigma
-
-
-If none of the above rules is applicable, then we cannot solve the
-given equation with a substitution. We can recognize these cases and
-transition to an explixit failure state.
-
-In the first failure case, the top function symbols of the two terms
-clash. Since the application of a substitution never changes a
-function symbol, no substitution can make the two terms equal.
-
-
-Structural fail:
-{f(s1, ..., tn) = g(t1, ..., tm) \cup R, sigma
-=============================================== if f!=g
-FAIL
-
-
-The second cause of failure is an equation where a variable X on one
-side has to be unified with a term t[X] that contains the same
-variable embedded on the other side. No binding of X will ever get rid
-of the context in which X is embedded, so no substitution will ever
-make X and t[X] equal.
-
-
-Occurs-Fail 1:
-{X=t} \cup R, sigma
-==================== if X does occur in t, X!=t
-FAIL
-
-
-Occurs-Fail 2:
-{t=X} \cup R, sigma
-====================  if X does occur in t, X!=t
-FAIL
-
-
-
-Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -128,6 +29,7 @@ Auf der Altenburg 7
 Germany
 Email: schulz@eprover.org
 """
+
 import unittest
 
 from prover.proof.unification import *

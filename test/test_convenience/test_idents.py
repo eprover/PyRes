@@ -4,9 +4,6 @@
 # Module idents.py
 
 """
-This module provides the facility to create distinct named objects,
-similar to e.g. enumerations in C-like languages.
-
 Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify

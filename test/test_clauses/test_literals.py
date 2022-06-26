@@ -4,45 +4,6 @@
 # Module literal.py
 
 """
-A simple implementation of first-order atoms and literals.
-
-We assume a set of function symbols F (with associated arities) and
-variables symbols as defined in terms.py. We now also assume a set P
-of predicate symbols, and extend the arity function to
-ar:F \cup P ->N
-
-The set of all first-order atoms over P, F, V, Atom(P,F,V) is defined
-as follows:
-- If t1, ... t_n are in Term(F,V) and p|n is in P, then p(t1,..., tn)
-  is in Atom(P,F,V)
-- Atom(P,F,V) is the smallest set with this property.
-
-
-Assume F={f|2, g|1, a|0, b|0}, V={X, Y, ...} and P={p|1, q|2}. Then
-the following are atoms:
-
-p(a)
-q(X, g(g(a)))
-p(f(b, Y))
-
-Because of the special role of equality for theorem proving, we
-usually assume "="|2 and "!="|2 are in P. In the concrete syntax,
-these symbols are written as infix symbols, i.e. we write a=b, not
-"=(a, b)".
-
-A literal is a signed atom. A positive literal is syntactically
-identical to its atom. A negative literal consists of the negation
-sign, ~, followed by an atom.
-
-Thus, we can describe the set
-Literals(P,F,V) = {~a | a in Atom(P,F,V)} \cup Atom(P,F,V)
-
-We establish the convention that t1!=t2 is equivalent to ~t1=t2 and
-~t1!=t2 is equivalent to t1=t2, and only use the respective later
-forms internally. In other words, the symbol != only occurs during
-parsing and printing.
-
-
 Copyright 2010-2020 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify

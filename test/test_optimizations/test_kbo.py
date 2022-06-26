@@ -4,20 +4,32 @@
 # Module kbo.py
 
 """
-This is an implementation of the Knuth Bendix Ordering (KBO)
-Based on following definition:
+Copyright 2019 Stephan Schulz, schulz@eprover.org
 
-Let >F be a precedence on F, ϕ a weight function admissible
-to >F, and s, t ∈ Term(F, V). Then s >kbo t if
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-    s ≡ f(s1,... , sn), t ≡ g(t1,... , tm), and
-        (1) |s|_x ≥ |t|_x for all x ∈ V and
-        (2a) ϕ(s) > ϕ(t) or
-        (2b) ϕ(s) = ϕ(t), f >F g or
-        (2c) ϕ(s) = ϕ(t), f = g, and there is some k with
-             s1 ≡ t1,... , s_k−1 ≡ t_k−1, s_k >kbo t_k,
-    or s ≡ f(s1,... , sn), t ≡ x ∈ V, and x ∈ Var(s).
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program ; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+MA  02111-1307 USA
+
+The original copyright holder can be contacted as
+
+Stephan Schulz
+Auf der Altenburg 7
+70376 Stuttgart
+Germany
+Email: schulz@eprover.org
 """
+
 import unittest
 
 from prover.clauses.literals import parseAtom

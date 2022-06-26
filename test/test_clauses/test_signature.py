@@ -4,27 +4,6 @@
 # Module signature.py
 
 """
-First-order signatures describe which names (for functions, including
-constants, and predicates) are available in a given first-order
-language. Very often, signatures are given implicitly. In other words,
-the symbols used in terms and formulas implictly make up the
-signature. For implementations of standard untyped predicate logic, we
-can always extract the necessary information directly from the
-formulae. 
-
-However, for certain operations it is much easier to have an explicit
-data object providing signature information. 
-
-A signature is a triple (F,P,ar), with the following properties:
-
-- F is a finite set of function symbols (including constants).
-- P is a finite set of predicate symbols.
-- F and P are disjunct, i.e. they don't share any symbols.
-- ar:F \cup P ->N_0 is the  arity function that associates a natural
-  number (the "arity") with each function symbol and predicate
-  symbols.
-
-
 Copyright 2012-2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify

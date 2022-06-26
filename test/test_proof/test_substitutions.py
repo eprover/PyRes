@@ -4,25 +4,7 @@
 # Module substitutions.py
 
 """
-A simple implementation of substitutions.
-
-Definition: A substitution sigma is a function sigma:V->Terms(F,V)
-with the property that sigma(X)=X for all but finitely many variables
-X from V.
-
-A substitution is continued to terms recursively:
-sigma(f(t1, ..., tn)) = f(sigma(t1), ..., sigma(t2))
-
-Substitutions are customarily represented by the Greek letter simga.
-
-Footnote:
-If more than one substitution is needed, the second one is usually
-called tau, and further ones are denoted with primes or subscripts.
-
-We represent substitutions by a thin wrapper around Python
-dictionaries mapping variables to terms.
-
-Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2019 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
