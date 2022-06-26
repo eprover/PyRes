@@ -110,7 +110,9 @@ Alternatively, you can generate .HTML files with the exact coverage with
 
 See https://coverage.readthedocs.io/en/6.4.1/cmd.html#cmd-report for additional information.
 
-## Information for CASC
+## Information on StarExec
+
+This section requires Make and only works on UNIX-based operating systems.
 
 To run jobs on StarExec, you need to upload a solver as a .ZIP file.
 The following command allows you to generate a .ZIP file with all the
@@ -118,12 +120,13 @@ necessary Python files inside.
 
 `make starexec`
 
-**THIS MIGHT OVERWRITE THE FOLDER $(HOME)/StarExec OR FILES INSIDE WITHOUT FURTHER WARNING.**
+This creates a .ZIP file named "StarExec_$(version).zip" in the folder $(HOME)/StarExec.
+The version and the directory can be customized in the Makefile.
 
 The .ZIP file does not only include Python files but also configurations
 that specify e.g., selected optimizations.
 
-In the Makefile you can specify which configurations should be included in the .ZIP file.
+In the Makefile you can also specify which configurations should be included in the .ZIP file.
 
 ## Result in the Output
 
