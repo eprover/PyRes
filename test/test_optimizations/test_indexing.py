@@ -274,7 +274,3 @@ cnf(c9,axiom, p(X,Y)).
         cands = index.getSubsumedCandidates(self.c5)
         print(cands)
         self.assertEqual(len(cands), 1)
-
-
-if __name__ == '__main__':
-    unittest.main()

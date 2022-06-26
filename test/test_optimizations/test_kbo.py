@@ -112,7 +112,3 @@ class TestKBO(unittest.TestCase):
         self.assertTrue(kbocompare(ocb_lit, self.a1, self.a2) == CompareResult.to_lesser)
         self.assertTrue(kbocompare(ocb_lit, self.a2, self.a3) == CompareResult.to_greater)
         self.assertTrue(kbocompare(ocb_lit, self.a1, self.a3) == CompareResult.to_uncomparable)
-
-
-if __name__ == '__main__':
-    unittest.main()

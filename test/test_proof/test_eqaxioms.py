@@ -130,7 +130,3 @@ class TestEqAxioms(unittest.TestCase):
         tmp = generateCompatAxioms(sig)
         # Note: No axiom for a
         self.assertEqual(len(tmp), 2)
-
-
-if __name__ == '__main__':
-    unittest.main()

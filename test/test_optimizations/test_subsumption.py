@@ -136,6 +136,3 @@ cnf(axiom, c7, Y=Y).
         tmp = backwardSubsumption(self.c1, self.cset)
         self.assertEqual(tmp, 6)
 
-
-if __name__ == '__main__':
-    unittest.main()

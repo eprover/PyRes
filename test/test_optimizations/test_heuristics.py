@@ -139,7 +139,3 @@ cnf(c8,axiom,(c=d|h(i(a))!=h(i(e)))).
         self.assertEqual(eval_funs.nextEval(), 0)
         self.assertEqual(eval_funs.nextEval(), 0)
         self.assertEqual(eval_funs.nextEval(), 1)
-
-
-if __name__ == '__main__':
-    unittest.main()

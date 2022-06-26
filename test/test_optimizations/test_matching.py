@@ -168,6 +168,3 @@ class TestMatching(unittest.TestCase):
 
         self.match_test(match_norec, self.t6, self.t6, True)
 
-
-if __name__ == '__main__':
-    unittest.main()

@@ -82,7 +82,3 @@ cnf(c3, axiom, c).
         print("Test factoring")
         res = computeAllFactors(self.fclause)
         print(res)
-
-
-if __name__ == '__main__':
-    unittest.main()

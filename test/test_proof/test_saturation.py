@@ -203,7 +203,3 @@ cnf(not_p, axiom, ~p(a)).
         self.assertEqual(pm.delete_tautologies, False)
         self.assertEqual(pm.forward_subsumption, False)
         self.assertEqual(pm.backward_subsumption, False)
-
-
-if __name__ == '__main__':
-    unittest.main()

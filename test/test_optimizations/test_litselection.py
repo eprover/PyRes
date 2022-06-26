@@ -122,7 +122,3 @@ class TestLitSelection(unittest.TestCase):
         self.assertEqual(len(ll), 1)
         lit = ll[0]
         self.assertEqual(lit, l3)
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -215,7 +215,3 @@ class TestUnification(unittest.TestCase):
         # self.unif_test(self.t6, self.s6, True)
         # self.unif_test(self.t7, self.s7, False)
         # self.unif_test(self.t8, self.s8, True)
-
-
-if __name__ == '__main__':
-    unittest.main()

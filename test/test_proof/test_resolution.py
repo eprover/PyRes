@@ -143,6 +143,3 @@ cnf(taut,axiom,p(X4)|~p(X4)).
         self.assertTrue(f5)
         print(f5)
 
-
-if __name__ == '__main__':
-    unittest.main()

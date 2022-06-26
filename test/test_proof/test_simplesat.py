@@ -99,6 +99,3 @@ cnf(not_p, axiom, p(b)).
         self.evalSatResult(self.spec1, True)
         self.evalSatResult(self.spec2, True)
         self.evalSatResult(self.spec3, False)
-
-if __name__ == '__main__':
-    unittest.main()

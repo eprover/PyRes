@@ -121,7 +121,3 @@ class TestSubst(unittest.TestCase):
         res = sigma.backtrack()
         self.assertTrue(not res)
 
-
-
-if __name__ == '__main__':
-    unittest.main()

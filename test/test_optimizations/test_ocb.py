@@ -46,6 +46,3 @@ class TestOCB(unittest.TestCase):
         # self.assertTrue(self.ocb1.nextcell.sig_size == 2)
         # self.assertTrue(self.list.initOCBCell.nextcell.sig_size == 2)
 
-
-if __name__ == '__main__':
-    unittest.main()

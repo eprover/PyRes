@@ -31,7 +31,3 @@ class TestOrderedResolution(unittest.TestCase):
         self.assertEqual(self.given_clause.literals[1].inference_lit, True)
         self.assertEqual(self.given_clause.literals[2].inference_lit, False)
         self.assertEqual(self.given_clause.literals[3].inference_lit, True)
-
-
-if __name__ == '__main__':
-    unittest.main()
