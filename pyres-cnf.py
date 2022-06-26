@@ -75,7 +75,10 @@ Email: schulz@eprover.org
 """
 
 import getopt
+import os
 import sys
+
+print(os.getcwd())
 
 from prover.clauses.clausesets import ClauseSet
 from prover.clauses.derivations import enableDerivationOutput, disableDerivationOutput
