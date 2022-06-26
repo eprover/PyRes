@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module terms.py
-
 """
 A simple implementation of first-order terms. We use nested Python
 lists in the style of s-expressions as the term data type.

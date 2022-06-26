@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module signature.py
-
 """
 Copyright 2012-2019 Stephan Schulz, schulz@eprover.org
 

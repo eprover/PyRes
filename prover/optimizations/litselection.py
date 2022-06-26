@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module litselection.py
-
 """
 Functions supporting (negative) literal selection. Literal selection
 indicates certain literals of a clause as "inference literals", and

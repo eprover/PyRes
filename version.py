@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module version.py
-
 """
 Just the version number, to centralize it.
 

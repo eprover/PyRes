@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module pyres-fof.py
-
 """
 Usage: pyres-fof.py [options] <problem_file>
 

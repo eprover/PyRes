@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module idents.py
-
 """
 This module provides the facility to create distinct named objects,
 similar to e.g. enumerations in C-like languages.

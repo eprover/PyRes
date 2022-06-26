@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module eqaxioms.py
-
 """
 Equality is a central relation in automated deduction. The simplest
 way of handling equality is to add axioms describing its

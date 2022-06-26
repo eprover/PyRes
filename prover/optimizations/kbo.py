@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module kbo.py
-
 """
 This is an implementation of the Knuth Bendix Ordering (KBO)
 Based on following definition:

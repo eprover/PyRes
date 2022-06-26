@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module formulacnf.py
-
 """
 Clausification of first-order formulas. Clausification is done in
 several steps:

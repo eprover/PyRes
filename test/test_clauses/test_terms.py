@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module terms.py
-
 """
 Copyright 2010-2019 Stephan Schulz, schulz@eprover.org
 

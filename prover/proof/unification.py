@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module unification.py
-
 """
 This code implements unification for first-order terms (and, by
 inheritance, atoms).

@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module lexer.py
-
 """
 A simple lexical analyser that converts a string into a sequence of
 tokens.

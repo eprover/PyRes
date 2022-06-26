@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module formulas.py
-
 """
 A simple implementation of first-order formulas and their associated
 meta-information.

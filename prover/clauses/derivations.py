@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module derivations.py
-
 """
 A datatype for representing derivations, i.e. jusifications for
 clauses and formulas. Derivations are recursively defined: A

@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module clausesets.py
-
 """
 Clause sets for maintaining sets of clauses, possibly sorted by
 heuristical evaluation.

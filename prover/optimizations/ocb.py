@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module ocb.py
-
 """
 Implementation of the order control block (ocb)
 OCB contains weights for funs (Dict) and weight of variables (unsigned int)

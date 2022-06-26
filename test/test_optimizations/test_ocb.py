@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module ocb.py
-
 """
 Copyright 2019 Stephan Schulz, schulz@eprover.org
 

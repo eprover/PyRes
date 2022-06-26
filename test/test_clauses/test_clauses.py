@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module clause.py
-
 """
 Copyright 2010-2021 Stephan Schulz, schulz@eprover.org
 

@@ -1,10 +1,4 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module setofsupport.py
-
 """
-
 Implementation of the set-of-support strategy (SOS)
 
 === Set-Of-Support ===

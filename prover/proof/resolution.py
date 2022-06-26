@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module resolution.py
-
 """
 This module implements the rules of the simple resolution calculus,
 namely binary resolution and factoring.

@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module simplesat.py
-
 """
 Minimalistic implementation of the given-clause algorithm for
 saturation of clause sets under the rules of the resolution calculus.

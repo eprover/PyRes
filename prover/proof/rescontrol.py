@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module rescontrol.py
-
 """
 Functions wrapping basic inference rules for convenience.
 

@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module substitutions.py
-
 """
 A simple implementation of substitutions.
 

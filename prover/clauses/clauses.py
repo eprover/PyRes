@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module clause.py
-
 """
 A simple implementation of first-order clauses.
 

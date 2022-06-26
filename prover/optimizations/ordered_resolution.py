@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module orderedResolution.py
-
-"""
-
-"""
 from prover.optimizations.kbo import *
 from prover.optimizations.ocb import *
 

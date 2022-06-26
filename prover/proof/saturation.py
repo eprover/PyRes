@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module saturation.py
-
 """
 Implementation of the given-clause algorithm for saturation of clause
 sets under the rules of the resolution calculus. This improves on the

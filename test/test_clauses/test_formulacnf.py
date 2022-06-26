@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module formulacnf.py
-
 """
 Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
 

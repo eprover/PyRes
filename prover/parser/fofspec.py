@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module fofspec.py
-
 """
 This module implements parsing and processing for full first-order
 logic, in mixed TPTP FOF and CNF format.

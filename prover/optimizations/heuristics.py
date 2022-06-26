@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module heuristics.py
-
 """
 This module implements heuristic evaluation functions for clauses.
 The purpose of heuristic evaluation is selection of clauses during the

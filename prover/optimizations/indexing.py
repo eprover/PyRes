@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module indexing.py
-
 """
 In general, an index is a data structure that allows us to reasonably
 efficiently retrieve items from a set of data items that are in a

@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module literal.py
-
 """
 A simple implementation of first-order atoms and literals.
 

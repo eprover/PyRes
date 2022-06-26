@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module signature.py
-
 """
 First-order signatures describe which names (for functions, including
 constants, and predicates) are available in a given first-order

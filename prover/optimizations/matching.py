@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module matching.py
-
 """
 This code implements matching for first-order terms
 (and, by inheritance, atoms).

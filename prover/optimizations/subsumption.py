@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module subsumption.py
-
 """
 This module implements first-order subsumption, as defined by the
 simplification rule below:

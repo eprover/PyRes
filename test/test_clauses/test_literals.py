@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# ----------------------------------
-#
-# Module literal.py
-
 """
 Copyright 2010-2020 Stephan Schulz, schulz@eprover.org
 
