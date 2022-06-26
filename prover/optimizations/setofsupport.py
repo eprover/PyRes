@@ -121,8 +121,7 @@ class SosStrategy(object):
         return num_sos_clauses
 
     def should_mark_clause(self, clause):
-        print("SosStrategy.should_mark_clause: This is a virtual method that should not be called")
-        sys.exit(1)
+        raise NotImplementedError
 
 
 class NoSos(SosStrategy):
