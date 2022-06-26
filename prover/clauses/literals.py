@@ -64,41 +64,10 @@ Germany
 Email: schulz@eprover.org
 """
 
-from prover.clauses.terms import *
-from prover.optimizations.matching import match
-
-
-def parseAtom(lexer):
-    """
-    Parse an atom. An atom is either a conventional atom, in which
-    case it's syntactically identical to a term, or it is an
-    equational literal, of the form 't1=t2' or 't1!=t2', where t1 and
-    t2 are terms.
-
-    In either case, we represent the atom as a first-order
-    term. Equational literals are represented at terms with faux
-    function symbols "=" and "!=".
-    """
-    atom = parseTerm(lexer)
-    if lexer.TestTok([Token.EqualSign, Token.NotEqualSign]):
-        # The literal is equational.
-        # We get the actual operator, '=' or '!=', followed by the
-        # other side of the (in)equation
-        op = lexer.Next().literal
-        lhs = atom
-        rhs = parseTerm(lexer)
-        atom = list([op, lhs, rhs])
-
-    return atom
-
-
-def atom2String(atom):
-    if termFunc(atom) in ["=", "!="]:
-        arg1 = termArgs(atom)[0]
-        arg2 = termArgs(atom)[1]
-        return term2String(arg1) + termFunc(atom) + term2String(arg2)
-    else:
-        return term2String(atom)
+from prover.clauses.terms import termFunc, termArgs, termEqual, termIsVar, termCollectVars, \
+    termCollectFuns, termCollectSig, termCopy, termWeight
+from prover.clauses.conversion import term2String
+from prover.optimizations.matching import match, Signature
 
 
 def atomIsConstTrue(atom):
@@ -313,55 +282,6 @@ class Literal(object):
         can be unified with or matched to each other.
         """
         return (self.isPositive(), termFunc(self.atom))
-
-
-def parseLiteral(lexer):
-    """
-    Parse a literal. A literal is an optional negation sign '~',
-    followed by an atom.
-    """
-    negative = False
-    if lexer.TestTok(Token.Negation):
-        negative = True
-        lexer.Next()
-    atom = parseAtom(lexer)
-
-    return Literal(atom, negative)
-
-
-def parseLiteralList(lexer):
-    """
-    Parse a list of literals separated by "|" (logical or). As per
-    TPTP 3 syntax, the single word "$false" is interpreted as the
-    false literal, and ignored.
-    """
-    res = []
-    if lexer.LookLit() == "$false":
-        lexer.Next()
-    else:
-        lit = parseLiteral(lexer)
-        res.append(lit)
-
-    while lexer.TestTok(Token.Or):
-        lexer.Next()
-
-        if lexer.LookLit() == "$false":
-            lexer.Next()
-        else:
-            lit = parseLiteral(lexer)
-            res.append(lit)
-
-    return res
-
-
-def literalList2String(list):
-    """
-    Convert a literal list to a textual representation that can be
-    parsed back.
-    """
-    if not list:
-        return "$false"
-    return "|".join(map(repr, list))
 
 
 def litInLitList(lit, litlist):

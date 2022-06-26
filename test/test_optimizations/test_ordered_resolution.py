@@ -27,8 +27,9 @@ Email: schulz@eprover.org
 
 import unittest
 
-from prover.clauses.clauses import parseClause
+from prover.parser.parser import parseClause
 from prover.optimizations.ordered_resolution import *
+from prover.parser.lexer import Lexer
 
 
 class TestOrderedResolution(unittest.TestCase):

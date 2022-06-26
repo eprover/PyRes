@@ -26,6 +26,9 @@ Email: schulz@eprover.org
 """
 
 import unittest
+
+from prover.clauses.conversion import term2String
+from test.convenience import string2Term
 from prover.clauses.terms import *
 
 

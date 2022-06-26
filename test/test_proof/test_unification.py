@@ -27,6 +27,8 @@ Email: schulz@eprover.org
 
 import unittest
 
+from prover.clauses.conversion import term2String
+from test.convenience import string2Term
 from prover.proof.unification import *
 
 
@@ -36,38 +38,38 @@ class TestUnification(unittest.TestCase):
     """
 
     def setUp(self):
-        self.s1 = terms.string2Term("X")
-        self.t1 = terms.string2Term("a")
+        self.s1 = string2Term("X")
+        self.t1 = string2Term("a")
 
-        self.s2 = terms.string2Term("X")
-        self.t2 = terms.string2Term("f(X)")
+        self.s2 = string2Term("X")
+        self.t2 = string2Term("f(X)")
 
-        self.s3 = terms.string2Term("X")
-        self.t3 = terms.string2Term("f(Y)")
+        self.s3 = string2Term("X")
+        self.t3 = string2Term("f(Y)")
 
-        self.s4 = terms.string2Term("f(X, a)")
-        self.t4 = terms.string2Term("f(b, Y)")
+        self.s4 = string2Term("f(X, a)")
+        self.t4 = string2Term("f(b, Y)")
 
-        self.s5 = terms.string2Term("f(X, g(a))")
-        self.t5 = terms.string2Term("f(X, Y))")
+        self.s5 = string2Term("f(X, g(a))")
+        self.t5 = string2Term("f(X, Y))")
 
-        self.s6 = terms.string2Term("f(X, g(a))")
-        self.t6 = terms.string2Term("f(X, X))")
+        self.s6 = string2Term("f(X, g(a))")
+        self.t6 = string2Term("f(X, X))")
 
-        self.s7 = terms.string2Term("g(X)")
-        self.t7 = terms.string2Term("g(f(g(X),b))")
+        self.s7 = string2Term("g(X)")
+        self.t7 = string2Term("g(f(g(X),b))")
 
-        self.s8 = terms.string2Term("p(X,X,X)")
-        self.t8 = terms.string2Term("p(Y,Y,e)")
+        self.s8 = string2Term("p(X,X,X)")
+        self.t8 = string2Term("p(Y,Y,e)")
 
-        self.s9 = terms.string2Term("f(f(g(X),a),X)")
-        self.t9 = terms.string2Term("f(Y,g(Y))")
+        self.s9 = string2Term("f(f(g(X),a),X)")
+        self.t9 = string2Term("f(Y,g(Y))")
 
-        self.s10 = terms.string2Term("f(f(g(X),a),g(X))")
-        self.t10 = terms.string2Term("f(Y,g(Z))")
+        self.s10 = string2Term("f(f(g(X),a),g(X))")
+        self.t10 = string2Term("f(Y,g(Z))")
 
-        self.s11 = terms.string2Term("p(X,g(a), f(a, f(a)))")
-        self.t11 = terms.string2Term("p(f(a), g(Y), f(Y, Z))")
+        self.s11 = string2Term("p(X,g(a), f(a, f(a)))")
+        self.t11 = string2Term("p(f(a), g(Y), f(Y, Z))")
 
     def unif_test(self, s, t, success_expected):
         """

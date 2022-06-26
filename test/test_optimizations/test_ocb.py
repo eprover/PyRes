@@ -28,6 +28,7 @@ Email: schulz@eprover.org
 import unittest
 
 from prover.optimizations.ocb import *
+from test.convenience import string2Term
 
 
 class TestOCB(unittest.TestCase):

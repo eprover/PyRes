@@ -32,7 +32,7 @@ import errno
 import os
 import os.path
 
-from prover.clauses.clauses import parseClause
+from prover.parser.parser import parseClause
 from prover.clauses.clausesets import ClauseSet
 from prover.clauses.formulacnf import wFormulaClausify
 from prover.clauses.formulas import parseWFormula, negateConjecture

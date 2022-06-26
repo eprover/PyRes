@@ -27,6 +27,8 @@ Email: schulz@eprover.org
 
 import unittest
 
+import prover.clauses.conversion
+from test.convenience import string2Term
 from prover.proof.substitutions import *
 
 
@@ -35,11 +37,11 @@ class TestSubst(unittest.TestCase):
     Test basic substitution functions.
     """
     def setUp(self):
-        self.t1 = terms.string2Term("f(X, g(Y))")
-        self.t2 = terms.string2Term("a")
-        self.t3 = terms.string2Term("b")
-        self.t4 = terms.string2Term("f(a, g(a))")
-        self.t5 = terms.string2Term("f(a, g(b))")
+        self.t1 = string2Term("f(X, g(Y))")
+        self.t2 = string2Term("a")
+        self.t3 = string2Term("b")
+        self.t4 = string2Term("f(a, g(a))")
+        self.t5 = string2Term("f(a, g(b))")
 
         self.sigma1 = Substitution([("X", self.t2), ("Y", self.t2)])
         self.sigma2 = Substitution([("X", self.t2), ("Y", self.t3)])
@@ -67,7 +69,7 @@ class TestSubst(unittest.TestCase):
         """
         Check application of substitutions
         """
-        self.assertEqual(terms.term2String(self.sigma1(self.t1)), "f(a,g(a))")
+        self.assertEqual(prover.clauses.conversion.term2String(self.sigma1(self.t1)), "f(a,g(a))")
         self.assertTrue(terms.termEqual(self.sigma1(self.t1), self.t4))
         self.assertTrue(terms.termEqual(self.sigma2(self.t1), self.t5))
 
@@ -92,7 +94,7 @@ class TestSubst(unittest.TestCase):
         """
         sigma = BTSubst()
         state = sigma.getState()
-        sigma.addBinding(('X', terms.string2Term("f(Y)")))
+        sigma.addBinding(('X', string2Term("f(Y)")))
         res = sigma.backtrackToState(state)
         self.assertEqual(res, 1)
         res = sigma.backtrack()

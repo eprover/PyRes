@@ -29,7 +29,7 @@ import unittest
 
 from prover.optimizations.heuristics import *
 from prover.parser.lexer import Lexer
-from prover.clauses.clauses import parseClause
+from prover.parser.parser import parseClause
 
 
 class TestHeuristics(unittest.TestCase):

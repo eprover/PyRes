@@ -25,10 +25,9 @@ Germany
 Email: schulz@eprover.org
 """
 
-import unittest
-
 from prover.optimizations.subsumption import *
 from prover.parser.lexer import Lexer
+from prover.parser.parser import parseClause
 
 
 class TestSubsumption(unittest.TestCase):

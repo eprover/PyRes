@@ -65,10 +65,13 @@ Germany
 Email: schulz@eprover.org
 """
 
-from prover.clauses.clauses import Clause, parseClause
+from prover.clauses.clause import Clause
+from prover.parser.parser import parseClause
 from prover.clauses.derivations import Derivation
 from prover.clauses.literals import Literal
 from prover.clauses.terms import *
+from prover.parser.lexer import Lexer
+from prover.parser.token import Token
 
 
 def generateEquivAxioms():

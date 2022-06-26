@@ -27,11 +27,11 @@ Email: schulz@eprover.org
 
 import unittest
 
-from prover.clauses.literals import parseLiteral
 from prover.clauses.clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
 from prover.clauses.signature import Signature
 from prover.optimizations.heuristics import PickGiven2
 from prover.parser.lexer import Lexer
+from prover.parser.parser import parseLiteral
 
 
 class TestClauseSets(unittest.TestCase):

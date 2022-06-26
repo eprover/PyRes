@@ -28,7 +28,7 @@ Germany
 Email: schulz@eprover.org
 """
 
-from prover.clauses.clauses import parseClause
+from prover.parser.parser import parseClause
 from prover.clauses.signature import Signature
 from prover.optimizations.indexing import ResolutionIndex, SubsumptionIndex
 from prover.optimizations.setofsupport import NoSos

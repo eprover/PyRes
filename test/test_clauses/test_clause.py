@@ -26,10 +26,12 @@ Email: schulz@eprover.org
 """
 import unittest
 
-from prover.clauses.clauses import parseClause, Clause
+from prover.clauses.clause import Clause
+from prover.parser.parser import parseClause
 from prover.optimizations.litselection import firstLit, varSizeLit
 from prover.optimizations.ocb import OCBCell
 from prover.clauses.terms import *
+from prover.parser.lexer import Lexer
 
 
 class TestClauses(unittest.TestCase):

@@ -39,10 +39,10 @@ Auf der Altenburg 7
 Germany
 Email: schulz@eprover.org
 """
-
 from prover.proof import substitutions
-from prover.clauses.derivations import Derivable, Derivation
-from prover.clauses.literals import parseLiteralList, literalList2String, litInLitList, oppositeInLitList
+from prover.clauses.derivations import Derivable
+from prover.clauses.literals import litInLitList, oppositeInLitList
+from prover.clauses.conversion import literalList2String
 from prover.optimizations.litselection import firstLit
 from prover.optimizations.ordered_resolution import selectInferenceLitsOrderedResolution
 from prover.clauses.terms import *
@@ -235,38 +235,3 @@ class Clause(Derivable):
         return False
 
 
-def parseClause(lexer):
-    """
-    Parse a clause. A clause in (slightly simplified) TPTP-3 syntax is
-    written as
-       cnf(<name>, <type>, <literal list>).
-    where <name> is a lower-case ident, type is a lower-case ident
-    from a specific list, and <literal list> is a "|" separated list
-    of literals, optionally enclosed in parenthesis.
-
-    For us, all clause types are essentially the same, so we only
-    distinguish "axiom", "negated_conjecture", and map everything else
-    to "plain".
-    """
-    lexer.AcceptLit("cnf")
-    lexer.AcceptTok(Token.OpenPar)
-    name = lexer.LookLit()
-    lexer.AcceptTok(Token.IdentLower)
-    lexer.AcceptTok(Token.Comma)
-    clause_type = lexer.LookLit()
-    if clause_type not in ["axiom", "negated_conjecture"]:
-        clause_type = "plain"
-    lexer.AcceptTok(Token.IdentLower)
-    lexer.AcceptTok(Token.Comma)
-    if lexer.TestTok(Token.OpenPar):
-        lexer.AcceptTok(Token.OpenPar)
-        lits = parseLiteralList(lexer)
-        lexer.AcceptTok(Token.ClosePar)
-    else:
-        lits = parseLiteralList(lexer)
-    lexer.AcceptTok(Token.ClosePar)
-    lexer.AcceptTok(Token.FullStop)
-
-    res = Clause(lits, clause_type, name)
-    res.setDerivation(Derivation("input"))
-    return res

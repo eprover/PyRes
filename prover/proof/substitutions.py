@@ -42,7 +42,7 @@ Auf der Altenburg 7
 Germany
 Email: schulz@eprover.org
 """
-
+import prover.clauses.conversion
 from prover.clauses import terms
 
 
@@ -75,7 +75,7 @@ class Substitution(object):
         Return a print representation of the substitution.
         """
         return "{"+\
-               ",".join([i +"<-" + terms.term2String(self.subst[i])
+               ",".join([i +"<-" + prover.clauses.conversion.term2String(self.subst[i])
                          for i in self.subst])\
                          +"}"
 

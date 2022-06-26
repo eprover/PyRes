@@ -26,7 +26,10 @@ Email: schulz@eprover.org
 """
 import unittest
 
+from prover.clauses.conversion import atom2String, literalList2String
 from prover.clauses.literals import *
+from prover.parser.lexer import Lexer
+from prover.parser.parser import parseLiteral, parseAtom, parseLiteralList
 from prover.proof.substitutions import BTSubst
 
 

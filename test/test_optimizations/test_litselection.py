@@ -27,9 +27,9 @@ Email: schulz@eprover.org
 
 import unittest
 
-from prover.clauses.literals import parseLiteralList
 from prover.optimizations.litselection import *
 from prover.parser.lexer import Lexer
+from prover.parser.parser import parseLiteralList
 
 
 class TestLitSelection(unittest.TestCase):

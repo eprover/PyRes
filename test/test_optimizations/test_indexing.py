@@ -27,8 +27,9 @@ Email: schulz@eprover.org
 
 import unittest
 
+import prover.parser.parser
 from prover.optimizations.indexing import *
-from prover.clauses import clauses
+from prover.clauses import clause
 from prover.parser.lexer import Lexer
 from prover.clauses.terms import termFunc
 
@@ -56,15 +57,15 @@ cnf(c8,axiom, r(f(a))).
 cnf(c9,axiom, p(X,Y)).
 """
         lex = Lexer(self.spec)
-        self.c1 = clauses.parseClause(lex)
-        self.c2 = clauses.parseClause(lex)
-        self.c3 = clauses.parseClause(lex)
-        self.c4 = clauses.parseClause(lex)
-        self.c5 = clauses.parseClause(lex)
-        self.c6 = clauses.parseClause(lex)
-        self.c7 = clauses.parseClause(lex)
-        self.c8 = clauses.parseClause(lex)
-        self.c9 = clauses.parseClause(lex)
+        self.c1 = prover.parser.parser.parseClause(lex)
+        self.c2 = prover.parser.parser.parseClause(lex)
+        self.c3 = prover.parser.parser.parseClause(lex)
+        self.c4 = prover.parser.parser.parseClause(lex)
+        self.c5 = prover.parser.parser.parseClause(lex)
+        self.c6 = prover.parser.parser.parseClause(lex)
+        self.c7 = prover.parser.parser.parseClause(lex)
+        self.c8 = prover.parser.parser.parseClause(lex)
+        self.c9 = prover.parser.parser.parseClause(lex)
 
     def testResolutionInsertRemove(self):
         """

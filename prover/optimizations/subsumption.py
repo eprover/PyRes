@@ -42,7 +42,7 @@ Email: schulz@eprover.org
 
 import unittest
 
-from prover.clauses.clauses import parseClause
+from prover.parser.parser import parseClause
 from prover.clauses.clausesets import ClauseSet
 from prover.parser.lexer import Lexer
 from prover.proof.substitutions import BTSubst

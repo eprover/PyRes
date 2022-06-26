@@ -66,9 +66,11 @@ Email: schulz@eprover.org
 
 from collections import deque
 
+from prover.clauses.conversion import term2String
 from prover.clauses.derivations import Derivable, Derivation, flatDerivation
-from prover.clauses.literals import parseLiteral
 from prover.clauses.terms import *
+from prover.parser.parser import parseTerm, parseLiteral
+from prover.parser.token import Token
 
 
 class Formula(object):

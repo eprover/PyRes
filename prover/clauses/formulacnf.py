@@ -63,7 +63,7 @@ Germany
 Email: schulz@eprover.org
 """
 
-from prover.clauses.clauses import Clause
+from prover.clauses.clause import Clause
 from prover.clauses.derivations import Derivation, flatDerivation
 from prover.clauses.formulas import Formula, WFormula
 from prover.clauses.literals import Literal

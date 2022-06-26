@@ -61,7 +61,6 @@ Email: schulz@eprover.org
 """
 
 from prover.clauses.signature import Signature
-from prover.parser.lexer import Token, Lexer
 
 
 def termIsVar(t):
@@ -94,58 +93,6 @@ def termArgs(t):
     """
     assert termIsCompound(t)
     return t[1:]
-
-
-def term2String(t):
-    """
-    Convert a term t into a string.
-    """
-    if termIsVar(t):
-        return t
-    else:
-        # We need to handle the case of constants separatly
-        if not termArgs(t):
-            return termFunc(t)
-        else:
-            arg_rep = ",".join([term2String(s) for s in termArgs(t)])
-            return termFunc(t) + "(" + arg_rep + ")"
-
-
-def parseTermList(lexer):
-    """
-    Parse a comma-delimited list of terms.
-    """
-    res = [parseTerm(lexer)]
-    while lexer.TestTok(Token.Comma):
-        lexer.AcceptTok(Token.Comma)
-        res.append(parseTerm(lexer))
-    return res
-
-
-def parseTerm(lexer):
-    """
-    Read a complete term from the lexer provided.
-    """
-    if lexer.TestTok(Token.IdentUpper):
-        res = lexer.Next().literal
-    else:
-        res = []
-        lexer.CheckTok([Token.IdentLower, Token.DefFunctor, Token.SQString])
-        res.append(lexer.Next().literal)
-        if lexer.TestTok(Token.OpenPar):
-            # It's a term with proper subterms, so parse them
-            lexer.AcceptTok(Token.OpenPar)
-            res.extend(parseTermList(lexer))
-            lexer.AcceptTok(Token.ClosePar)
-    return res
-
-
-def string2Term(string):
-    """
-    Convert a string into a term.
-    """
-    lexer = Lexer(string)
-    return parseTerm(lexer)
 
 
 def termListEqual(l1, l2):

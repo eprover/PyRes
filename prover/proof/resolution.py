@@ -57,8 +57,7 @@ Auf der Altenburg 7
 Germany
 Email: schulz@eprover.org
 """
-
-from prover.clauses import clauses
+from prover.clauses.clause import Clause
 from prover.clauses.derivations import flatDerivation
 from prover.proof.unification import mgu
 
@@ -82,7 +81,7 @@ def resolution(clause1, lit1, clause2, lit2):
     lits1 = [lit.instantiate(sigma) for lit in clause1.literals if lit != l1]
     lits2 = [lit.instantiate(sigma) for lit in clause2.literals if lit != l2]
     lits1.extend(lits2)
-    res = clauses.Clause(lits1)
+    res = Clause(lits1)
     res.removeDupLits()
     res.setDerivation(flatDerivation("resolution", [clause1, clause2]))
 
@@ -103,7 +102,7 @@ def factor(clause, lit1, lit2):
     if sigma is None:
         return None
     lits = [lit.instantiate(sigma) for lit in clause.literals if lit != l2]
-    res = clauses.Clause(lits)
+    res = Clause(lits)
     res.removeDupLits()
     res.setDerivation(flatDerivation("factor", [clause]))
 

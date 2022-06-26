@@ -28,7 +28,9 @@ Email: schulz@eprover.org
 import unittest
 
 from prover.optimizations.matching import *
-from prover.clauses.terms import string2Term, term2String, termEqual
+from prover.clauses.terms import termEqual
+from prover.clauses.conversion import term2String
+from test.convenience import string2Term
 from prover.proof.substitutions import BTSubst
 
 

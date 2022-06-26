@@ -26,7 +26,7 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from prover.convenience.idents import Ident
+from prover.general.idents import Ident
 
 
 class TestIdents(unittest.TestCase):

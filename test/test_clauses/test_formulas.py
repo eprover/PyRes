@@ -29,6 +29,7 @@ import unittest
 from prover.clauses.derivations import toggleDerivationOutput
 from prover.clauses.formulas import *
 from prover.clauses.terms import *
+from prover.parser.lexer import Lexer
 
 
 class TestFormulas(unittest.TestCase):

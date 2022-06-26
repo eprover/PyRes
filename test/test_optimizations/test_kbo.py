@@ -27,9 +27,11 @@ Email: schulz@eprover.org
 
 import unittest
 
-from prover.clauses.literals import parseAtom
 from prover.optimizations.kbo import *
 from prover.optimizations.ocb import OCBCell
+from prover.parser.lexer import Lexer
+from prover.parser.parser import parseAtom
+from test.convenience import string2Term
 
 
 class TestKBO(unittest.TestCase):
