@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------
 
 STAREXECPATH=$(HOME)/StarExec
-VERSION=v2.0.11
+VERSION=2.0.0
 
 CONFIG_SUB_FOLDERS = default sos0 sos1 sos2 sos3
 
@@ -25,6 +25,7 @@ starexec: clean
 	mkdir -p $(STAREXECPATH)/bin
 	find . -name ".#*"  -exec rm {} \;
 	cp *.py $(STAREXECPATH)/bin
+	cp -r prover $(STAREXECPATH)/bin
 	for config in $(CONFIGS) ; do \
 		cp starexec_run_PyRes_$$config $(STAREXECPATH)/bin ; \
 	done
