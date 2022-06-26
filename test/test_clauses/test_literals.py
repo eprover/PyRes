@@ -240,7 +240,3 @@ class TestLiterals(unittest.TestCase):
 
         self.assertEqual(sig.getArity("b"), 0)
         self.assertEqual(sig.getArity("p"), 1)
-
-
-if __name__ == '__main__':
-    unittest.main()

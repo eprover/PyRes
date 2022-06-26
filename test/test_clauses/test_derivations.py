@@ -107,7 +107,3 @@ class TestDerivations(unittest.TestCase):
         toggleDerivationOutput()
         self.assertTrue(o3.strDerivation() != "")
         self.assertTrue(o4.strDerivation() == "")
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -237,7 +237,3 @@ cnf(prove_neither_charles_nor_butler_did_it,negated_conjecture,
         pos = clauses.getResolutionLiterals(lit)
         self.assertTrue(len(pos), 6)
         print(pos)
-
-
-if __name__ == '__main__':
-    unittest.main()

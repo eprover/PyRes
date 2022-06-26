@@ -211,7 +211,3 @@ class TestFormulas(unittest.TestCase):
         sig.isPred("r")
         sig.isFun("a")
         sig.isConstant("a")
-
-
-if __name__ == '__main__':
-    unittest.main()

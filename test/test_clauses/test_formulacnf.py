@@ -424,7 +424,3 @@ fof(testscosko, axiom, (![X]:?[Y]:((p(X)&q(X))|q(X,Y))|a)).
             for c in clauses:
                 print(c)
             toggleDerivationOutput()
-
-
-if __name__ == '__main__':
-    unittest.main()

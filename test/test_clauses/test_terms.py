@@ -227,7 +227,3 @@ class TestTerms(unittest.TestCase):
         self.assertTrue(countvaroccurrences(self.t4, 1).get("X") == 1)
         self.assertTrue(countvaroccurrences(self.t4, 1).get("Y") == 1)
         self.assertTrue(countvaroccurrences(self.t8, 1).get("X") == 2)
-
-
-if __name__ == '__main__':
-    unittest.main()
