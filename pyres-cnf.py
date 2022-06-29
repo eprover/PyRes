@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+# ----------------------------------
+#
+# Module pyres-cnf.py
+
 """
 Usage: pyres-cnf.py [options] <problem_file>
 

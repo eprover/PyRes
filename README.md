@@ -48,6 +48,12 @@ Suggested command line
 python3 pyres-simple.py EXAMPLES/PUZ002-1.p
 ```
 
+If your machine is running on a UNIX OS (Linux, Mac) you can also run
+```
+./pyres-simple.py EXAMPLES/PUZ002-1.p
+```
+This is equivalent to the command before because the script starts with the line `#!/usr/bin/env python3` which tells the os to run the script with python3.
+
 PUZ001-1.p is quite hard for pyres-simple!
 
 

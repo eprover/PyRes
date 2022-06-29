@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+# ----------------------------------
+#
+# Module pyres-simple.py
+
 """
 Usage: pyres-simple.py <problem_file>
 
