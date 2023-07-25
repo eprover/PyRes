@@ -48,6 +48,7 @@ from idents import Ident
 from lexer import Token,Lexer
 from clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
 import heuristics
+from litselection import largestLit
 from rescontrol import computeAllResolvents, computeAllFactors
 from subsumption import forwardSubsumption, backwardSubsumption
 
@@ -238,6 +239,8 @@ class TestProver(unittest.TestCase):
         print()
         self.params = SearchParams()
         self.params.delete_tautologies = True
+        self.params.backward_subsumption = True
+        self.params.forward_subsumption = True
         self.spec1 = """
  cnf(axiom, a_is_true, a).
  cnf(negated_conjecture, is_a_true, ~a)."""
@@ -334,7 +337,7 @@ cnf(taut, axiom, p(X)|~p(X)).
 cnf(not_p, axiom, ~p(a)).
 """
 
-    def evalSatResult(self, spec, provable):
+    def evalSatResult(self, spec, provable, indexed=False):
         """
         Evaluate the result of a saturation compared to the expected
         result.
@@ -344,7 +347,7 @@ cnf(not_p, axiom, ~p(a)).
         problem = ClauseSet()
         problem.parse(lex)
 
-        prover = ProofState(self.params, problem)
+        prover = ProofState(self.params, problem, False, indexed)
         res = prover.saturate()
 
         if provable:
@@ -369,6 +372,11 @@ cnf(not_p, axiom, ~p(a)).
         self.evalSatResult(self.spec1, True)
         self.evalSatResult(self.spec2, True)
         self.evalSatResult(self.spec3, False)
+
+        self.params.literal_selection = largestLit
+        self.evalSatResult(self.spec1, True, True)
+        self.evalSatResult(self.spec2, True, True)
+        self.evalSatResult(self.spec3, False, True)
 
 
     def testParamSet(self):

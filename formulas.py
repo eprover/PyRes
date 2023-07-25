@@ -680,7 +680,8 @@ class TestFormulas(unittest.TestCase):
         print(f3)
         print(f4)
         toggleDerivationOutput()
-
+        tmp = negateConjecture(f2)
+        print(tmp)
         sig = f1.collectSig()
         f2.collectSig(sig)
         f3.collectSig(sig)

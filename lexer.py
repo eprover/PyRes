@@ -341,6 +341,13 @@ class TestLexer(unittest.TestCase):
         self.example4 = "^"
         self.example5 = "fof(test,axiom,![X,Y]:?[Z]:~p(X,Y,Z))."
 
+    def testError(self):
+        """
+        Cover the Error class.
+        """
+        err = ScannerError()
+        self.assertEqual(repr(err), "ScannerError('<none>')")
+
     def testLex(self):
         """
         Test that comments and whitespace are normally ignored.

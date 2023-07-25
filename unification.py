@@ -283,6 +283,7 @@ class TestUnification(unittest.TestCase):
         print()
         self.unif_test(self.s1, self.t1, True)
         self.unif_test(self.s2, self.t2, False)
+        self.unif_test(self.t2, self.s2, False)
         self.unif_test(self.s3, self.t3, True)
         self.unif_test(self.s4, self.t4, True)
         self.unif_test(self.s5, self.t5, True)
