@@ -92,7 +92,7 @@ def generateEquivAxioms():
     res = []
     while not lex.TestTok(Token.EOFToken):
         c = parseClause(lex)
-        c.setDerivation(Derivation("eq_axiom"))
+        c.setDerivation(Derivation("introduced(tautology, theory(equality)"))
         res.append(c)
     return res
 
@@ -130,7 +130,7 @@ def generateFunCompatAx(f, arity):
     res.append(concl)
 
     resclause = Clause(res)
-    resclause.setDerivation(Derivation("eq_axiom"))
+    resclause.setDerivation(Derivation("introduced(tautology, theory(equality)"))
     return resclause
     
 
@@ -151,7 +151,7 @@ def generatePredCompatAx(p, arity):
     res.append(Literal(posp, False))
     
     resclause = Clause(res)
-    resclause.setDerivation(Derivation("eq_axiom"))
+    resclause.setDerivation(Derivation("introduced(tautology, theory(equality)"))
     return resclause
 
 

@@ -659,46 +659,51 @@ def wFormulaCNF(wf):
     """
     Convert a (wrapped) formula to Conjunctive Normal Form.
     """
+
+    ftype = "plain"
+    if(wf.type in ["conjecture", "negated_conjecture"]):
+        ftype = wf.type
+    
     f, m0 = formulaOpSimplify(wf.formula)
     f, m1 = formulaSimplify(f)
     if m0 or m1:
-        tmp = WFormula(f, wf.type)
+        tmp = WFormula(f, ftype)
         tmp.setDerivation(flatDerivation("fof_simplification", [wf]))
         wf = tmp
 
     f,m = formulaNNF(f,1)
     if m:
-        tmp = WFormula(f, wf.type)
+        tmp = WFormula(f, ftype)
         tmp.setDerivation(flatDerivation("fof_nnf", [wf]))
         wf = tmp
 
     f,m = formulaMiniScope(f)
     if m:
-        tmp = WFormula(f, wf.type)
+        tmp = WFormula(f, ftype)
         tmp.setDerivation(flatDerivation("shift_quantors", [wf]))
         wf = tmp
 
     f = formulaVarRename(f)
     if not f.isEqual(wf.formula):
-        tmp = WFormula(f, wf.type)
+        tmp = WFormula(f, ftype)
         tmp.setDerivation(flatDerivation("variable_rename", [wf]))
         wf = tmp
 
     f = formulaSkolemize(f)
     if not f.isEqual(wf.formula):
-        tmp = WFormula(f, wf.type)
+        tmp = WFormula(f, ftype)
         tmp.setDerivation(flatDerivation("skolemize", [wf], "status(esa)"))
         wf = tmp
 
     f = formulaShiftQuantorsOut(f)
     if not f.isEqual(wf.formula):
-        tmp = WFormula(f, wf.type)
+        tmp = WFormula(f, ftype)
         tmp.setDerivation(Derivation("shift_quantors", [wf]))
         wf = tmp
 
     f = formulaDistributeDisjunctions(f)
     if not f.isEqual(wf.formula):
-        tmp = WFormula(f, wf.type)
+        tmp = WFormula(f, ftype)
         tmp.setDerivation(flatDerivation("distribute", [wf]))
         wf = tmp
 
