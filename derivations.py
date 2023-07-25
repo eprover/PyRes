@@ -193,7 +193,7 @@ class Derivation(object):
             assert(len(self.parents)==1)
             return self.parents[0].name
         else:
-            return "inference(%s,%s,%s)"%\
+            return "inference(%s,[%s],%s)"%\
                    (self.operator, self.status, repr(self.parents))
 
 
