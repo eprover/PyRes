@@ -44,7 +44,7 @@ X1!=Y1|...|Xn!=Yn|f(X1,...,Xn)=f(Y1,...Yn) for all f|n in F.
 X1!=Y1|...|Xn!=Yn|~p(X1,...Xn)|p(Y1,...,Yn) for all p|n in P.
 
 
-Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2011-2023 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

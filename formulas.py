@@ -43,7 +43,7 @@ some code for parsing and printing infix equality, but also to
 represent a formula in Negation Normal Form without any negations in
 the frame of the formula.
 
-Copyright 2011-2019 Stephan Schulz, schulz@eprover.org
+Copyright 2011-2023 Stephan Schulz, schulz@eprover.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
