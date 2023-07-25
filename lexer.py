@@ -113,6 +113,7 @@ class Token(object):
     Or             = Ident("|")
     And            = Ident("&")
     Implies        = Ident("=>")
+    AltImplies     = Ident("->")
     BImplies       = Ident("<=")
     Equiv          = Ident("<=>")
     Xor            = Ident("<~>")
@@ -163,6 +164,7 @@ class Lexer(object):
         (re.compile("\|"),                    Token.Or),
         (re.compile("&"),                     Token.And),
         (re.compile("=>"),                    Token.Implies),
+        (re.compile("->"),                    Token.Implies),
         (re.compile("<=>"),                   Token.Equiv),
         (re.compile("<="),                    Token.BImplies),
         (re.compile("<~>"),                   Token.Xor),
@@ -192,6 +194,9 @@ class Lexer(object):
         self.pos = 0
         self.name = name
 
+    def getName(self):
+        return self.name
+        
     def Push(self, token):
         """
         Return a token to the token stack. This allows basically

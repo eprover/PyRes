@@ -490,7 +490,7 @@ def parseWFormula(lexer):
     lexer.AcceptTok(Token.FullStop)
 
     res = WFormula(form, type, name)
-    res.setDerivation(Derivation("input"))
+    res.setInputDeriv(lexer.getName(), name)
 
     return res
 

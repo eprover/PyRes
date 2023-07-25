@@ -60,7 +60,7 @@ def tptpLexer(source, refdir):
     name = os.path.join(refdir, source)
     try:
         fp = open(name, "r")
-        lex = Lexer(fp.read())
+        lex = Lexer(fp.read(), name)
         fp.close()
         refdir = os.path.dirname(name)
     except IOError:
@@ -68,7 +68,7 @@ def tptpLexer(source, refdir):
         if tptp:
             name = os.path.join(tptp, source)
             fp = open(name, "r")
-            lex = Lexer(fp.read())
+            lex = Lexer(fp.read()), name
             fp.close()
             refdir = os.path.dirname(name)
         else:

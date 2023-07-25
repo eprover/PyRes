@@ -79,7 +79,16 @@ class Derivable(object):
             Derivable.derivedIdCounter=Derivable.derivedIdCounter+1
 
     def setDerivation(self, derivation):
+        """
+        Set the derivation that created this derivable.
+        """
         self.derivation = derivation
+
+    def setInputDeriv(self, filename, name):
+        """
+        Special case: It's an input object.
+        """
+        self.derivation = Derivation("file('%s', %s)"%(filename,name))
 
     def getParents(self):
         """
@@ -176,8 +185,8 @@ class Derivation(object):
         """
         Return a string for the derivation in TPTP-3 format.
         """
-        if self.operator == "input":
-            return "input"
+        if self.operator.startswith("file("):
+            return self.operator
         elif self.operator == "eq_axiom":
             return "eq_axiom"
         elif self.operator == "reference":
@@ -194,7 +203,7 @@ class Derivation(object):
         Return a list of all derived objects that are used in this
         derivation.
         """
-        if self.operator == "input":
+        if self.operator.startswith("file("):
             return []
         elif self.operator == "eq_axiom":
             return []

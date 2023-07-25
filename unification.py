@@ -212,6 +212,10 @@ def mgu(t1, t2):
     Try to unify t1 and t2, return substitution on success, or None on failure.
     """
     res =  mguTermList([t1], [t2], Substitution())
+    res2 = "False"
+    if res:
+       res2 = "True"
+    # print("# :", term2String(t1), " : ", term2String(t2), " => ", res2);
     return res
 
 

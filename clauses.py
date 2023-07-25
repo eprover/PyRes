@@ -274,7 +274,7 @@ def parseClause(lexer):
     lexer.AcceptTok(Token.FullStop)
 
     res = Clause(lits, type, name)
-    res.setDerivation(Derivation("input"))
+    res.setInputDeriv(lexer.getName(), name)
     return res
 
 
