@@ -187,7 +187,7 @@ class Derivation(object):
         """
         if self.operator.startswith("file("):
             return self.operator
-        elif self.operator.startswith("introduced("):
+        elif self.operator.startswith("theory("):
             return self.operator
         elif self.operator == "reference":
             assert(len(self.parents)==1)
@@ -205,7 +205,7 @@ class Derivation(object):
         """
         if self.operator.startswith("file("):
             return []
-        elif self.operator.startswith("introduced("):
+        elif self.operator.startswith("theory("):
             return []
         elif self.operator == "reference":
             assert(len(self.parents)==1)
@@ -262,7 +262,7 @@ class TestDerivations(unittest.TestCase):
         o5 = Derivable()
         o6 = Derivable()
         o7 = Derivable()
-        o1.setDerivation(Derivation("introduced(tautology, theory(equality))"))
+        o1.setDerivation(Derivation("theory(equality)"))
         print(repr(o1.derivation))
         o2.setDerivation(Derivation("file('fake', fake')"))
         o3.setDerivation(flatDerivation("factor", [o1]))
@@ -286,7 +286,7 @@ class TestDerivations(unittest.TestCase):
         o2 = Derivable()
         o3 = Derivable()
         o4 = Derivable()
-        o1.setDerivation(Derivation("introduced(tautology, theory(equality))"))
+        o1.setDerivation(Derivation("theory(equality)"))
         o2.setDerivation(Derivation("input"))
         o3.setDerivation(flatDerivation("resolution", [o1, o2]))
         enableDerivationOutput()
