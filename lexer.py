@@ -347,6 +347,7 @@ class TestLexer(unittest.TestCase):
         """
         err = ScannerError()
         self.assertEqual(repr(err), "ScannerError('<none>')")
+        self.assertEqual(repr(err), err.__str__())
 
     def testLex(self):
         """
@@ -354,6 +355,8 @@ class TestLexer(unittest.TestCase):
         """
         lex1=Lexer(self.example1)
         lex2=Lexer(self.example2)
+        tok1 = lex1.Look()
+        print(tok1, tok1.linepos())
         res1 = [(i.type, i.literal) for i in lex1.Lex()]
         res2 = [(i.type, i.literal) for i in lex2.Lex()]
         self.assertEqual(res1, res2)

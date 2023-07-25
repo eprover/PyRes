@@ -63,7 +63,7 @@ def tptpLexer(source, refdir):
         lex = Lexer(fp.read(), name)
         fp.close()
         refdir = os.path.dirname(name)
-    except IOError:
+    except IOError: # pragma: nocover
         tptp = os.getenv("TPTP")
         if tptp:
             name = os.path.join(tptp, source)
@@ -196,7 +196,7 @@ class TestFormulas(unittest.TestCase):
         self.seed = """
         cnf(agatha,plain,lives(agatha)).
         cnf(butler,plain,lives(butler)).
-        cnf(charles,plain,lives(charles)).
+        cnf(charles,negated_conjecture,lives(charles)).
         include('includetest.txt').
         """
         inctext = """
