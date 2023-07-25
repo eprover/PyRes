@@ -264,7 +264,7 @@ class TestDerivations(unittest.TestCase):
         o7 = Derivable()
         o1.setDerivation(Derivation("introduced(tautology, theory(equality))"))
         print(repr(o1.derivation))
-        o2.setDerivation(Derivation("input"))
+        o2.setDerivation(Derivation("file('fake', fake')"))
         o3.setDerivation(flatDerivation("factor", [o1]))
         o4.setDerivation(flatDerivation("factor", [o3]))
         o5.setDerivation(flatDerivation("resolution", [o1,o2]))

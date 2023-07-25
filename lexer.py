@@ -336,7 +336,7 @@ class TestLexer(unittest.TestCase):
     def setUp(self):
         print()
         self.example1 = "f(X,g(a,b))"
-        self.example2 = "# Comment\nf(X,g(a,b))"
+        self.example2 = "% Comment\nf(X,g(a,b))"
         self.example3 = "cnf(test,axiom,p(a)|p(f(X)))."
         self.example4 = "^"
         self.example5 = "fof(test,axiom,![X,Y]:?[Z]:~p(X,Y,Z))."
@@ -414,7 +414,7 @@ class TestLexer(unittest.TestCase):
         lex.AcceptLit("(")
         lex.AcceptLit("f")
         lex.AcceptLit("(")
-        # That should be enoug ;-)
+        # That should be enough ;-)
 
     def testErrors(self):
         """
