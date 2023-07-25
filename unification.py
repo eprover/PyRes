@@ -215,7 +215,7 @@ def mgu(t1, t2):
     res2 = "False"
     if res:
        res2 = "True"
-    # print("# :", term2String(t1), " : ", term2String(t2), " => ", res2);
+    # print("% :", term2String(t1), " : ", term2String(t2), " => ", res2);
     return res
 
 

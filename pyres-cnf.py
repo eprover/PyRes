@@ -133,11 +133,11 @@ if __name__ == '__main__':
 
     print(state.statisticsStr())
     if res != None:
-        print("# SZS status Unsatisfiable")
+        print("% SZS status Unsatisfiable")
         proof = res.orderedDerivation()
         enableDerivationOutput()
         for s in proof:
             print(s)
         disableDerivationOutput()
     else:
-        print("# SZS status Satisfiable")
+        print("% SZS status Satisfiable")

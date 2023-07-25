@@ -86,6 +86,6 @@ if __name__ == '__main__':
     res = state.saturate()
 
     if res != None:
-        print("# SZS status Unsatisfiable")
+        print("% SZS status Unsatisfiable")
     else:
-        print("# SZS status Satisfiable")
+        print("% SZS status Satisfiable")

@@ -124,7 +124,7 @@ def processOptions(opts):
         elif opt=="-s" or opt == "--silent":
             silent = True
         elif opt=="-V" or opt == "--version":
-            print("# Version: ", version)
+            print("% Version: ", version)
         elif opt=="-p" or opt == "--proof":
             proofObject = True
         elif opt=="-i" or opt == "--index":
@@ -161,8 +161,8 @@ def timeoutHandler(sign, frame):
     expect this signal from the benchmark environment (typically
     StarExec).
     """
-    print("# Failure: Resource limit exceeded (time)")
-    print("# SZS status ResourceOut")
+    print("% Failure: Resource limit exceeded (time)")
+    print("% SZS status ResourceOut")
     sys.exit(0)
 
 
@@ -217,39 +217,40 @@ if __name__ == '__main__':
 
     if res != None:
         if problem.isFof and problem.hasConj:
-            print("# SZS status Theorem")
+            print("% SZS status Theorem")
         else:
-            print("# SZS status Unsatisfiable")
+            print("% SZS status Unsatisfiable")
         if proofObject:
             proof = res.orderedDerivation()
             enableDerivationOutput()
-            print("# SZS output start CNFRefutation")
+            print("% SZS output start CNFRefutation")
             for s in proof:
                 print(s)
-            print("# SZS output end CNFRefutation")
+            print("% SZS output end CNFRefutation")
             disableDerivationOutput()
     else:
         if problem.isFof and problem.hasConj:
-            print("# SZS status CounterSatisfiable")
+            print("% SZS status CounterSatisfiable")
         else:
-            print("# SZS status Satisfiable")
+            print("% SZS status Satisfiable")
         if proofObject:
             dummy = Derivable("dummy",
                               flatDerivation("pseudoreference",
                                              state.processed.clauses))
             sat = dummy.orderedDerivation()
             enableDerivationOutput()
-            print("# SZS output start Saturation")
+            print("% SZS output start Saturation")
             for s in sat[:-1]:
                 print(s)
-            print("# SZS output end Saturation")
+            print("% SZS output end Saturation")
             disableDerivationOutput()
     print(state.statisticsStr())
 
     # We use the resources interface to get and print the CPU time
     resources = getrusage(RUSAGE_SELF)
-    print("# -------- CPU Time ---------")
-    print("# User time          : %.3f s"%(resources.ru_utime,))
-    print("# System time        : %.3f s"%(resources.ru_stime,))
-    print("# Total time         : %.3f s"%(resources.ru_utime+
-                                           resources.ru_stime,))
+    print("% -------- CPU Time ---------")
+    print("%% User time          : %.3f s"%(resources.ru_utime,))
+    print("%% System time        : %.3f s"%(resources.ru_stime,))
+    print("%% Total time         : %.3f s"%(resources.ru_utime+
+                                            resources.ru_stime,))
+    

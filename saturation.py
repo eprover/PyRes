@@ -141,7 +141,7 @@ class ProofState(object):
         given_clause = self.unprocessed.extractBest()
         given_clause = given_clause.freshVarCopy()
         if not self.silent:
-            print("#")
+            print("%")
         if given_clause.isEmpty():
             # We have found an explicit contradiction
             return given_clause
@@ -175,7 +175,7 @@ class ProofState(object):
         if(self.params.literal_selection):
             given_clause.selectInferenceLits(self.params.literal_selection)
         if not self.silent:
-            print("#", given_clause)
+            print("%", given_clause)
         new = []
         factors    = computeAllFactors(given_clause)
         new.extend(factors)
@@ -210,13 +210,13 @@ class ProofState(object):
         output.
         """
         return """
-# Initial clauses    : %d
-# Processed clauses  : %d
-# Factors computed   : %d
-# Resolvents computed: %d
-# Tautologies deleted: %d
-# Forward subsumed   : %d
-# Backward subsumed  : %d""" \
+%% Initial clauses    : %d
+%% Processed clauses  : %d
+%% Factors computed   : %d
+%% Resolvents computed: %d
+%% Tautologies deleted: %d
+%% Forward subsumed   : %d
+%% Backward subsumed  : %d""" \
     %(self.initial_clause_count,
       self.proc_clause_count,
       self.factor_count,
@@ -350,15 +350,15 @@ cnf(not_p, axiom, ~p(a)).
         if provable:
             self.assertNotEqual(res, None)
             if res == None: # pragma: nocover
-                print("# Bug: Should have found a proof!")
+                print("% Bug: Should have found a proof!")
             else:
-                print("# Proof found")
+                print("% Proof found")
         else:
             self.assertEqual(res, None)
             if res != None: # pragma: nocover
-                print("# Bug: Should not have  found a proof!")
+                print("% Bug: Should not have found a proof!")
             else:
-                print("# No proof found")
+                print("% No proof found")
 
         print(prover.statisticsStr())
 

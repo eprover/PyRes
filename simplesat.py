@@ -70,7 +70,7 @@ class SimpleProofState(object):
         """
         given_clause = self.unprocessed.extractFirst()
         given_clause = given_clause.freshVarCopy()
-        print("#", given_clause)
+        print("%", given_clause)
         if given_clause.isEmpty():
             # We have found an explicit contradiction
             return given_clause
@@ -143,15 +143,15 @@ cnf(not_p, axiom, p(b)).
         if provable:
             self.assertNotEqual(res, None)
             if res == None: # pragma: nocover
-                print("# Bug: Should have found a proof!")
+                print("% Bug: Should have found a proof!")
             else:
-                print("# Proof found")
+                print("% Proof found")
         else:
             self.assertEqual(res, None)
             if res != None: # pragma: nocover
-                print("# Bug: Should not have  found a proof!")
+                print("% Bug: Should not have  found a proof!")
             else:
-                print("# No proof found")
+                print("% No proof found")
                 
         
     def testSaturation(self):
