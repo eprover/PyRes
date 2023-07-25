@@ -641,6 +641,10 @@ def formulaCNFSplit(f):
     """
     Given a formula in CNF, convert it to a set of clauses.
     """
+    ftype = "plain"
+    if(f.type in ["conjecture", "negated_conjecture"]):
+        ftype = f.type
+
     matrix = f.formula.getMatrix()
 
     res = []
@@ -648,7 +652,7 @@ def formulaCNFSplit(f):
 
     for c in conjuncts:
         litlist = [l.child1 for l in c.disj2List()]
-        clause = Clause(litlist, f.type)
+        clause = Clause(litlist, ftype)
         res.append(clause)
 
     return res
