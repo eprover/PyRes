@@ -71,12 +71,12 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Token,Lexer
-from derivations import Derivable,Derivation
-from signature import Signature
-from terms import *
-from literals import Literal
-from clauses import Clause,parseClause
+from .lexer import Token,Lexer
+from .derivations import Derivable,Derivation
+from .signature import Signature
+from .terms import *
+from .literals import Literal
+from .clauses import Clause,parseClause
 
 
 def generateEquivAxioms():

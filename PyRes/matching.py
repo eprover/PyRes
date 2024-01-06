@@ -72,8 +72,8 @@ Germany
 Email: schulz@eprover.org
 """
 
-from terms import *
-from substitutions import *
+from .terms import *
+from .substitutions import *
 
 
    

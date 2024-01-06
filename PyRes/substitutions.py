@@ -48,7 +48,7 @@ Germany
 Email: schulz@eprover.org
 """
 
-import terms
+from . import terms
 import unittest
 
 

@@ -47,10 +47,10 @@ Email: schulz@eprover.org
 
 import sys
 import getopt
-from version import version
-from lexer import Token,Lexer
-from clausesets import ClauseSet
-from simplesat import SimpleProofState
+from .version import version
+from .lexer import Token,Lexer
+from .clausesets import ClauseSet
+from .simplesat import SimpleProofState
 
 
 def processOptions(opts):

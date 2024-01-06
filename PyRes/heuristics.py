@@ -43,8 +43,8 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Lexer
-import clauses
+from .lexer import Lexer
+from . import clauses
 
 
 class ClauseEvaluationFunction(object):

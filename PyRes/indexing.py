@@ -72,10 +72,10 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Token,Lexer
-from terms import termFunc
-from literals import Literal
-import clauses
+from .lexer import Token,Lexer
+from .terms import termFunc
+from .literals import Literal
+from . import clauses
 
 
 class ResolutionIndex(object):

@@ -69,13 +69,13 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Token,Lexer
-from derivations import Derivable,Derivation,flatDerivation,enableDerivationOutput,toggleDerivationOutput
-from terms import *
-from substitutions import Substitution, freshVar
-from literals import Literal
-from clauses import Clause
-from formulas import Formula, WFormula, parseWFormula, parseFormula
+from .lexer import Token,Lexer
+from .derivations import Derivable,Derivation,flatDerivation,enableDerivationOutput,toggleDerivationOutput
+from .terms import *
+from .substitutions import Substitution, freshVar
+from .literals import Literal
+from .clauses import Clause
+from .formulas import Formula, WFormula, parseWFormula, parseFormula
 
 
 class SkolemSymbols(object):

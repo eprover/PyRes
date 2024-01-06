@@ -71,12 +71,12 @@ Email: schulz@eprover.org
 
 import unittest
 from collections import deque
-from lexer import Token,Lexer
-from derivations import Derivable,Derivation,flatDerivation,toggleDerivationOutput
-from signature import Signature
-from terms import *
-import substitutions
-from literals import Literal, parseLiteral, parseLiteralList,\
+from .lexer import Token,Lexer
+from .derivations import Derivable,Derivation,flatDerivation,toggleDerivationOutput
+from .signature import Signature
+from .terms import *
+from . import substitutions
+from .literals import Literal, parseLiteral, parseLiteralList,\
      literalList2String, litInLitList, oppositeInLitList
 
 
