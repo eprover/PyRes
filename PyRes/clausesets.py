@@ -34,12 +34,12 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Lexer
-from signature import Signature
-from literals import parseLiteral
-from clauses import Clause, parseClause
-from heuristics import PickGiven2
-from indexing import ResolutionIndex, SubsumptionIndex
+from .lexer import Lexer
+from .signature import Signature
+from .literals import parseLiteral
+from .clauses import Clause, parseClause
+from .heuristics import PickGiven2
+from .indexing import ResolutionIndex, SubsumptionIndex
 
 class ClauseSet(object):
     """

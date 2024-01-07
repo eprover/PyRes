@@ -70,11 +70,11 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Token,Lexer
-from signature import Signature
-from terms import *
-from substitutions import BTSubst
-from matching import match
+from .lexer import Token,Lexer
+from .signature import Signature
+from .terms import *
+from .substitutions import BTSubst
+from .matching import match
 
 
 

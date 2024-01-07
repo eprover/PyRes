@@ -38,13 +38,13 @@ import errno
 import os
 import os.path
 
-from lexer import Lexer, Token
-from signature import Signature
-from clauses import Clause, parseClause
-from clausesets import ClauseSet
-from formulas import WFormula, parseWFormula, negateConjecture
-from formulacnf import wFormulaClausify
-from eqaxioms import generateEquivAxioms, generateCompatAxioms
+from .lexer import Lexer, Token
+from .signature import Signature
+from .clauses import Clause, parseClause
+from .clausesets import ClauseSet
+from .formulas import WFormula, parseWFormula, negateConjecture
+from .formulacnf import wFormulaClausify
+from .eqaxioms import generateEquivAxioms, generateCompatAxioms
 
 def tptpLexer(source, refdir):
     """

@@ -34,10 +34,10 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Token,Lexer
-from resolution import resolution, factor
-from clauses import parseClause
-from clausesets import ClauseSet
+from .lexer import Token,Lexer
+from .resolution import resolution, factor
+from .clauses import parseClause
+from .clausesets import ClauseSet
 
 
 def computeAllResolvents(clause, clauseset):

@@ -44,13 +44,13 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from idents import Ident
-from lexer import Token,Lexer
-from clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
-import heuristics
-from litselection import largestLit
-from rescontrol import computeAllResolvents, computeAllFactors
-from subsumption import forwardSubsumption, backwardSubsumption
+from .idents import Ident
+from .lexer import Token,Lexer
+from .clausesets import ClauseSet, HeuristicClauseSet, IndexedClauseSet
+from . import heuristics
+from .litselection import largestLit
+from .rescontrol import computeAllResolvents, computeAllFactors
+from .subsumption import forwardSubsumption, backwardSubsumption
 
 
 class SearchParams(object):

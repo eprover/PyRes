@@ -36,7 +36,7 @@ Email: schulz@eprover.org
 import unittest
 import string
 import re
-from idents import Ident
+from .idents import Ident
 
 class ScannerError(Exception):
     """

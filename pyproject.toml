@@ -1,0 +1,9 @@
+[project]
+name = "PyRes"
+version = "1.0"
+authors = [{name = "Stephan Schulz", email = "schulz@eprover.org"}]
+description = "Pedagogical first-order prover in Python"
+license = {"file" = "COPYING"}
+
+[tool.setuptools]
+packages = ["PyRes"]

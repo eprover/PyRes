@@ -46,12 +46,12 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Lexer
-from substitutions import BTSubst
-from matching import match
-from literals import Literal
-from clauses import Clause, parseClause
-from clausesets import ClauseSet
+from .lexer import Lexer
+from .substitutions import BTSubst
+from .matching import match
+from .literals import Literal
+from .clauses import Clause, parseClause
+from .clausesets import ClauseSet
 
 def subsumeLitLists(subsumer, subsumed, subst):
     """

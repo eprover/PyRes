@@ -59,8 +59,8 @@ Email: schulz@eprover.org
 """
 
 import unittest
-from lexer import Token,Lexer
-from literals import Literal, parseLiteral, parseLiteralList,\
+from .lexer import Token,Lexer
+from .literals import Literal, parseLiteral, parseLiteralList,\
      literalList2String
 
 
