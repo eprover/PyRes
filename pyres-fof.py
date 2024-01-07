@@ -93,15 +93,15 @@ from resource import RLIMIT_STACK, setrlimit, getrlimit
 import getopt
 from signal import  signal, SIGXCPU
 from resource import getrusage, RUSAGE_SELF
-from .version import version
-from .lexer import Token,Lexer
-from .derivations import enableDerivationOutput,disableDerivationOutput,Derivable,flatDerivation
-from .clausesets import ClauseSet
-from .clauses import firstLit, varSizeLit, eqResVarSizeLit
-from .fofspec import FOFSpec
-from .heuristics import GivenClauseHeuristics
-from .saturation import SearchParams,ProofState
-from .litselection import LiteralSelectors
+from PyRes.version import version
+from PyRes.lexer import Token,Lexer
+from PyRes.derivations import enableDerivationOutput,disableDerivationOutput,Derivable,flatDerivation
+from PyRes.clausesets import ClauseSet
+from PyRes.clauses import firstLit, varSizeLit, eqResVarSizeLit
+from PyRes.fofspec import FOFSpec
+from PyRes.heuristics import GivenClauseHeuristics
+from PyRes.saturation import SearchParams,ProofState
+from PyRes.litselection import LiteralSelectors
 
 
 suppressEqAxioms = False

@@ -63,13 +63,13 @@ Email: schulz@eprover.org
 
 import sys
 import getopt
-from .version import version
-from .lexer import Token,Lexer
-from .derivations import enableDerivationOutput,disableDerivationOutput
-from .clausesets import ClauseSet
-from .heuristics import GivenClauseHeuristics
-from .saturation import SearchParams,ProofState
-from .litselection import LiteralSelectors
+from PyRes.version import version
+from PyRes.lexer import Token,Lexer
+from PyRes.derivations import enableDerivationOutput,disableDerivationOutput
+from PyRes.clausesets import ClauseSet
+from PyRes.heuristics import GivenClauseHeuristics
+from PyRes.saturation import SearchParams,ProofState
+from PyRes.litselection import LiteralSelectors
 
 
 def processOptions(opts):
