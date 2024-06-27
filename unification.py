@@ -196,7 +196,7 @@ def mguTermList(l1, l2, subst):
           # Try to apply "Decompose"
           # For f(s1, ..., sn) = g(t1, ..., tn), first f and g have to
           # be equal...
-          if termFunc(t1) != termFunc(t2):
+          if terms.termFunc(t1) != terms.termFunc(t2):
              # Nope, "Structural fail":
              return None
           # But if the symbols are equal, here is the decomposition:

@@ -121,7 +121,7 @@ class Substitution(object):
         if terms.termIsVar(term):
             return self.value(term)
         else:
-            res  = [term[0]]
+            res  = [terms.termFunc(term)]
             args = [self.apply(x) for x in terms.termArgs(term)]
             res.extend(args)
             return res
