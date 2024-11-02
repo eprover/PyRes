@@ -102,7 +102,7 @@ from fofspec import FOFSpec
 from heuristics import GivenClauseHeuristics
 from saturation import SearchParams,ProofState
 from litselection import LiteralSelectors
-
+from alternatingpath import RelevanceGraph
 
 suppressEqAxioms = False
 silent           = False
@@ -212,7 +212,11 @@ if __name__ == '__main__':
         problem.addEqAxioms()
     cnf = problem.clausify()
 
+    relevanceGraph = RelevanceGraph(cnf)
+    print(relevanceGraph.toMermaid())
+
     state = ProofState(params, cnf, silent, indexed)
+
     res = state.saturate()
 
     if res != None:
@@ -253,4 +257,4 @@ if __name__ == '__main__':
     print("%% System time        : %.3f s"%(resources.ru_stime,))
     print("%% Total time         : %.3f s"%(resources.ru_utime+
                                             resources.ru_stime,))
-    
+
