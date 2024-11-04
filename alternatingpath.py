@@ -7,11 +7,11 @@ from collections import defaultdict
 
 class Node():
     def __init__(self, literal: Literal, clause: Clause, direction) -> None:
-        self.literal = literal
-        self.clause = clause
+        self.literal: Literal = literal
+        self.clause: Clause = clause
         self.direction = direction
-    def getIdentifier(self):
-        output = f"{self.literal}{self.clause.name}{self.direction}"
+    def getIdentifier(self) -> str:
+        output: str = f"{self.literal}{self.clause.name}{self.direction}"
         replacementDict = {
             ",": "Comma",
             "~": "Not",
@@ -26,34 +26,34 @@ class Node():
         return output
 
 class Edge():
-    def __init__(self, node1, node2) -> None:
-        self.node1 = node1
-        self.node2 = node2
+    def __init__(self, node1: Node, node2: Node) -> None:
+        self.node1: Node = node1
+        self.node2: Node = node2
 
 class RelevanceGraph():
-    def __init__(self, clauseSet) -> None:
+    def __init__(self, clauseSet: ClauseSet) -> None:
         self.outNodes, self.inNodes = self.constructNodes(clauseSet)
         self.edges = self.constructInClauseEdges().union(self.constructBetweenClauseEdges())
 
-    def constructNodes(self, clauseSet: ClauseSet):
-        outNodes = set()
-        inNodes = set()
+    def constructNodes(self, clauseSet: ClauseSet) -> tuple[set[Node]]:
+        outNodes = set[Node]()
+        inNodes = set[Node]()
         for clause in clauseSet.clauses:
             for literal in clause.literals:
                 outNodes.add(Node(literal, clause, "out"))
                 inNodes.add(Node(literal, clause, "in"))
         return outNodes, inNodes
 
-    def constructInClauseEdges(self):
-        inClauseEdges = set()
+    def constructInClauseEdges(self) -> set[Edge]:
+        inClauseEdges = set[Edge]()
         for inNode in self.inNodes:
             for outNode in self.outNodes:
                 if (inNode.clause == outNode.clause and inNode.literal != outNode.literal):
                     inClauseEdges.add(Edge(inNode, outNode))
         return inClauseEdges
 
-    def constructBetweenClauseEdges(self):
-        betweenClauseEdges = set()
+    def constructBetweenClauseEdges(self) -> set[Edge]:
+        betweenClauseEdges = set[Edge]()
         for outNode in self.outNodes:
             for inNode in self.inNodes:
                 mguExists = mgu(outNode.literal.atom, inNode.literal.atom)!=None
@@ -62,22 +62,22 @@ class RelevanceGraph():
                     betweenClauseEdges.add(Edge(outNode, inNode))
         return betweenClauseEdges
 
-    def getClauses(self):
-        clauses = set()
+    def getClauses(self) -> set[Clause]:
+        clauses = set[Clause]()
         for node in self.getAllNodes():
             clauses.add(node.clause)
         return clauses
 
-    def getAllNodes(self):
+    def getAllNodes(self) -> set[Node]:
         return self.outNodes.union(self.inNodes)
 
     def toMermaid(self) -> str:
-        output = "flowchart TD"
+        output: str = "flowchart TD"
 
         nodeGroups = defaultdict(list)
         for node in list(self.getAllNodes()):
             nodeGroups[node.clause].append(node)
-        nodeGroups = list(nodeGroups.values())
+        nodeGroups: list = list(nodeGroups.values())
         for nodeGroup in nodeGroups:
             nodeGroup = list(nodeGroup)
             groupOutput = f'\n\tsubgraph {nodeGroup[0].clause.name}'
