@@ -63,7 +63,8 @@ class SearchParams(object):
                  delete_tautologies   = False,
                  forward_subsumption  = False,
                  backward_subsumption = False,
-                 literal_selection    = None):
+                 literal_selection    = None,
+                 relevance_distance = None):
         """
         Initialize heuristic parameters.
         """
@@ -95,6 +96,8 @@ class SearchParams(object):
         literals from a set of negative literals (both represented as
         lists, not Python sets) as the inference literal.
         """
+        self.relevance_distance = relevance_distance
+        # TODO: add doc
 
 
 

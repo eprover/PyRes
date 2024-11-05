@@ -115,7 +115,7 @@ class ClauseSet(object):
         """
         Return a subset (as a list) of the set containing at least all
         clauses potentially subsuming queryclause. For a plain
-        ClauseSet, we just return all clauses in the set. 
+        ClauseSet, we just return all clauses in the set.
         """
         return self.clauses
 
@@ -126,7 +126,9 @@ class ClauseSet(object):
         ClauseSet, we just return all clauses in the set.
         """
         return self.clauses
-        
+    def getNegatedConjectures(self):
+        return ClauseSet(list(filter(lambda clause: clause.type=="negated_conjecture", self.clauses)))
+
 
     def parse(self, lexer):
         """
@@ -200,7 +202,7 @@ class IndexedClauseSet(ClauseSet):
     """
     def __init__(self, clauses = []):
         """
-        Create the two indices and call the superclass initializer. 
+        Create the two indices and call the superclass initializer.
         """
         self.res_index = ResolutionIndex()
         self.sub_index = SubsumptionIndex()
@@ -226,19 +228,19 @@ class IndexedClauseSet(ClauseSet):
 
     def getResolutionLiterals(self, lit):
         """
-        Overwrite the original function with one based on indexing. 
+        Overwrite the original function with one based on indexing.
         """
         return self.res_index.getResolutionLiterals(lit)
 
     def getSubsumingCandidates(self, queryclause):
         """
-        Overwrite the original function with one based on indexing. 
+        Overwrite the original function with one based on indexing.
         """
         return self.sub_index.getSubsumingCandidates(queryclause)
 
     def getSubsumedCandidates(self, queryclause):
         """
-        Overwrite the original function with one based on indexing. 
+        Overwrite the original function with one based on indexing.
         """
         return self.sub_index.getSubsumedCandidates(queryclause)
 

@@ -135,6 +135,8 @@ def processOptions(opts):
             params.forward_subsumption = True
         elif opt=="-b" or opt == "--backward-subsumption":
             params.backward_subsumption = True
+        elif opt=="-r" or opt == "--relevance-distance":
+            params.relevance_distance = int(optarg)
         elif opt=="-H" or opt == "--given-clause-heuristic":
             try:
                 params.heuristics = GivenClauseHeuristics[optarg]
@@ -186,7 +188,7 @@ if __name__ == '__main__':
 
     try:
         opts, args = getopt.gnu_getopt(sys.argv[1:],
-                                       "hsVpitfbH:n:S",
+                                       "hsVpitfbH:n:Sr:",
                                        ["help",
                                         "silent",
                                         "version",
@@ -194,10 +196,11 @@ if __name__ == '__main__':
                                         "index",
                                         "delete-tautologies",
                                         "forward-subsumption",
-                                        "backward-subsumption"
+                                        "backward-subsumption",
                                         "given-clause-heuristic=",
-                                        "neg-lit-selection="
-                                        "supress-eq-axioms"])
+                                        "neg-lit-selection=",
+                                        "supress-eq-axioms",
+                                        "relevance-distance="])
     except getopt.GetoptError as err:
         print(sys.argv[0],":", err)
         sys.exit(1)
@@ -212,14 +215,10 @@ if __name__ == '__main__':
         problem.addEqAxioms()
     cnf = problem.clausify()
 
-    subset = ClauseSet([cnf.clauses[0]])
-    relevanceGraph = RelevanceGraph(cnf)
-    graph = relevanceGraph.toMermaid()
-    relevanceNeighbourhood = relevanceGraph.getRelevantNeighbourhood(subset, 1)
-    print(f"Starting point: {[cnf.clauses[0]]}")
-    print(relevanceNeighbourhood)
-    print(graph)
-    exit()
+    if params.relevance_distance!=None:
+        axioms = cnf.getNegatedConjectures()
+        relevanceGraph = RelevanceGraph(cnf)
+        cnf = relevanceGraph.getRelevantNeighbourhood(axioms, params.relevance_distance)
 
     state = ProofState(params, cnf, silent, indexed)
 
