@@ -212,8 +212,14 @@ if __name__ == '__main__':
         problem.addEqAxioms()
     cnf = problem.clausify()
 
+    subset = ClauseSet([cnf.clauses[0]])
     relevanceGraph = RelevanceGraph(cnf)
-    print(relevanceGraph.toMermaid())
+    graph = relevanceGraph.toMermaid()
+    relevanceNeighbourhood = relevanceGraph.getRelevantNeighbourhood(subset, 1)
+    print(f"Starting point: {[cnf.clauses[0]]}")
+    print(relevanceNeighbourhood)
+    print(graph)
+    exit()
 
     state = ProofState(params, cnf, silent, indexed)
 
