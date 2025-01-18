@@ -175,8 +175,7 @@ def timeoutHandler(sign, frame):
     print("% SZS status ResourceOut")
     sys.exit(0)
 
-
-if __name__ == "__main__":
+def main(from_notebook = False, notebook_opts = [], notebook_args = []):
     # We try to increase stack space, since we use a lot of
     # recursion. This works differentially well on different OSes, so
     # it is a bit more complex than I would hope for.
@@ -193,34 +192,33 @@ if __name__ == "__main__":
 
     signal(SIGXCPU, timeoutHandler)
     sys.setrecursionlimit(10000)
-
-    try:
-        opts, args = getopt.gnu_getopt(
-            sys.argv[1:],
-            "hsVpitfbH:n:Sr:",
-            [
-                "help",
-                "silent",
-                "version",
-                "proof",
-                "index",
-                "delete-tautologies",
-                "forward-subsumption",
-                "backward-subsumption",
-                "given-clause-heuristic=",
-                "neg-lit-selection=",
-                "supress-eq-axioms",
-                "relevance-distance=",
-            ],
-        )
-    except getopt.GetoptError as err:
-        print(sys.argv[0], ":", err)
-        sys.exit(1)
-
-    params = processOptions(opts)
+    if not from_notebook:
+        try:
+            opts, args = getopt.gnu_getopt(
+                sys.argv[1:],
+                "hsVpitfbH:n:Sr:",
+                [
+                    "help",
+                    "silent",
+                    "version",
+                    "proof",
+                    "index",
+                    "delete-tautologies",
+                    "forward-subsumption",
+                    "backward-subsumption",
+                    "given-clause-heuristic=",
+                    "neg-lit-selection=",
+                    "supress-eq-axioms",
+                    "relevance-distance=",
+                ],
+            )
+        except getopt.GetoptError as err:
+            print(sys.argv[0], ":", err)
+            sys.exit(1)
+    params = processOptions(notebook_opts if from_notebook else opts)
 
     problem = FOFSpec()
-    for file in args:
+    for file in notebook_args if from_notebook else args:
         problem.parse(file)
 
     if not suppressEqAxioms:
@@ -240,8 +238,6 @@ if __name__ == "__main__":
         silent,
         indexed,
     )
-    print(f"distance: {params.relevance_distance}")
-    print(f"relevant_cnf: {rel_cnf}")
 
     res = state.saturate()
     # todo: test alternate path findings properly into statistics and output
@@ -284,3 +280,7 @@ if __name__ == "__main__":
     print("%% User time          : %.3f s" % (resources.ru_utime,))
     print("%% System time        : %.3f s" % (resources.ru_stime,))
     print("%% Total time         : %.3f s" % (resources.ru_utime + resources.ru_stime,))
+
+
+if __name__ == "__main__":
+    main()
