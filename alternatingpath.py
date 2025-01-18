@@ -82,17 +82,18 @@ class RelevanceGraph:
 
     @staticmethod
     def edge_neighb_of_subset(edge: Edge, subset: list[Node]) -> bool:
-        return edge.node1 in subset != edge.node2 in subset
+        return (edge.node1 in subset) != (edge.node2 in subset)
 
     def get_neighbours(self, subset: list[Node]) -> list[Node]:
         neighbouring_nodes: list[Node] = []
         neighbouring_edges: list[Edge] = filter(
-            lambda edge: self.edge_neighb_of_subset(edge, subset), self.edges
+            lambda edge: self.edge_neighb_of_subset(edge, subset),
+            self.edges
         )
 
         for edge in neighbouring_edges:
             if edge.node1.clause in subset:
-                neighbouring_nodes.append(edge.node2)
+                neighbouring_nodes.append(object=edge.node2)
             else:
                 neighbouring_nodes.append(edge.node1)
         return neighbouring_nodes
