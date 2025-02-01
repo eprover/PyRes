@@ -28,7 +28,8 @@ class RelevanceGraph:
     def __init__(self, clause_set: ClauseSet) -> None:
         self.out_nodes, self.in_nodes = self.construct_nodes(clause_set)
         self.edges: set[Edge] = (
-            self.construct_inclause_edges() | self.construct_betweenclause_edges()
+            self.construct_inclause_edges()
+            | self.construct_betweenclause_edges()
         )
 
     @staticmethod
@@ -49,17 +50,24 @@ class RelevanceGraph:
                     in_node.clause == out_node.clause
                     and in_node.literal != out_node.literal
                 ):
-                    in_clause_edges.add(Edge(in_node, out_node))
+                    in_clause_edges.add(
+                        Edge(in_node, out_node))
         return in_clause_edges
 
     def construct_betweenclause_edges(self) -> set[Edge]:
         between_clause_edges = set[Edge]()
         for out_node in self.out_nodes:
             for in_node in self.in_nodes:
-                different_signs = out_node.literal.negative != in_node.literal.negative
-                mguExists = mgu(out_node.literal.atom, in_node.literal.atom) != None
+                different_signs = (
+                    out_node.literal.negative
+                    != in_node.literal.negative
+                )
+                mguExists = mgu(
+                    out_node.literal.atom,
+                    in_node.literal.atom) != None
                 if mguExists and different_signs:
-                    between_clause_edges.add(Edge(out_node, in_node))
+                    between_clause_edges.add(
+                        Edge(out_node, in_node))
         return between_clause_edges
 
     def get_all_nodes(self) -> set[Node]:
@@ -100,7 +108,8 @@ class RelevanceGraph:
 
     def get_rel_neighbourhood(self, from_clauses: ClauseSet, distance: int) -> ClauseSet:
 
-        neighbourhood: list[Node] = list(self.clauses_to_nodes(from_clauses))
+        neighbourhood: list[Node] = list(
+            self.clauses_to_nodes(from_clauses))
         for _ in range(2 * distance - 1):
             new_neighbours = self.get_neighbours(neighbourhood)
             neighbourhood += new_neighbours
