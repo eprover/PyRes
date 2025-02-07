@@ -117,6 +117,9 @@ class RelevanceGraph:
         clauses = self.nodes_to_clauses(neighbourhood)
         return clauses
 
+    # def to_graphviz(self):
+    #     import graphviz
+
     def to_mermaid(self) -> str:
         output: str = "flowchart TD"
 
