@@ -23,7 +23,7 @@ term t, find all terms s for which a substitution sigma exists such
 that s=sigma(t), and unifiability (find all terms with a sigma such
 that sigma(s)=sigma(t).
 
-Clause indexed directly index clauses, typically by abstracting a
+Clause indexes directly index clauses, typically by abstracting a
 clause into some kind of sequential vector. Typical retrieval
 relations are subsumption (both ways).
 
