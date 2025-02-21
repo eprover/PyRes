@@ -3,7 +3,7 @@ from clausesets import ClauseSet
 from literals import Literal
 from unification import mgu
 from collections import defaultdict
-
+from alternatingpath_abstract import RelevanceGraph
 
 class Node:
     def __init__(self, literal: Literal, clause: Clause, direction) -> None:
@@ -24,64 +24,57 @@ class Edge:
         return f"Edge: {self.node1} - {self.node2}"
 
 
-class RelevanceGraph:
-    def __init__(self, clause_set: ClauseSet) -> None:
+class SetRelevanceGraph(RelevanceGraph):
+
+    def construct_graph(self, clause_set: ClauseSet) -> None:
         self.out_nodes, self.in_nodes = self.construct_nodes(clause_set)
         self.edges: set[Edge] = (
-            self.construct_inclause_edges()
-            | self.construct_betweenclause_edges()
+            self.construct_inclause_edges() | self.construct_betweenclause_edges()
         )
 
     @staticmethod
-    def construct_nodes(clause_set: ClauseSet) -> tuple[set[Node]]:
-        out_nodes = set[Node]()
-        in_nodes = set[Node]()
+    def construct_nodes(clause_set: ClauseSet):
+        out_nodes = set()
+        in_nodes = set()
         for clause in clause_set.clauses:
             for literal in clause.literals:
                 out_nodes.add(Node(literal, clause, "out"))
                 in_nodes.add(Node(literal, clause, "in"))
         return out_nodes, in_nodes
 
-    def construct_inclause_edges(self) -> set[Edge]:
-        in_clause_edges = set[Edge]()
+    def construct_inclause_edges(self):
+        in_clause_edges = set()
         for in_node in self.in_nodes:
             for out_node in self.out_nodes:
                 if (
                     in_node.clause == out_node.clause
                     and in_node.literal != out_node.literal
                 ):
-                    in_clause_edges.add(
-                        Edge(in_node, out_node))
+                    in_clause_edges.add(Edge(in_node, out_node))
         return in_clause_edges
 
-    def construct_betweenclause_edges(self) -> set[Edge]:
-        between_clause_edges = set[Edge]()
+    def construct_betweenclause_edges(self):
+        between_clause_edges = set()
         for out_node in self.out_nodes:
             for in_node in self.in_nodes:
-                different_signs = (
-                    out_node.literal.negative
-                    != in_node.literal.negative
-                )
-                mguExists = mgu(
-                    out_node.literal.atom,
-                    in_node.literal.atom) != None
+                different_signs = out_node.literal.negative != in_node.literal.negative
+                mguExists = mgu(out_node.literal.atom, in_node.literal.atom) != None
                 if mguExists and different_signs:
-                    between_clause_edges.add(
-                        Edge(out_node, in_node))
+                    between_clause_edges.add(Edge(out_node, in_node))
         return between_clause_edges
 
-    def get_all_nodes(self) -> set[Node]:
+    def get_all_nodes(self):
         return self.out_nodes | self.in_nodes
 
     @staticmethod
-    def nodes_to_clauses(nodes: set[Node]) -> ClauseSet:
+    def nodes_to_clauses(nodes):
         clauses = ClauseSet()
         for node in nodes:
             clauses.addClause(node.clause)
         clauses.clauses = list(set(clauses.clauses))
         return clauses
 
-    def clauses_to_nodes(self, clauses: ClauseSet) -> set[Node]:
+    def clauses_to_nodes(self, clauses: ClauseSet):
         allNodes = self.get_all_nodes()
         nodesOfClauseSubset = filter(
             lambda node: node.clause in clauses.clauses, allNodes
@@ -89,14 +82,13 @@ class RelevanceGraph:
         return nodesOfClauseSubset
 
     @staticmethod
-    def edge_neighb_of_subset(edge: Edge, subset: list[Node]) -> bool:
+    def edge_neighb_of_subset(edge: Edge, subset):
         return (edge.node1 in subset) != (edge.node2 in subset)
 
-    def get_neighbours(self, subset: list[Node]) -> list[Node]:
-        neighbouring_nodes: list[Node] = []
-        neighbouring_edges: list[Edge] = filter(
-            lambda edge: self.edge_neighb_of_subset(edge, subset),
-            self.edges
+    def get_neighbours(self, subset):
+        neighbouring_nodes = []
+        neighbouring_edges = filter(
+            lambda edge: self.edge_neighb_of_subset(edge, subset), self.edges
         )
 
         for edge in neighbouring_edges:
@@ -106,10 +98,9 @@ class RelevanceGraph:
                 neighbouring_nodes.append(edge.node1)
         return neighbouring_nodes
 
-    def get_rel_neighbourhood(self, from_clauses: ClauseSet, distance: int) -> ClauseSet:
+    def get_rel_neighbourhood(self, from_clauses: ClauseSet, distance: int):
 
-        neighbourhood: list[Node] = list(
-            self.clauses_to_nodes(from_clauses))
+        neighbourhood = list(self.clauses_to_nodes(from_clauses))
         for _ in range(2 * distance - 1):
             new_neighbours = self.get_neighbours(neighbourhood)
             neighbourhood += new_neighbours
@@ -117,15 +108,12 @@ class RelevanceGraph:
         clauses = self.nodes_to_clauses(neighbourhood)
         return clauses
 
-    # def to_graphviz(self):
-    #     import graphviz
-
     def to_mermaid(self) -> str:
         output: str = "flowchart TD"
 
         node_groups = defaultdict(list)
 
-        nodes_list: list[Node] = list(self.get_all_nodes())
+        nodes_list = list(self.get_all_nodes())
         nodes_sorted = sorted(
             nodes_list,
             key=lambda node: (
