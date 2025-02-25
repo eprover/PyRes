@@ -4,6 +4,7 @@
 # Module pyres-fof.py
 import multiprocessing as mp
 import time
+import re
 
 """
 Usage: pyres-fof.py [options] <problem_file>
@@ -109,12 +110,18 @@ from fofspec import FOFSpec
 from heuristics import GivenClauseHeuristics
 from saturation import SearchParams, ProofState
 from litselection import LiteralSelectors
-from alternatingpath import RelevanceGraph
+from PyRes.alternatingpath_set import SetRelevanceGraph
+import re
 
 suppressEqAxioms = False
 silent = False
 indexed = False
 proofObject = False
+
+
+def is_pyres_solvable(problem_path: str):
+    file_name = problem_path[problem_path.index("/") + 1 :]
+    return bool(re.search("\\+|\\-", file_name))
 
 
 def processOptions(opts):
@@ -178,19 +185,38 @@ def timeoutHandler(sign, frame):
     sys.exit(0)
 
 
+def get_szs_status(problem, params, rel_cnf, cnf, state, res) -> str:
+    status = ""
+    if res != None:
+        if problem.isFof and problem.hasConj:
+            status = "SZS status Theorem"
+        else:
+            status = "SZS status Unsatisfiable"
+    else:
+        if params.perform_rel_filter and len(rel_cnf) != len(cnf):
+            status = "SZS status GaveUp"
+        elif problem.isFof and problem.hasConj:
+            status = "SZS status CounterSatisfiable"
+        else:
+            status = "SZS status Satisfiable"
+    return status
+
+
 def try_rel_distance(
     d: int,
     cnf,
+    problem,
     params,
     return_dict: dict,
 ):
-    p_name = mp.current_process().name
-    print(f"Starting {p_name}")
+    p = mp.current_process()
+    return_dict[p.name] = (d, None, None)
     params.relevance_distance = d
     rel_cnf: ClauseSet = ClauseSet()
+
     if params.perform_rel_filter:
         neg_conjs = cnf.getNegatedConjectures()
-        rel_graph = RelevanceGraph(cnf)
+        rel_graph = SetRelevanceGraph(cnf)
         rel_cnf = rel_graph.get_rel_neighbourhood(neg_conjs, params.relevance_distance)
     state = ProofState(
         params,
@@ -200,9 +226,10 @@ def try_rel_distance(
     )
     res = state.saturate()
 
-    gave_up = res == None and params.perform_rel_filter and len(rel_cnf) != len(cnf)
-    print(f"Ending {p_name}")
-    return_dict[p_name] = (d, res, gave_up)
+    # gave_up = res == None and params.perform_rel_filter and len(rel_cnf) != len(cnf)
+    szs_status = get_szs_status(problem, params, rel_cnf, cnf, state, res)
+    print((d, True, szs_status))
+    return_dict[p.name] = (d, True, szs_status)
 
 
 def main(from_external=False, external_opts=[], external_args=[]):
@@ -245,10 +272,27 @@ def main(from_external=False, external_opts=[], external_args=[]):
         except getopt.GetoptError as err:
             print(sys.argv[0], ":", err)
             sys.exit(1)
-    params = processOptions(external_opts if from_external else opts)
+    # args = [
+    #     file for file in
+    #     (external_args if from_external else args)
+    #     if is_pyres_solvable(file)
+    # ]
+    print(
+        [
+            file
+            for file in (external_args if from_external else args)
+            if is_pyres_solvable(file)
+        ]
+    )
+    opts = external_args if from_external else opts
+    params = processOptions(opts)
+
+    # if(len(args)==0):
+    #     print("% SZS status Inappropriate")
+    #     return
 
     problem = FOFSpec()
-    for file in external_args if from_external else args:
+    for file in args:
         problem.parse(file)
 
     if not suppressEqAxioms:
@@ -256,73 +300,38 @@ def main(from_external=False, external_opts=[], external_args=[]):
     cnf = problem.clausify()
 
     params.perform_rel_filter = True
+    mp.set_start_method("spawn")
     manager = mp.Manager()
     return_dict = manager.dict()
-    processes: list[mp.Process] = []
     tried_rel_distances = []
 
-    for i in range(1, len(cnf.clauses)):
+    SINGLE_RUN_TIMEOUT = 6
+    for i in range(1, len(cnf.clauses) + 1):
         p = mp.Process(
             target=try_rel_distance,
             name=f"rel_dist_{i}",
-            args=(i, cnf, params, return_dict),
+            args=(i, cnf, problem, params, return_dict),
         )
         p.start()
-        processes.append(p)
-        tried_rel_distances.append(i)
+        start = time.time()
 
-    TIMEOUT = 60
-    start = time.time()
-    while time.time() - start <= TIMEOUT:
-        if not any([p.is_alive() for p in processes]):
-            break
-        time.sleep(.1)
-    else:
-        for p in processes:
+        while (time.time() - start <= SINGLE_RUN_TIMEOUT) and p.exitcode is None:
+            time.sleep(0.1)
+        else:
             p.terminate()
             p.join()
 
-    print(return_dict)
+        tried_rel_distances.append(i)
+        last_return_state = (
+            return_dict.values()[-1][-1] if len(return_dict.values()) > 0 else None
+        )
+        if last_return_state == "SZS status Unsatisfiable":
+            break
 
-    #     if not gave_up:
-    #         final_rel_distance = i
-    #         break
-    #     else:
-    #         print(f"Gave up with rel_distance = {i}")
+    return_list = list(sorted(return_dict.values(), key=lambda item: item[0]))
+    print(return_list)
 
-    # # todo: test alternate path findings properly into statistics and output
-    # if res != None:
-    #     if problem.isFof and problem.hasConj:
-    #         print("% SZS status Theorem")
-    #     else:
-    #         print("% SZS status Unsatisfiable")
-    #     if proofObject:
-    #         proof = res.orderedDerivation()
-    #         enableDerivationOutput()
-    #         print("% SZS output start CNFRefutation")
-    #         for s in proof:
-    #             print(s)
-    #         print("% SZS output end CNFRefutation")
-    #         disableDerivationOutput()
-    # else:
-    #     if params.perform_rel_filter and len(rel_cnf) != len(cnf):
-    #         print("%\n% SZS status GaveUp")
-    #     elif problem.isFof and problem.hasConj:
-    #         print("% SZS status CounterSatisfiable")
-    #     else:
-    #         print("% SZS status Satisfiable")
-    #     if proofObject:
-    #         dummy = Derivable(
-    #             "dummy", flatDerivation("pseudoreference", state.processed.clauses)
-    #         )
-    #         sat = dummy.orderedDerivation()
-    #         enableDerivationOutput()
-    #         print("% SZS output start Saturation")
-    #         for s in sat[:-1]:
-    #             print(s)
-    #         print("% SZS output end Saturation")
-    #         disableDerivationOutput()
-    # print(state.statisticsStr())
+    print(f"% {return_list[-1][-1]}" if len(return_list) > 0 else None)
 
     # We use the resources interface to get and print the CPU time
     resources = getrusage(RUSAGE_SELF)

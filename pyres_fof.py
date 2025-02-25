@@ -89,6 +89,7 @@ Email: schulz@eprover.org
 """
 
 import sys
+import time
 from resource import RLIMIT_STACK, setrlimit, getrlimit
 import getopt
 from signal import signal, SIGXCPU
@@ -225,12 +226,17 @@ def main(from_notebook=False, notebook_opts=[], notebook_args=[]):
     if not suppressEqAxioms:
         problem.addEqAxioms()
     cnf = problem.clausify()
-
     rel_cnf: ClauseSet = ClauseSet()
     if params.perform_rel_filter:
+        print(f"# rel_distance: {params.relevance_distance}")
         neg_conjs = cnf.getNegatedConjectures()
+        start = time.process_time()
         rel_graph = SetRelevanceGraph(cnf)
+        graph_constructed = time.process_time()
         rel_cnf = rel_graph.get_rel_neighbourhood(neg_conjs, params.relevance_distance)
+        neighbourhood_computed = time.process_time()
+        print(f"# graph_construction_time: {graph_constructed - start}")
+        print(f"# neighbourhood_computation_time: {neighbourhood_computed - graph_constructed}")
     state = ProofState(
         params,
         rel_cnf if params.perform_rel_filter else cnf,
