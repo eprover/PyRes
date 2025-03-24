@@ -75,9 +75,10 @@ class SetRelevanceGraph(RelevanceGraph):
 
     def clauses_to_nodes(self, clauses: ClauseSet):
         allNodes = self.get_all_nodes()
-        nodesOfClauseSubset = filter(
-            lambda node: node.clause in clauses.clauses, allNodes
-        )
+        nodesOfClauseSubset = [
+            node for node in allNodes
+            if node.clause in clauses.clauses
+        ]
         return nodesOfClauseSubset
 
     @staticmethod
@@ -86,9 +87,10 @@ class SetRelevanceGraph(RelevanceGraph):
 
     def get_neighbours(self, subset):
         neighbouring_nodes = []
-        neighbouring_edges = filter(
-            lambda edge: self.edge_neighb_of_subset(edge, subset), self.edges
-        )
+        neighbouring_edges = [
+            edge for edge in self.edges
+            if self.edge_neighb_of_subset(edge, subset)
+        ]
 
         for edge in neighbouring_edges:
             if edge.node1.clause in subset:
@@ -168,7 +170,7 @@ class SetRelevanceGraph(RelevanceGraph):
             if current_edge_type == "between-clause":
                 output += f"\n\t{edge.node1.__repr__()} --- {edge.node2.__repr__()}"
 
-        node_strings = list(map(lambda node: node.__repr__(), nodes_sorted))
+        node_strings = [f"{node}", for node in nodes_sorted]
 
         for index, string in enumerate(node_strings):
             output = output.replace(string, str(index))
