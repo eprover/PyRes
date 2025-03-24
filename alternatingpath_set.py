@@ -14,7 +14,6 @@ class Node:
     def __repr__(self) -> str:
         return f"<{self.clause.name},{self.literal},{self.direction}>"
 
-
 class Edge:
     def __init__(self, node1: Node, node2: Node) -> None:
         self.node1: Node = node1
