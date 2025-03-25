@@ -70,15 +70,15 @@ class SetRelevanceGraph(RelevanceGraph):
         clauses = ClauseSet()
         for node in nodes:
             clauses.addClause(node.clause)
-        clauses.clauses = list(set(clauses.clauses))
+        clauses.clauses = set(clauses.clauses)
         return clauses
 
     def clauses_to_nodes(self, clauses: ClauseSet):
         allNodes = self.get_all_nodes()
-        nodesOfClauseSubset = [
+        nodesOfClauseSubset = {
             node for node in allNodes
             if node.clause in clauses.clauses
-        ]
+        }
         return nodesOfClauseSubset
 
     @staticmethod
@@ -86,25 +86,25 @@ class SetRelevanceGraph(RelevanceGraph):
         return (edge.node1 in subset) != (edge.node2 in subset)
 
     def get_neighbours(self, subset):
-        neighbouring_nodes = []
-        neighbouring_edges = [
+        neighbouring_nodes = set()
+        neighbouring_edges = {
             edge for edge in self.edges
             if self.edge_neighb_of_subset(edge, subset)
-        ]
+        }
 
         for edge in neighbouring_edges:
             if edge.node1.clause in subset:
-                neighbouring_nodes.append(object=edge.node2)
+                neighbouring_nodes.add(edge.node2)
             else:
-                neighbouring_nodes.append(edge.node1)
+                neighbouring_nodes.add(edge.node1)
         return neighbouring_nodes
 
     def get_rel_neighbourhood(self, from_clauses: ClauseSet, distance: int):
 
-        neighbourhood = list(self.clauses_to_nodes(from_clauses))
+        neighbourhood = self.clauses_to_nodes(from_clauses)
         for _ in range(2 * distance - 1):
             new_neighbours = self.get_neighbours(neighbourhood)
-            neighbourhood += new_neighbours
+            neighbourhood |= new_neighbours
 
         clauses = self.nodes_to_clauses(neighbourhood)
         return clauses
@@ -170,7 +170,8 @@ class SetRelevanceGraph(RelevanceGraph):
             if current_edge_type == "between-clause":
                 output += f"\n\t{edge.node1.__repr__()} --- {edge.node2.__repr__()}"
 
-        node_strings = [f"{node}", for node in nodes_sorted]
+        node_strings = [f"{node}" for node in nodes_sorted]
+
 
         for index, string in enumerate(node_strings):
             output = output.replace(string, str(index))
