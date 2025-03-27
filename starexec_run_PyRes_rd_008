@@ -6,21 +6,21 @@
 # upload it to a StarExec cluster - then follow local instructions
 # ;-).
 #
-
+source /etc/profile.d/modules.csh
+setenv MODULEPATH /starexec/sw/modulefiles/Linux:/starexec/sw/modulefiles/Core:/starexec/sw/lmod/lmod/modulefiles/Core
+module load python/3.13.0
+python --version
+which python3.13.0
 echo -n "% Problem    : " ; head -2 $1 | tail -1 | sed -e "s/.*  : //"
 set ProblemSPC=`grep " SPC " $1 | sed -e "s/.* : //"`
 set default_flags="-tifbsVp -nlargest -HPickGiven5"
+set rel_flags="-r 008"
 set final=" "$1
-set ecmd="python3 ./pyres_fof.py $default_flags $final"
+set ecmd="python3 ./pyres_fof.py $default_flags $rel_flags $final"
 python3 --version
 if ( `expr "$ProblemSPC" : "FOF.*"` || `expr "$ProblemSPC" : "CNF.*"` ) then
 	echo "% Command    : " $ecmd
-	/home/starexec/bin/GetComputerInfo -p THIS Model CPUModel RAMPerCPU OS | \
-        sed -e "s/Computer     /% Computer   /" \
-            -e "s/Model        /% Model      /" \
-            -e "s/CPUModel     /% CPU        /" \
-            -e "s/RAMPerCPU    /% Memory     /" \
-            -e "s/OS           /% OS         /"
+	/home/starexec/bin/GetComputerInfo -p THIS Model CPUModel RAMPerCPU OS |         sed -e "s/Computer     /% Computer   /"             -e "s/Model        /% Model      /"             -e "s/CPUModel     /% CPU        /"             -e "s/RAMPerCPU    /% Memory     /"             -e "s/OS           /% OS         /"
 	echo -n "% CPULimit   : " ; echo "$STAREXEC_CPU_LIMIT"
 	echo -n "% DateTime   : " ; date
 	echo "% CPUTime    : "
@@ -28,3 +28,4 @@ if ( `expr "$ProblemSPC" : "FOF.*"` || `expr "$ProblemSPC" : "CNF.*"` ) then
 else
     echo "% SZS status Inappropriate"
 endif
+    
