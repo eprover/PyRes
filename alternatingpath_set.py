@@ -93,7 +93,7 @@ class SetRelevanceGraph(RelevanceGraph):
         }
 
         for edge in neighbouring_edges:
-            if edge.node1.clause in subset:
+            if edge.node1 in subset:
                 neighbouring_nodes.add(edge.node2)
             else:
                 neighbouring_nodes.add(edge.node1)
