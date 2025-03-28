@@ -82,10 +82,10 @@ class SetRelevanceGraph(RelevanceGraph):
         return nodesOfClauseSubset
 
     @staticmethod
-    def edge_neighb_of_subset(edge: Edge, subset):
+    def edge_neighb_of_subset(edge: Edge, subset: set[Node]):
         return (edge.node1 in subset) != (edge.node2 in subset)
 
-    def get_neighbours(self, subset):
+    def get_neighbours(self, subset: set[Node]):
         neighbouring_nodes = set()
         neighbouring_edges = {
             edge for edge in self.edges
