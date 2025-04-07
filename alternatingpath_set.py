@@ -109,7 +109,7 @@ class SetRelevanceGraph(RelevanceGraph):
         clauses = self.nodes_to_clauses(neighbourhood)
         return clauses
 
-    def to_mermaid(self) -> str:
+    def to_mermaid(self, path: str) -> str:
         output: str = "flowchart TD"
 
         node_groups = defaultdict(list)
@@ -142,7 +142,6 @@ class SetRelevanceGraph(RelevanceGraph):
         for index, _ in enumerate(self.in_nodes):
             output += f"\n\t{2*index} ~~~ {2*index+1}"
 
-        # edgesSorted = sorted(list(self.edges), key=lambda edge: (edge.node1.clause.name.casefold(), edge.node1.literal.__repr__().casefold(), edge.node1.direction.casefold()))
         edges_sorted = sorted(
             list(self.edges),
             key=lambda edge: (
@@ -175,4 +174,6 @@ class SetRelevanceGraph(RelevanceGraph):
 
         for index, string in enumerate(node_strings):
             output = output.replace(string, str(index))
-        return output
+
+        with open(path, "w") as f:
+            f.write(output)

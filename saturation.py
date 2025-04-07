@@ -65,7 +65,8 @@ class SearchParams(object):
                  backward_subsumption = False,
                  literal_selection    = None,
                  perform_rel_filter = None,
-                 relevance_distance = None
+                 relevance_distance = None,
+                 graph_output_file = None,
                  ):
         """
         Initialize heuristic parameters.
@@ -100,6 +101,7 @@ class SearchParams(object):
         """
         self.perform_rel_filter = perform_rel_filter
         self.relevance_distance = relevance_distance
+        self.graph_output_file = graph_output_file
         # TODO: add doc
 
 

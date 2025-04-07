@@ -145,6 +145,8 @@ def processOptions(opts):
         elif opt == "-r" or opt == "--relevance-distance":
             params.relevance_distance = int(optarg)
             params.perform_rel_filter = True
+        elif opt == "-g" or opt == "--graph-output-file":
+            params.graph_output_file = optarg
         elif opt == "-H" or opt == "--given-clause-heuristic":
             try:
                 params.heuristics = GivenClauseHeuristics[optarg]
@@ -198,7 +200,7 @@ def main(from_notebook=False, notebook_opts=[], notebook_args=[]):
         try:
             opts, args = getopt.gnu_getopt(
                 sys.argv[1:],
-                "hsVpitfbH:n:Sr:",
+                "hsVpitfbH:n:Sr:g:",
                 [
                     "help",
                     "silent",
@@ -212,6 +214,7 @@ def main(from_notebook=False, notebook_opts=[], notebook_args=[]):
                     "neg-lit-selection=",
                     "supress-eq-axioms",
                     "relevance-distance=",
+                    "graph-output-file=",
                 ],
             )
         except getopt.GetoptError as err:
@@ -237,6 +240,9 @@ def main(from_notebook=False, notebook_opts=[], notebook_args=[]):
         neighbourhood_computed = time.process_time()
         print(f"# graph_construction_time: {graph_constructed - start}")
         print(f"# neighbourhood_computation_time: {neighbourhood_computed - graph_constructed}")
+        if params.graph_output_file:
+            rel_graph.to_mermaid(params.graph_output_file)
+
     state = ProofState(
         params,
         rel_cnf if params.perform_rel_filter else cnf,
