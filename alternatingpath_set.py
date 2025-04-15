@@ -67,11 +67,7 @@ class SetRelevanceGraph(RelevanceGraph):
 
     @staticmethod
     def nodes_to_clauses(nodes):
-        clauses = ClauseSet()
-        for node in nodes:
-            clauses.addClause(node.clause)
-        clauses.clauses = set(clauses.clauses)
-        return clauses
+        return ClauseSet({node.clause for node in nodes})
 
     def clauses_to_nodes(self, clauses: ClauseSet):
         allNodes = self.get_all_nodes()
@@ -86,17 +82,14 @@ class SetRelevanceGraph(RelevanceGraph):
         return (edge.node1 in subset) != (edge.node2 in subset)
 
     def get_neighbours(self, subset: set[Node]):
-        neighbouring_nodes = set()
         neighbouring_edges = {
             edge for edge in self.edges
             if self.edge_neighb_of_subset(edge, subset)
         }
-
-        for edge in neighbouring_edges:
-            if edge.node1 in subset:
-                neighbouring_nodes.add(edge.node2)
-            else:
-                neighbouring_nodes.add(edge.node1)
+        neighbouring_nodes = {
+            edge.node2 if edge.node1 in subset else edge.node1
+            for edge in neighbouring_edges
+        }
         return neighbouring_nodes
 
     def get_rel_neighbourhood(self, from_clauses: ClauseSet, distance: int):
