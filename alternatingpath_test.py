@@ -1,6 +1,6 @@
 import unittest
 from alternatingpath_set import SetRelevanceGraph
-from alternatingpath_bfs import AdjacencyRelevanceGraph
+from alternatingpath_adjacency_set import AdjacencySetRelevanceGraph
 from fofspec import FOFSpec
 
 
@@ -20,7 +20,8 @@ def compute_neighbourhood(apt_class, problem_path, rel_distance):
     rel_cnf = rel_graph.get_rel_neighbourhood(neg_conjs, rel_distance)
     return rel_cnf
 
-apt_classes = [SetRelevanceGraph, AdjacencyRelevanceGraph]
+
+apt_classes = [SetRelevanceGraph, AdjacencySetRelevanceGraph]
 
 testproblems = [
     ("EXAMPLES/PUZ002-1.p", 0, 1),
@@ -39,18 +40,22 @@ testproblems = [
     ("EXAMPLES/PUZ002-1.p", 13, 12),
 ]
 
+
 class TestClass(unittest.TestCase):
 
     def test_rel_cnf_size(self):
         """Test, wether the size of the output ClauseSet is right for a given graph_class, problem and rel_distance"""
+        print()
         for problem_path, rel_distance, expected in testproblems:
             for apt_class in apt_classes:
                 msg = f"Testing '{apt_class.__name__}' on '{problem_path}' with rel_distance {rel_distance}"
+                print(msg)
                 with self.subTest(msg=msg):
                     rel_cnf_size = len(
                         compute_neighbourhood(apt_class, problem_path, rel_distance)
                     )
                     self.assertEqual(rel_cnf_size, expected)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
