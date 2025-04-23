@@ -90,6 +90,7 @@ Email: schulz@eprover.org
 
 import sys
 import time
+import os
 from resource import RLIMIT_STACK, setrlimit, getrlimit
 import getopt
 from signal import signal, SIGXCPU
@@ -228,7 +229,7 @@ def main(from_notebook=False, notebook_opts=[], notebook_args=[]):
 
     problem = FOFSpec()
     for file in notebook_args if from_notebook else args:
-        problem.parse(file)
+        problem.parse(source=file, refdir=(os.environ["TPTP"] if from_notebook else None))
 
     if not suppressEqAxioms:
         problem.addEqAxioms()
