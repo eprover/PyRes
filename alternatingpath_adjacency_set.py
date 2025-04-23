@@ -73,7 +73,6 @@ class AdjacencySetRelevanceGraph(RelevanceGraph):
         neighbouring_nodes = {
             neighbour for node in subset for neighbour in node.neighbours
         }
-        print(neighbouring_nodes)
         return neighbouring_nodes
 
     def get_rel_neighbourhood(self, from_clauses: ClauseSet, distance: int):

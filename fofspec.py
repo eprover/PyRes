@@ -68,7 +68,7 @@ def tptpLexer(source, refdir):
         if tptp:
             name = os.path.join(tptp, source)
             fp = open(name, "r")
-            lex = Lexer(fp.read()), name
+            lex = Lexer(fp.read(), name)
             fp.close()
             refdir = os.path.dirname(name)
         else:
