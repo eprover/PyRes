@@ -109,7 +109,7 @@ from fofspec import FOFSpec
 from heuristics import GivenClauseHeuristics
 from saturation import SearchParams, ProofState
 from litselection import LiteralSelectors
-from alternatingpath_set import SetRelevanceGraph
+from alternatingpath_universal_set import UniversalSetRelevanceGraph
 from alternatingpath_adjacency_set import AdjacencySetRelevanceGraph
 
 suppressEqAxioms = False
@@ -229,7 +229,9 @@ def main(from_notebook=False, notebook_opts=[], notebook_args=[]):
 
     problem = FOFSpec()
     for file in notebook_args if from_notebook else args:
-        problem.parse(source=file, refdir=(os.environ["TPTP"] if from_notebook else None))
+        problem.parse(
+            source=file, refdir=(os.environ["TPTP"] if from_notebook else None)
+        )
 
     if not suppressEqAxioms:
         problem.addEqAxioms()

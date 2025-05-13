@@ -5,6 +5,7 @@ from unification import mgu
 from collections import defaultdict
 from alternatingpath_abstract import RelevanceGraph
 
+
 class Node:
     def __init__(self, literal: Literal, clause: Clause, direction) -> None:
         self.literal: Literal = literal
@@ -13,6 +14,7 @@ class Node:
 
     def __repr__(self) -> str:
         return f"<{self.clause.name},{self.literal},{self.direction}>"
+
 
 class Edge:
     def __init__(self, node1: Node, node2: Node) -> None:
@@ -23,7 +25,7 @@ class Edge:
         return f"Edge: {self.node1} - {self.node2}"
 
 
-class SetRelevanceGraph(RelevanceGraph):
+class UniversalSetRelevanceGraph(RelevanceGraph):
 
     def construct_graph(self, clause_set: ClauseSet) -> None:
         self.out_nodes, self.in_nodes = self.construct_nodes(clause_set)
@@ -72,8 +74,7 @@ class SetRelevanceGraph(RelevanceGraph):
     def clauses_to_nodes(self, clauses: ClauseSet):
         allNodes = self.get_all_nodes()
         nodesOfClauseSubset = {
-            node for node in allNodes
-            if node.clause in clauses.clauses
+            node for node in allNodes if node.clause in clauses.clauses
         }
         return nodesOfClauseSubset
 
@@ -83,8 +84,7 @@ class SetRelevanceGraph(RelevanceGraph):
 
     def get_neighbours(self, subset: set[Node]):
         neighbouring_edges = {
-            edge for edge in self.edges
-            if self.edge_neighb_of_subset(edge, subset)
+            edge for edge in self.edges if self.edge_neighb_of_subset(edge, subset)
         }
         neighbouring_nodes = {
             edge.node2 if edge.node1 in subset else edge.node1
@@ -163,7 +163,6 @@ class SetRelevanceGraph(RelevanceGraph):
                 output += f"\n\t{edge.node1.__repr__()} --- {edge.node2.__repr__()}"
 
         node_strings = [f"{node}" for node in nodes_sorted]
-
 
         for index, string in enumerate(node_strings):
             output = output.replace(string, str(index))

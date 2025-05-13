@@ -1,5 +1,5 @@
 import unittest
-from alternatingpath_set import SetRelevanceGraph
+from alternatingpath_universal_set import UniversalSetRelevanceGraph
 from alternatingpath_adjacency_set import AdjacencySetRelevanceGraph
 from fofspec import FOFSpec
 
@@ -21,7 +21,7 @@ def compute_neighbourhood(apt_class, problem_path, rel_distance):
     return rel_cnf
 
 
-apt_classes = [SetRelevanceGraph, AdjacencySetRelevanceGraph]
+apt_classes = [UniversalSetRelevanceGraph, AdjacencySetRelevanceGraph]
 
 testproblems = [
     ("EXAMPLES/PUZ002-1.p", 0, 1),
