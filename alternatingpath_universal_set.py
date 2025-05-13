@@ -47,21 +47,22 @@ class UniversalSetRelevanceGraph(RelevanceGraph):
         in_clause_edges = set()
         for in_node in self.in_nodes:
             for out_node in self.out_nodes:
-                if (
-                    in_node.clause == out_node.clause
-                    and in_node.literal != out_node.literal
-                ):
-                    in_clause_edges.add(Edge(in_node, out_node))
+                if in_node.clause != out_node.clause:
+                    continue
+                if in_node.literal == out_node.literal:
+                    continue
+                in_clause_edges.add(Edge(in_node, out_node))
         return in_clause_edges
 
     def construct_betweenclause_edges(self):
         between_clause_edges = set()
         for out_node in self.out_nodes:
             for in_node in self.in_nodes:
-                different_signs = out_node.literal.negative != in_node.literal.negative
-                mguExists = mgu(out_node.literal.atom, in_node.literal.atom) != None
-                if mguExists and different_signs:
-                    between_clause_edges.add(Edge(out_node, in_node))
+                if out_node.literal.negative == in_node.literal.negative:
+                    continue
+                if mgu(out_node.literal.atom, in_node.literal.atom) == None:
+                    continue
+                between_clause_edges.add(Edge(out_node, in_node))
         return between_clause_edges
 
     def get_all_nodes(self):
@@ -84,8 +85,10 @@ class UniversalSetRelevanceGraph(RelevanceGraph):
 
     def get_neighbours(self, subset: set[Node]):
         neighbouring_edges = {
-            edge for edge in self.edges if self.edge_neighb_of_subset(edge, subset)
+            edge for edge in self.edges
+            if self.edge_neighb_of_subset(edge, subset)
         }
+        self.edges -= neighbouring_edges
         neighbouring_nodes = {
             edge.node2 if edge.node1 in subset else edge.node1
             for edge in neighbouring_edges
