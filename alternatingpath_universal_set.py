@@ -7,13 +7,12 @@ from alternatingpath_abstract import RelevanceGraph
 
 
 class Node:
-    def __init__(self, literal: Literal, clause: Clause, direction) -> None:
+    def __init__(self, literal: Literal, clause: Clause) -> None:
         self.literal: Literal = literal
         self.clause: Clause = clause
-        self.direction = direction
 
     def __repr__(self) -> str:
-        return f"<{self.clause.name},{self.literal},{self.direction}>"
+        return f"<{self.clause.name},{self.literal}>"
 
 
 class Edge:
@@ -39,8 +38,8 @@ class UniversalSetRelevanceGraph(RelevanceGraph):
         in_nodes = set()
         for clause in clause_set.clauses:
             for literal in clause.literals:
-                out_nodes.add(Node(literal, clause, "out"))
-                in_nodes.add(Node(literal, clause, "in"))
+                out_nodes.add(Node(literal, clause))
+                in_nodes.add(Node(literal, clause))
         return out_nodes, in_nodes
 
     def construct_inclause_edges(self):
